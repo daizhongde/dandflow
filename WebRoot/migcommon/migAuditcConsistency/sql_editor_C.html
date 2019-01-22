@@ -1,0 +1,38 @@
+<!doctype html>
+<title>CodeMirror: editor_C</title>
+<meta charset="utf-8"/>
+
+
+<article>
+<form>
+		<textarea id="code_C" name="code"></textarea>
+</form>
+<script>
+jQuery(document).ready(function(){
+
+	if( isNotNvl(add.SQLValue) ){
+		$("#code_C").val( add.SQLValue );
+	};
+
+  var mime = 'text/x-mariadb';
+  // get mime type
+  if (window.location.href.indexOf('mime=') > -1) {
+    mime = window.location.href.substr(window.location.href.indexOf('mime=') + 5);
+  }
+  add.editor = CodeMirror.fromTextArea(document.getElementById('code_C'), {
+    mode: mime,
+    indentWithTabs: true,
+    smartIndent: true,
+    lineNumbers: true,
+    matchBrackets : true,
+    autofocus: true,
+    extraKeys: {"Ctrl-Space": "autocomplete"},
+    hintOptions: {tables: {
+      users: {name: null, score: null, birthDate: null},
+      countries: {name: null, population: null, size: null}
+    }}
+  });
+  
+});
+</script>
+</article>

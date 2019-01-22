@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>亚信通迅录</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/icon.css"/>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+<style type="text/css">
+a {text-decoration:none;}
+</style>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/plugins/easyuiExtends.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+
+<script type="text/javascript">
+var noquery = VIRTUE.noquery;
+var query = VIRTUE.query;
+var imp = VIRTUE.imp;
+var exp = VIRTUE.exp;
+var OPE = VIRTUE.operator;
+
+function enterKeyDown(event)
+{
+    if(event.keyCode==13)
+    {
+    	submitForm();
+	}
+};
+
+/** format level **/
+function fmtEmail(email){
+	return "<a href='mailto:"+email+"'>"+email+"</a>";
+};
+
+/** validate and assign value **/
+function PackingParameter(){
+	var formData = $('#s_form').form( 'getData');
+	query.init();
+	for (var field in formData) {
+		if( formData[field] !== "" ){
+			if( field=="supervisor_id" || field == "organization_id" || field == "age"){
+				query.jdata.condition[field] = formData[field];
+				query.jdata.operator[field] = OPE.EQUAL;
+			}else{
+				query.jdata.condition[field] = formData[field];
+				query.jdata.operator[field] = OPE.CONTAIN;
+			}
+		}
+	}
+	exp.jdata.condition = query.jdata.condition;
+	exp.jdata.operator = query.jdata.operator;
+	return true;
+};
+
+/** search data ,reload data  **/
+function submitForm(){
+   	if(!PackingParameter()){
+   		return;
+   	}
+//  jdata = { act: 'query',condition: {'t1.nmlevel': [0,1,2,3]},operator : {'t1.nmlevel' : 13} };
+   	$('#grid').datagrid( 'reload', { jdata: encodeURI( $.toJSON( query.jdata ) ) } );
+};
+/**  清空  **/
+function clearForm(){
+	$('#s_form').form('clear');
+};
+/** export data, don't search   **/
+function exportData(){
+	if(!PackingParameter()){
+   		return;
+   	}
+    var form = document.createElement("form");
+    document.body.appendChild(form);
+    var i = document.createElement("input");
+    i.type = "hidden";
+    i.name = "jdata";
+    i.value = encodeURI($.toJSON( exp.jdata ) );
+    form.appendChild(i);
+    form.action = "../../exp/tAsiainfoEmployeeEXPmodule.action";
+    form.method = "post";
+    form.submit();
+};
+
+var read = {};
+read.jdata = { act: "read",condition: {nmid: ""},operator : {nmid:1} };
+function browseModule() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		$('#win').window('open').window('setTitle', '浏览模块');
+		read.jdata.condition.nmid = row.ID;
+		$('#win').window("refresh", "../../curd/tAsiainfoEmployeeCURDbrowse.action?jdata="+encodeURI($.toJSON( read.jdata )));
+	}
+};
+
+var toolbar = [{
+	text:'查看',
+	iconCls:'icon-search',
+	handler:function(){ browseModule(); }
+}];
+//program component
+$(function(){
+	$('#grid').datagrid({
+// 		title: '员工信息',
+		//iconCls:'icon-reload',
+// 		toolbar: toolbar,
+		width: 938,
+		height: 720,
+		nowrap: true,
+		striped: true,
+		fit: true,
+// 		collapsible: true,
+		url: "../../query/tAsiainfoEmployeeJEasyUIQUERYdfind.action",
+		idField: "person_id",
+		remoteSort: true,
+		sortName:"person_id",
+		sortOrder:"desc",
+		singleSelect: true,
+		frozenColumns: [[
+            {title:'员工ID',field:"person_id", width:60, sortable: true, hidden: true },
+		    {title:'姓名',field:"last_name", width:70, sortable: true },
+		    {title:'员工号',field:"employee_number", width:70, sortable: true }
+		]],
+		columns:[[
+			{title:'部门ID',field:"organization_id", width:70, sortable: true, hidden: true  },
+			{title:'部门',field:"org_name", width:210, sortable: true },
+		    {title:'公司ID',field:"company_id", width:70, sortable: true, hidden: true },
+		    {title:'公司',field:"company", width:120, sortable: true },
+		    {title:'战略单元ID',field:"sbu_id", width:70, sortable: true, hidden: true  },
+			{title:'战略单元',field:"sbu", width:120, sortable: true, hidden: true  },
+		    {title:'座机号',field:"office", width:70, sortable: true },
+		    {title:'手机号',field: "mobile", width: 90 },
+		    {title:'NT账号',field:"nt_account", width:80, sortable: true },
+		    {title:'E-Mail',field:"email_address", width:140, formatter: fmtEmail  },
+		    {title:'办公地点',field:"working_location", width:70, sortable: true },
+		    {title:'上级ID',field:"supervisor_id", width:60, sortable: true, hidden: true },
+		    {title:'上级（员工号）',field:"supervisor_name", width:100, sortable: true },
+		    {title:'电话黄页',field:"pager", width:120, sortable: true, hidden: true },
+		    {title:'年龄',field:"age", width:60, sortable: true, hidden: false },
+		    {title:'生日',field:"birth_date", width:80, sortable: true, hidden: false },
+		    {title:'学历',field:"highest_degree", width:200, sortable: true, hidden: false },
+		    {title:'合同ID',field:"assignment_id", width:60, sortable: true, hidden: true },
+		    {title:'雇佣日期',field:"hire_date", width:80, sortable: true, hidden: false }
+		]],
+		rownumbers:true,
+		pagination:true,
+		queryParams:{
+			jdata: encodeURI($.toJSON( noquery.jdata )) 
+		}
+	});
+
+});
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+    <div data-options="region:'north',border:true,split:true" style="height:145px;background:#B3DFDA;" title="亚信通迅录" >  
+    	<form id="s_form" method="post" style="margin:0;padding:0;">
+			<div style="padding:0px 0 0px 5px">
+				<table width="100%">
+                <tr>
+                    <td>SBU:</td>
+                    <td>
+                        <input class="easyui-combobox" 
+		                        id='sbu_id' name="sbu_id" value="" editable="false"
+		                        data-options="valueField:'id', textField:'text',url:'../../cbb/tAsiainfoEmployeeCBBgetENUMData_SBU.action',
+		                        method:'post',
+                        onChange: function(newValue, oldValue){
+                        	submitForm();
+                        }" 
+		                        style="width:150px;">
+                    </td>
+                    <td>公司:</td>
+                    <td>
+                        <input class="easyui-combobox" 
+		                        id='company_id' name="company_id" value="" editable="false"
+		                        data-options="valueField:'id', textField:'text',url:'../../cbb/tAsiainfoEmployeeCBBgetENUMData_Company.action',
+		                        method:'post',
+                        onChange: function(newValue, oldValue){
+                        	submitForm();
+                        }" 
+		                        style="width:150px;">
+                    </td>
+                    <td>部门:</td>
+                    <td>
+                        <input id="org_name" name="org_name" value="" style="width:140px;" onkeydown="enterKeyDown(event)">
+                    </td>
+                    <td>办公地点:</td>
+                    <td>
+                        <input id="working_location" name="working_location" value="" style="width:140px;" onkeydown="enterKeyDown(event)">
+                    </td>
+                </tr>
+                <tr>
+                    <td>姓名:</td>
+                    <td>
+                        <input id="last_name" name="last_name" value="" style="width:140px;" onkeydown="enterKeyDown(event)">
+                    </td>
+                    <td>座机号:</td>
+                    <td>
+                        <input id="office" name="office" value="" style="width:140px;" onkeydown="enterKeyDown(event)">
+                    </td>
+                    <td>手机号:</td>
+                    <td>
+                        <input id="mobile" name="mobile" value="" style="width:140px;" onkeydown="enterKeyDown(event)">
+                    </td>
+                    <td>上司:</td>
+                    <td>
+                        <input class="easyui-combotree" 
+		                        id='"supervisor_id"' name="supervisor_id" value="" editable="false"
+		                        data-options="valueField:'id', textField:'text',url:'../../tree/tAsiainfoEmployeeTREEquery_JEasyUI_CBT_Async.action',
+		                        method:'post',panelWidth:400,panelHeight: 350,
+                        onChange: function(newValue, oldValue){
+                        	submitForm();
+                        }" 
+		                        style="width:250px;">
+<!-- 		                        AuthorityUser  AsiainfoEmployee -->
+                    </td>
+                    
+                </tr>
+                <tr>
+                	<td>NT账号:</td>
+                    <td>
+                        <input id="nt_account" name="nt_account" value="" style="width:140px;" onkeydown="enterKeyDown(event)">
+                    </td>
+                    <td>员工号:</td>
+                    <td>
+                        <input id="employee_number" name="employee_number" value="" style="width:140px;" onkeydown="enterKeyDown(event)">
+                    </td>
+                    <td>年龄:</td>
+                    <td>
+                        <input id="age" name="age" value="" style="width:140px;" onkeydown="enterKeyDown(event)">
+                    </td>
+                   
+                    <td>部门（树）:</td>
+                    <td>
+                        <input class="easyui-combotree" 
+		                        id='organization_id' name="organization_id" value="" editable="false"
+		                        data-options="valueField:'id', textField:'text',url:'../../tree/tAuthorityInstTREEquery_JEasyUI_CBT_Async.action',
+		                        method:'post',panelWidth:400,panelHeight: 350,
+                        onChange: function(newValue, oldValue){
+                        	submitForm();
+                        }" 
+		                        style="width:250px;">
+                    </td>
+                </tr>
+            	</table>
+			</div>
+			
+			<table width="100%" border="0" align="center">
+			<tr bgcolor="#E2EEFE" valign="bottom">
+				<td height="23"><div align="center"><!-- default height='21'  -->
+					<input id='btnSearch' type='button' onclick='submitForm()' value='查 询'/>&nbsp;
+<!-- 					<input id='btnExpSimply' type='button' onclick="$('#EXPdlg').dialog('open')" value='导 出'/>&nbsp; -->
+<!-- 					<input id='btnExpWizard' type='button' onclick="$('#EXPdlg1').dialog('open')" value='导出向导'/>&nbsp; -->
+					<input type='button' onclick="clearForm()" value='清 空'/>
+				</div></td>
+			</tr>
+			</table>
+        </form>
+    </div>
+    <div data-options="region:'center',border:false" title="员工main" style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+</body>
+</html>

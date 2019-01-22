@@ -1,0 +1,200 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+    <meta charset="UTF-8">  
+    <title>批量文件主表-汇总报表</title>  
+    <link rel="stylesheet" type="text/css" href="../js/jquery-easyui-1.3.1/themes/default/easyui.css"/>
+	<link rel="stylesheet" type="text/css" href="../js/jquery-easyui-1.3.1/themes/icon.css"/>
+	<script type="text/javascript" src="../js/jquery-1.4.2.min.js" ></script> 
+	<script type="text/javascript" src="../js/jquery-easyui-1.3.1/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="../js/jquery-easyui-1.3.1/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript">
+var app = {};
+app.sqlWhere=" ";//发布后改为1=0
+app.values=new Array();//默认什么都不显示
+app.values2 = "";//防重复提交
+var flag = false;//验证结果
+
+getTwoChar=function(str){
+	str = new String(str);
+	if(str.length==1){
+		str="0"+str;
+	}
+	return str;
+}
+//日期格式转换 2012-11-05->20121105
+formatDate2S=function(s){
+	s = new String(s);
+	if(s != "" && s != "null"){
+		var Y=s.substr(0,4);
+		var M=s.substr(5,2);
+		var D=s.substr(8,2);
+		return Y+M+D;
+	}else{
+		return "";
+	}
+};
+getCurrentDate=function(){
+	var date = new Date();
+	var Y=date.getFullYear();
+	var M=date.getMonth()+1;
+	var D=date.getDate();
+	return Y+'-'+getTwoChar(M)+'-'+getTwoChar(D);
+};
+
+$(document).ready(function(){
+	$("#date1").datebox('setValue',getCurrentDate());
+	$("#date2").datebox('setValue',getCurrentDate());
+});
+
+//alert(getCurrentDate());
+//submit report request
+function submitForm(){
+	if(!checkForm()){
+   		return false;
+   	}
+   	//汇总报表没有限制
+//    	if(!checkLimit()){
+//    		return false;
+//    	}
+	var date1 = $('#date1').combo('getValue');
+	var date2 = $('#date2').combo('getValue');
+	var stepno1 = $('#cc').combobox('getValue');
+// 	date1=formatDate2S(date1);
+// 	date2=formatDate2S(date2);
+//	window.open ("fmainReport_A_iframe.jsp?date1="+date1+"&date2="+date2+"&stepno1="+stepno1, "批量制卡汇总报表A", "top=0, left=0, toolbar=yes, menubar=yes, scrollbars=yes, resizable=yes,location=yes, status=yes");
+    document.getElementById("report").src="fmainReport_A_iframe.jsp?date1="+date1+"&date2="+date2+"&stepno1="+stepno1;
+	return true;
+}
+function clearForm(){
+	$('#ff').form('clear');  
+}
+function checkForm(){
+	var date1 = $('#date1').combo('getValue');
+	var date2 = $('#date2').combo('getValue');
+	var stepno1 = $('#cc').combobox('getValue');
+	if(date1==""){
+		alert("请选择开始日期！");
+		return false;
+	}
+	if(date2==""){
+		alert("请选择截止日期！");
+		return false;
+	}
+	if(date1 != "" && date2 != "" && date1 > date2){
+		alert("截止日期必须大于开始日期！");
+		return false;
+	}
+	app.values = new Array();
+	app.sqlWhere="";
+	if(stepno1==""){
+		
+	}else if(stepno1==11){
+		app.sqlWhere += "and a.n_stepno1 in (2,3,4) ";
+	}else{
+		app.sqlWhere += "and a.n_stepno1= ? ";
+		app.values[app.values.length]=stepno1;
+	}
+	//app.sqlWhere+="and a.C_fMTIME between to_date('"+date1+" 00:00:01','YYYY-mm-dd HH24:MI:SS') and to_date('"+date2+" 23:59:59','YYYY-mm-dd HH24:MI:SS') ";
+	app.sqlWhere+="and a.C_fMTIME between to_date(?,'YYYY-mm-dd HH24:MI:SS') and to_date(?,'YYYY-mm-dd HH24:MI:SS') ";
+	app.values[app.values.length]=date1+" 00:00:01";
+	app.values[app.values.length]=date2+" 23:59:59";
+	app.values=app.values.join(",");
+	return true;
+}
+
+function checkLimit(){
+	if(app.values2 == app.values){
+		window.alert("禁止重复提交!");
+		return false;
+	}
+	//到这里checkLimit就有返回值了
+	$.ajax({
+	   type: "POST",
+	   url: "../json/fmainJsondfindTotal.action",
+	   data: {sqlWhere: app.sqlWhere,values: encodeURI(app.values)},
+	   async: false,//为了取函数返回值验证结果，这个是必须的
+	   success: function(msg){
+	     //alert( "Data got: " + msg );
+	     //alert("msg.total:"+msg.total);
+	     if(msg.total<=1000){
+	     	 //doReport();
+	     	 app.values2 = app.values;
+	     	 //alert("小于1千");
+	     	 flag= true;
+	     	 return true;
+	     }else if(msg.total>1000 && msg.total<=5000){
+	     	 var r=confirm("记录超过1千条！确认要生成报表吗？");
+			 if (r==true){
+			    //doReport();
+			    app.values2 = app.values;
+			    flag= true;
+			    return true;
+			 }
+	     }else if(msg.total>5000){
+	     	alert("记录超过5000条不能生成报表！请缩小查询范围！导出15万以下的数据可在<制卡情况查询>功能里导出！");
+	     	flag= false;
+	     	return false;
+	     }else{
+	     	alert("查询记录数失败！详情："+msg);
+	     	flag= false;
+	     	return false;
+	     }
+	   }
+	});
+	//alert(flag);
+	return flag;
+};
+//生成报表 
+// function doReport(){
+//  var date1 = $('#date1').combo('getValue');
+// 	var date2 = $('#date2').combo('getValue');
+// 	date1=formatDate2S(date1);
+// 	date2=formatDate2S(date2);
+// 	document.getElementById("report").src="fmainReport_iframe.jsp?date1="+date1+"&date2="+date2+"&stepno1="+stepno1;
+// 	return true;
+// }
+
+</script>
+</head>  
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+ <div data-options="region:'north',border:true,split:true" style="height:90px;background:#B3DFDA;" title="查询条件" >  
+        <div style="padding:0px 0 0px 15px;height:auto">  
+            <form id="ff" method="post">  
+	            <table>  
+	                <tr>
+	                    <td><div style="padding:0px 0 0px 0px">最后处理日期起:</div></td>
+	                    <td><input id ="date1" name ="date1" required class="easyui-datebox" ></input></td>
+	                    <td><div style="padding:0px 0 0px 15px">止:</div></td>  
+	                    <td><input id ="date2" name ="date2" required class="easyui-datebox" ></input></td>
+	                    <td><div style="padding:0px 0 0px 15px">处理情况:</div></td>
+	                    <td>
+	                        <select class="easyui-combobox" id="cc" name="stepno1" style="width:190px;">
+	                        	<option value="" selected="selected">--选择--</option>
+	                        	<option value="1">未解密(加密的社保报盘文件)</option>
+	                        	<option value="2">已解密(未转换)</option>
+		                        <option value="3">已转换(未下载)</option>
+		                        <option value="4">已下载(未上传回盘文件)</option>
+		                        <option value="11">已解密+已转换+已下载(未回盘)</option>
+		                        <option value="5">已上传(未转换)</option>
+		                        <option value="6">已转换(未加密)</option>
+		                        <option value="7">已加密(未发送)</option>
+		                        <option value="8">已发送(加密的社保回盘文件)</option>
+	                        </select>
+	                    </td>
+	        			<td>
+	                    	<div style="text-align:center;padding:0px 0 0px 15px">  
+					            <a href="#" class="easyui-linkbutton" iconCls="icon-search" onclick="submitForm()">生成报表</a>
+					            <a href="javascript:void(0)" class="easyui-linkbutton" onclick="clearForm()">重置</a>
+					        </div> 
+	        			</td>
+	                </tr>
+	            </table>
+	        </form>  
+        </div>
+    </div>
+    <div data-options="region:'center',border:true" title="report1" style="overflow:hidden;" noheader="true">
+		<iframe scrolling="yes" id = "report" name = "report" frameborder="0" src="blank2.html" style="width:100%;height:100%"></iframe>
+	</div>
+</body>  
+</html>  

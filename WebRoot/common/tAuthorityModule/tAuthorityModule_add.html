@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>添加模块 JDATA</title>
+<!-- 	<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.3.5/themes/default/easyui.css"/> -->
+<!-- 	<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.3.5/themes/icon.css"/> -->
+<!-- 	<script type="text/javascript" src="../../scripts/jquery-1.4.4.min.js" ></script> -->
+<!-- 	<script type="text/javascript" src="../../scripts/jquery-easyui/1.3.5/jquery.easyui.min.js"></script> -->
+<!-- 	<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script> -->
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+<div data-options="region:'center',border:false" title="模块main" style="overflow:hidden;" noheader="true">
+<!-- 	<div class="easyui-panel" title="New Topic" style="width:400px"> -->
+		<div style="padding:10px 0 10px 60px">
+	    <form id="add.form" method="post" action="">
+	    	<table align="center">
+	    		<tr>
+	    			<td>模块名称:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="cmname_C" name="pojo.CMname" data-options="required:true"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>模块路径:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="cmpath_C" name="pojo.CMpath" data-options="required:false"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>叶子节点:</td>
+	    			<td><select class="easyui-combobox" id="cmleaf_C" name="pojo.CMleaf" style="width:200px;">
+	    			<!-- <option value="">--选择--</option> --> 
+                        	<option value="true" selected="selected">是</option>
+                        	<option value="false">否</option>
+                        </select>
+                    </td>
+	    		</tr>
+	    		<tr>
+	    			<td>模块级别:</td>
+	    			<td><select class="easyui-combobox" id="nmlevel_C" name="pojo.NMlevel" style="width:200px;" data-options="required:true">
+	    					<option value="" selected="selected"></option>
+	    					<option value="0">零级模块</option>
+                        	<option value="1">一级模块</option>
+                        	<option value="2">二级模块</option>
+                        	<option value="3">三级模块</option>
+                        	<option value="4">四级模块</option>
+                        </select>
+                     </td>
+	    		</tr>
+	    		<tr>
+	    			<td>上级模块:</td>
+	    			<td>
+<!-- 	    			<select class="easyui-combobox" id="nmparent_C" name="pojo.NMparent" style="width:200px;" data-options="required:true"> -->
+<!--                         	<option value="1">湖南社保金融卡省内前置系统</option> -->
+<!--                         	<option value="2">系统管理</option> -->
+<!--                         	<option value="7">开户机构维护</option> -->
+<!--                         	<option value="9">卡商维护</option> -->
+<!--                         	<option value="12">系统参数管理</option> -->
+<!--                         </select> -->
+<!-- ../../common/getComboboxData_Parent_JEasyUICommontAuthorityModule.action -->
+<!-- valueField:'0',textField:'1',url:'get_data2.js' -->
+<!-- valueField:'id',textField:'text',url:'get_data2.js' -->
+<!-- 						<input id="nmparent_C" class="easyui-combobox" name="pojo.NMparent" style="width:200px;"  -->
+<!-- 						data-options="valueField:'ID',textField:'TEXT',url:'../../cbb/tAuthorityModuleCBBgetCBBData_Parent.action'"> -->
+                        <input class="easyui-combotree" 
+	                        id="nmparent_C" name="pojo.NMparent" 
+	                        data-options="url:'../../tree/tAuthorityModuleTREEquery_JEasyUI_CBT.action',method:'post',required:true" 
+	                        style="width:260px;">
+                    </td>
+	    		</tr>
+	    		
+	    		<tr>
+	    			<td>模块次序:</td>
+	    			<td><input class="easyui-numberbox" type="text" id="nmorder_C" name="pojo.NMorder"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>模块说明:</td>
+	    			<td><textarea id="cmnote_C" name="pojo.CMnote" style="height:60px;font-size: 12px;"></textarea></td>
+	    		</tr>
+	    	</table>
+	    </form>
+	    </div>
+	    <div style="text-align:center;padding:5px">
+	    	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="add.submitForm()">提交</a>
+	    	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="add.clearForm()">清空</a>
+	    </div>
+<!-- 	</div> -->
+<script type="text/javascript">
+var add = VIRTUE.add;
+
+add.submitForm = function (){
+	var cmname = $('#cmname_C').val();
+	var cmpath = $('#cmpath_C').val();
+	var cmleaf = $('#cmleaf_C').combobox('getValue');
+// 	var nmparent = $('#nmparent_C').combobox('getValue');
+	var nmparent = $('#nmparent_C').combotree('getValue');
+	var nmlevel = $('#nmlevel_C').combobox('getValue');
+	var nmorder = $('#nmorder_C').val();
+	var cmnote = $('#cmnote_C').val();
+	
+	add.init();
+	add.jdata.data.name = cmname;
+	add.jdata.data.path = cmpath;
+	add.jdata.data.leaf = cmleaf;
+	add.jdata.data.parent = nmparent;
+	add.jdata.data.level = nmlevel;
+	add.jdata.data.order = nmorder;
+	add.jdata.data.note = cmnote;
+	jQuery.post( "../../curd/tAuthorityModuleCURDadd.action", { jdata: encodeURI($.toJSON( add.jdata )) },
+	   function(oResponse, status){
+// 		alert(oResponse);
+// 		oResponse = eval("(" + oResponse + ")");
+		alert(oResponse.msg);
+// 		var data="";
+// 		try{
+// 			data= eval(oResponse);
+// 			data= eval("(" + oResponse.responseText + ")");
+// 		}catch(exception) {
+// 		    alert(exception);
+// 	    }
+		if(oResponse.success == true){
+// 			window.location.assign("../../DataTable/jeasyui/table_jeasyui.html");
+			$('#grid').datagrid('reload',{ jdata: encodeURI($.toJSON( query.jdata ) ) } );
+			$('#win').window('close');
+		}
+// 		     $('#grid').datagrid("options").pageNumber=app.pageNumber;
+// 			 $('#grid').datagrid("options").pageSize=app.pageSize;
+// 			 $('#grid').datagrid('reload',{sqlWhere:app.sqlWhere,values:encodeURI(app.values)});
+// 		     document.getElementById("mylayer").style.display="inline";
+// 		     var t=setTimeout("document.getElementById('mylayer').style.display='none'",1000);
+// 		     refreshCount("announce");
+	   });
+};
+add.clearForm = function (){
+	$('#add.form').form('clear');
+};
+</script>
+</div>
+</body>
+</html>

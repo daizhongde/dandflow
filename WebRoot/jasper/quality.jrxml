@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="quality" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="7c017579-786f-4b68-910d-05eae6ffcd71">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[SELECT STR_TO_DATE(SUBSTR(fares_serial,1,8),'%Y%m%d') fares_serial,item,SUM(amount) amount FROM(
+SELECT fares_serial,'source count' item,fares_src_count amount FROM tool.mig_auditf_main_result  UNION ALL
+SELECT fares_serial,'dst count' item,fares_dst_count amount FROM tool.mig_auditf_main_result  UNION ALL
+SELECT fares_serial,'pass count' item,fares_src_passcnt amount FROM tool.mig_auditf_main_result  UNION ALL
+SELECT fares_serial,'key pass count' item,fares_key_passcnt amount FROM tool.mig_auditf_main_result  UNION ALL
+SELECT fares_serial,'source count' item,fares_src_count amount FROM tool.mig_auditf_main_result_his UNION ALL
+SELECT fares_serial,'dst count' item,fares_dst_count amount FROM tool.mig_auditf_main_result_his  UNION ALL
+SELECT fares_serial,'pass count' item,fares_src_passcnt amount FROM tool.mig_auditf_main_result_his  UNION ALL
+SELECT fares_serial,'key pass count' item,fares_key_passcnt amount FROM tool.mig_auditf_main_result_his) a
+GROUP BY fares_serial,item]]>
+	</queryString>
+	<field name="fares_serial" class="java.sql.Date"/>
+	<field name="item" class="java.lang.String"/>
+	<field name="amount" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<columnFooter>
+		<band height="484" splitType="Stretch">
+			<barChart>
+				<chart>
+					<reportElement isPrintRepeatedValues="false" mode="Opaque" x="0" y="3" width="777" height="448" uuid="0af9cd85-74ee-4829-a0fe-16c71bb11378"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA[$F{item}]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{fares_serial}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{amount}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+		</band>
+	</columnFooter>
+</jasperReport>

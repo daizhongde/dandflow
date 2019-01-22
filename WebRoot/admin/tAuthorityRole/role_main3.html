@@ -1,0 +1,613 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>角色管理-带按钮权限(使用rmrel表的实现)</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="keywords" content="jquery,ui,easy,easyui,web">
+	<meta name="description" content="easyui help you build your web page easily!">
+
+	<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/icon.css">
+
+	<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+	<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/plugins/easyuiExtends.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+
+<style type="text/css">
+<!--
+body {
+    background-color: #C3E3FF;
+}
+#mylayer {
+  position: absolute;
+/*   left: 5px; */
+/*   top: 30px; */
+	right: 5px;
+	bottom: 5px;
+}
+	-->
+</style>
+<script type="text/javascript">
+var newNodeCount = 0;
+var appendFlag = 0;
+
+var noquery = VIRTUE.noquery;
+var query = VIRTUE.query;
+var OPE = VIRTUE.operator;
+
+//for test
+// query.jdata.condition.rid = 0;
+// query.jdata.operator.rid = OPE.EQUAL;
+// query.jdata.condition.mid = 0;
+// query.jdata.operator.mid = OPE.EQUAL;
+// var jdata = encodeURI( $.toJSON( query.jdata ) )
+
+/** 此函数目前不有用 */
+fmtCheckbox = function(value,row, index ){
+	if(value=='Y'){
+		return "<input type='checkbox' checked='true' name='checkbtn' />";
+	}else{
+		return "<input type='checkbox' name='checkbtn' />";
+	}
+};
+
+/** update right view panel  **/
+function updateView( node ){
+	
+	if(node.attributes.level==1){
+		jQuery('#nrid').val( "" );
+		jQuery('#crno').val( "" );
+		jQuery('#crname').val( "" );
+		jQuery('#nrlevel').combobox( 'setValue',  "" );
+		jQuery('#crnote').val( "" ); 
+		
+	 	var mt = $('#mt');
+	 	var mt_root = mt.tree( 'find', 1 );
+	 	mt.tree('reload', mt_root.target );
+		return;
+	}else{
+		jQuery('#nrid').val( node.id );
+		jQuery('#crno').val( node.attributes.no );
+		jQuery('#crname').val( node.text );
+		jQuery('#nrlevel').combobox( 'setValue', node.attributes.rlevel );
+//	 	document.getElementById("cmleaf").value= node.attributes.leaf;
+
+		jQuery('#crnote').val( node.attributes.note ); 
+//	 	$('#mt').attr("data-options","url:'../../tree/tAuthorityModuleTREEquery_JEasyUI_CheckBoxTree.action?roleId="+node.id+"',method:'get',animate:true,checkbox:true,onlyLeafCheck : true"); 
+//	 	data-options="url:'../../tree/tAuthorityModuleTREEquery_JEasyUI_CheckBoxTree.action',method:'get',animate:true,checkbox:true,onlyLeafCheck : true"
+	}
+				
+	//由于tree没有reload(url)方法，所以这里对原来的combotree做了覆盖
+	$('#mt').tree({
+		url : "../../tree/tAuthorityModuleTREEquery_JEasyUI_CheckBoxTree.action?roleId="+node.id,
+		method:'post',
+		animate : true,
+		checkbox : true,
+		onlyLeafCheck : true
+	});
+	$('#dg').datagrid( 'reload', { jdata: encodeURI( $.toJSON( noquery.jdata ) ) } );
+};
+
+/** update tree node's role no.  **/
+function onChangeCRno( o ){
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	if( node != null ){
+		node.attributes.url = o.value;
+// 		alert('url change excuted!');
+		VIRTUE.update.init();
+		VIRTUE.update.jdata.data.no = o.value;
+		VIRTUE.update.jdata.condition.id = node.id; 
+		VIRTUE.update.jdata.operator.id = VIRTUE.operator.EQUAL;//default,this line can comment
+		updateModel( VIRTUE.update.jdata );
+	}
+};
+
+/** update tree node's text  **/
+function onChangeCRname( o ){
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	if( node != null && node.attributes.level != 1 ){
+		node.text = o.value;
+// 		alert('name change excuted!');
+		t.tree('update', {
+			target: node.target,
+			text: o.value
+		});
+		//t.tree('reload');
+		VIRTUE.update.init();
+		VIRTUE.update.jdata.data.name = o.value;
+		VIRTUE.update.jdata.condition.id = node.id; 
+		VIRTUE.update.jdata.operator.id = VIRTUE.operator.EQUAL;//default,this line can comment
+		updateModel( VIRTUE.update.jdata );
+	}
+};
+
+
+/** update tree node's note  **/
+function onChangeCRnote( o ){
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	if( node != null && node.attributes.level != 1  ){
+		node.attributes.note = o.value;
+// 		alert('note change excuted!');
+		VIRTUE.update.init();
+		VIRTUE.update.jdata.data.note = o.value;
+		VIRTUE.update.jdata.condition.id = node.id; 
+		VIRTUE.update.jdata.operator.id = VIRTUE.operator.EQUAL;//default,this line can comment
+		updateModel( VIRTUE.update.jdata );
+	}
+};
+</script>
+</head>
+<body class="easyui-layout">
+<!-- mt module tree   disabled : true,  disabled="disabled"   center style="padding:10px 0 0 0;"  -->
+	<div data-options="region:'south',split:false" title="按钮权限" style="height:120px;background-color: rgb(228, 235, 241)">
+		<table id="dg" class="easyui-datagrid"
+			data-options="singleSelect:true,
+			fit : true, onClickCell: onClickCell, onEndEdit: onEndEditCheckbox,
+			url:'../../query/tAuthorityRmrelationJEasyUIQUERYdfind.action',method:'get',
+			queryParams:{jdata: encodeURI( $.toJSON( noquery.jdata ) ) }">
+		  <thead>
+			<tr>
+				<th data-options="field:'n_rid',width: 60,hidden: false">角色ID</th>
+				<th data-options="field:'n_mid',width:60,hidden: false">模块ID</th>
+				<th data-options="field:'create_btn',width: 60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">新增</th>
+				<th data-options="field:'update_btn',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">修改</th>
+				<th data-options="field:'update_btn1',width:60, align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">修改(only mine)</th>
+				<th data-options="field:'read_btn',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">查看</th>
+				<th data-options="field:'delete_btn',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">删除</th>
+				<th data-options="field:'delete_btn1',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">删除(only mine)</th>
+				<th data-options="field:'delete_btn2',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">删除(all mine)</th>
+				<th data-options="field:'import_btn',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">导入</th>
+				<th data-options="field:'import_wizardbtn',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">导入向导</th>
+				<th data-options="field:'search_btn',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">查询</th>
+				<th data-options="field:'export_btn',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">导出</th>
+				<th data-options="field:'export_wizardbtn',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">导出向导</th>
+				<th data-options="field:'print_btn',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">打印</th>
+				<th data-options="field:'print_previewbtn',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">打印预览</th>
+				<th data-options="field:'btn15',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">按钮15</th>
+				<th data-options="field:'btn16',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">按钮16</th>
+				<th data-options="field:'btn17',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">按钮17</th>
+				<th data-options="field:'btn18',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">按钮18</th>
+				<th data-options="field:'btn19',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">按钮19</th>
+				<th data-options="field:'btn20',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">按钮20</th>
+				<th data-options="field:'btn21',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">按钮21</th>
+				<th data-options="field:'btn22',width:60,align:'center',editor:{type:'checkbox',options:{on:'Y',off:'N'}}">按钮22</th>
+			</tr>
+		  </thead>
+		</table>
+	</div>
+	
+	<div data-options="region:'center'" style="background-color: rgb(228, 235, 241)" title="角色信息" >
+		<!-- 信息已保存 -->
+		<div id="mylayer" style="display: none;background-color: #FFFFCC" ><font size="4" color="green">信息已保存!</font></div>
+	
+	    <table width="100%">
+    		<tr>
+    			<td>角色ID:</td>
+    			<td><input type="text" id="nrid" name="pojo.NRid" data-options="required: true" 
+    				style="width:100px;" disabled="disabled"></input>
+				</td>
+    			<td>角色编号:</td>
+    			<td><input type="text" id="crno" name="pojo.CRno" data-options="required: true" 
+    				onchange="onChangeCRno(this)" style="width:100px;" disabled="disabled"></input>
+				</td>
+			</tr>   		
+    		<tr>
+    			<td>角色名称:</td>
+    			<td><input class="easyui-validatebox" type="text" id="crname" name="pojo.CRname" data-options="required: true" 
+    					onchange="onChangeCRname(this)" style="width:300px;"></input>
+				</td>
+    			<td>角色级别:</td>
+    			<td><input class="easyui-combobox"
+                        id="nrlevel" name="nrlevel"
+						data-options="url:'../../cbb/tAuthorityLevelCBBgetCBBData_IdAndName.action',
+						method : 'post',
+						disabled : true,
+						valueField : 'id',textField : 'text'" 
+                        style="width : 100px;">
+                </td>
+    		</tr>   		
+    		<tr>
+    			<td>角色说明:</td>
+    			<td colspan="3"><textarea id="crnote" name="pojo.CRnote" style="width:500px; height:50px; font-size: 12px;" onchange="onChangeCRnote(this)"></textarea></td>
+    		</tr>
+    	</table>
+	</div>
+	<div data-options="region:'east',border:true,split:true" style="width:400px;padding:10px;" title="模块挂接情况" >
+		<ul id="mt" class="easyui-tree" data-options="url:'../../tree/tAuthorityModuleTREEquery_JEasyUI_CheckBoxTree_ExceptDev.action',
+			method:'get',
+			mode: 'remote',
+			lines: true,
+			animate : true,
+			checkbox : true,
+			onlyLeafCheck : true,
+			onCheck: function(node, checked){
+				var t = $('#tt');
+				var roleNode = t.tree('getSelected');
+				if(roleNode){
+					//$('#mt').tree('select', node.target);//这个移到了授权和取消授权的回调函数中
+				
+					if(checked)
+					{
+						VIRTUE.add.init();
+						VIRTUE.add.jdata.data.rid = roleNode.id;
+						VIRTUE.add.jdata.data.mid = node.id;
+						grantModule( VIRTUE.add.jdata, node, roleNode );
+					}
+					else
+					{
+						VIRTUE.del.init();
+						VIRTUE.del.jdata.condition.rid = roleNode.id;
+						VIRTUE.del.jdata.condition.mid = node.id; 
+						//VIRTUE.del.jdata.operator.id = VIRTUE.operator.EQUAL;//default =
+						//VIRTUE.del.jdata.operator.id = VIRTUE.operator.EQUAL;
+						revokeModule(VIRTUE.del.jdata, node, roleNode );
+					}
+				}
+				else
+				{
+					alert('请选择角色！');
+				}
+			},
+			onSelect: onSelectModule"></ul>
+	</div>
+	<!-- serverJsonData.json  ../../tree/tAuthorityModuleTREEquery_JEasyUI_Tree.action -->
+	<div data-options="region:'west',border: true,split:true" title="角色按级分类树" style="padding:10px 0 0 0;width:200px;" noheader="false">
+		<ul id="tt" class="easyui-tree" data-options="url:'../../tree/tAuthorityRoleTREEquery_JEasyUI_Tree_ExceptDev.action',
+				method : 'post', 
+				mode: 'remote',
+				dnd : false, 
+				lines: true,
+				animate : true, 
+				revert:true,
+				onContextMenu: function(e,node){
+					e.preventDefault();
+					$(this).tree('select',node.target);
+					$('#mm').menu('show',{
+						left: e.pageX,
+						top: e.pageY
+					});
+				},
+				onExpand: function(node){
+					if(appendFlag==1){
+						append_F();
+						appendFlag=0;
+					}
+				},
+				onClick: updateView"
+		></ul>
+	</div>
+	<div id="mm" class="easyui-menu" style="width:120px;">
+		<div onclick="append()" data-options="iconCls:'icon-add'">添加</div>
+		<div onclick="removeit()" data-options="iconCls:'icon-remove'">删除</div>
+		<div class="menu-sep"></div>
+		<div onclick="expand()">展开</div>
+		<div onclick="collapse()">折叠</div>
+		<div class="menu-sep"></div>
+		<div onclick="expandAll()">全部展开</div>
+		<div onclick="collapseAll()">全部折叠</div>
+	</div>
+<script type="text/javascript">
+/** add a module event hander */
+function append() {
+	newNodeCount ++;
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	if(node.state=="closed")//deal with asyc node
+	{
+		appendFlag = 1;
+		t.tree('expand', node.target);
+	}
+	else
+	{
+		append_F();
+	}
+};
+/** add a module,append a node finally */
+function append_F() {
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+
+	if( node.attributes.level == 2  ){
+		alert("请在角色类别下面添加角色!");
+		return;
+	}
+	
+	var newNode = {
+		id: 'newNode' + newNodeCount,
+		text : '新建角色' + newNodeCount,
+		state: 'open',
+		attributes :{
+			leaf: 'true',
+			parent: node.id,
+			no: "",
+			level: node.attributes.level + 1,//2
+			rlevel : node.attributes.rlevel,
+			note: ""
+		}
+	};
+	
+	t.tree('append', {
+		parent : (node ? node.target : null),
+		data : [ newNode ]
+	} );
+	
+// 	find a node and then select it
+	var newNode1 = t.tree( 'find', 'newNode'+newNodeCount );
+	
+	VIRTUE.add.init();
+	VIRTUE.add.jdata.data.name = newNode1.text;
+// 	VIRTUE.add.jdata.data.path = newNode1.attributes.url;
+// 	VIRTUE.add.jdata.data.leaf = newNode1.attributes.leaf;
+// 	VIRTUE.add.jdata.data.parent = newNode1.attributes.parent;
+	VIRTUE.add.jdata.data.level = newNode1.attributes.rlevel;
+// 	VIRTUE.add.jdata.data.order = newNode1.attributes.order;
+	VIRTUE.add.jdata.data.note = newNode1.attributes.note;
+	
+	createModel( VIRTUE.add.jdata, newNode1 );
+}
+ /**
+  * del a module:
+  	1:cud.jdata.del.rows.push(1);
+  */
+function removeit() {
+	var node = $('#tt').tree('getSelected');
+	if( node.attributes.level == 1  ){
+		alert("不能删除角色类别!");
+		return;
+	}
+	
+	VIRTUE.del.init();
+	VIRTUE.del.jdata.condition.id = node.id; 
+	VIRTUE.del.jdata.operator.id = VIRTUE.operator.EQUAL;//default,this line can comment
+	destroyModel( VIRTUE.del.jdata, node );
+	$('#tt').tree('remove', node.target);
+}
+function collapse() {
+	var node = $('#tt').tree('getSelected');
+	$('#tt').tree('collapse', node.target);
+}
+function expand() {
+	var node = $('#tt').tree('getSelected');
+	$('#tt').tree('expand', node.target);
+};
+function collapseAll() {
+	$('#tt').tree('collapseAll');
+}
+function expandAll() {
+	$('#tt').tree('expandAll');
+}
+/** create db model 
+ *
+ @param jdata for sqlassembel
+ @param id new node's id
+ */
+function createModel( jdata, newNode1 ){
+	var t = $('#tt');
+// 	var newNode1 = t.tree( 'find', id );
+	
+	jQuery.post("../../curd/tAuthorityRoleCURDaddRetId.action", {
+		jdata : encodeURI( jQuery.toJSON( jdata ) )
+	}, function(oResponse, status) {
+// 		oResponse = eval("(" + oResponse + ")");
+// 		alert(oResponse.msg);
+		if (oResponse.success == true) {
+			var rno = new String("00"+oResponse.id);
+			rno = rno.substring(rno.length-3);
+			
+			t.tree('update', {
+	 			target: newNode1.target,
+	 			id: oResponse.id,
+	 			state: 'open',
+	 			attributes:{
+	 				leaf: 'true',
+	 				no: rno,
+	 				level: newNode1.attributes.level,//2,
+	 				rlevel: newNode1.attributes.rlevel
+	 			}
+	 		});
+			
+			var newNode = t.tree( 'find', oResponse.id );
+		 	t.tree('select', newNode.target);
+		 	t.tree('scrollTo',newNode.target);
+		 	updateView( newNode );
+		}else{
+			alert(oResponse.msg);
+// 			t.tree( 'remove', newNode1.target );
+			t.tree( 'reload' );
+		}
+	});
+};
+
+/** update db model **/
+function updateModel( jdata, node ){
+	jQuery.post("../../curd/tAuthorityRoleCURDmodify.action", {
+		jdata : encodeURI( jQuery.toJSON( jdata ) )
+	}, function(oResponse, status) {
+		var t = jQuery('#tt');
+// 		oResponse = eval("(" + oResponse + ")");
+// 		alert(oResponse.msg);
+		if (oResponse.success == true) {
+			//弹出一个层一秒钟后消失
+		    document.getElementById("mylayer").style.display="inline";
+		    var t=setTimeout("document.getElementById('mylayer').style.display='none'",1000);
+		}else if (oResponse.success == false) {
+			alert(oResponse.msg);
+			t.tree( 'reload' );
+		}
+	});
+};
+
+/** delete db model 
+ *@param jdata for sqlassembel
+  @param node to judge whether delete node is last node
+ */
+function destroyModel( jdata, mNode, roleNode ){
+// 	t.tree( 'getData', node.target ).children.length
+
+	/** there two post request, You can use a delete request do all back process, but it with Low efficiency  **/
+	jQuery.post("../../curd/tAuthorityRoleCURDdelete.action", {
+// 		id : node.id,
+		jdata : encodeURI( jQuery.toJSON( jdata ) )
+	}, function(oResponse, status) {
+		var t = $('#tt');
+// 		oResponse = eval("(" + oResponse + ")");
+// 		alert(oResponse.msg);
+		if (oResponse.success == true) {
+// 			var parent = t.tree( 'getParent', node.target );
+// 			var children = t.tree( 'getData', parent.target ).children;
+// 			var order = node.attributes.order;
+// 			t.tree( 'reload' );//for node icon
+		}else{
+			alert(oResponse.msg);
+			t.tree( 'reload' );
+		}
+	});
+};
+
+/** grant module to special role
+*
+@param jdata for sqlassembel
+@param mNode check's module node
+@param roleNode select's roleNode
+*/
+function grantModule( jdata, mNode, roleNode ){
+	var t = $('#mt');
+	
+	jQuery.post("../../curd/tAuthorityRmrelationCURDaddWithId.action", {
+		jdata : encodeURI( jQuery.toJSON( jdata ) )
+	}, function(oResponse, status) {
+//		oResponse = eval("(" + oResponse + ")");
+//		alert(oResponse.msg);
+		if (oResponse.success == true) {
+
+		}else{
+			alert(oResponse.msg);
+			t.tree( 'reload' );
+		}
+		t.tree('select', mNode.target);
+	});
+};
+
+/** revoke module from special role
+*@param jdata for sqlassembel
+ @param mNode uncheck's module node
+*/
+function revokeModule( jdata, mNode, roleNode ){
+//	t.tree( 'getData', node.target ).children.length
+
+	/** there two post request, You can use a delete request do all back process, but it with Low efficiency  **/
+	jQuery.post("../../curd/tAuthorityRmrelationCURDdelete.action", {
+//		id : node.id,
+		jdata : encodeURI( jQuery.toJSON( jdata ) )
+	}, function(oResponse, status) {
+		var t = $('#mt');
+//		oResponse = eval("(" + oResponse + ")");
+//		alert(oResponse.msg);
+		if (oResponse.success == true) {
+			
+		}else{
+			alert(oResponse.msg);
+			t.tree( 'reload' );
+		}
+		t.tree('select', mNode.target);
+	});
+};
+/** grant button to special role
+*
+@param jdata for sqlassembel
+@param mNode check's module node
+@param roleNode select's roleNode
+*/
+function grantButton( jdata, mNode, roleNode ){
+	var t = $('#mt');
+	
+	jQuery.post("../../curd/tAuthorityRmrelationCURDmodify.action", {
+		jdata : encodeURI( jQuery.toJSON( jdata ) )
+	}, function(oResponse, status) {
+//		oResponse = eval("(" + oResponse + ")");
+//		alert(oResponse.msg);
+		if (oResponse.success == true) {
+
+		}else{
+			alert(oResponse.msg);
+			t.tree( 'reload' );
+		}
+	});
+};
+/** node 模块树被选定的节点  */
+function onSelectModule(node){
+	var t = $('#tt');
+	var roleNode = t.tree('getSelected');
+	if(roleNode){
+		console.log($.toJSON(node))
+           //目前没有被check也刷新table
+// 		if(node.checked){//刷新south relation table, 而且规定只有这里才能触发south table refresh
+			query.jdata.condition.rid = roleNode.id;
+			query.jdata.condition.mid = node.id;
+			$('#dg').datagrid( 'reload', { jdata: encodeURI( $.toJSON( query.jdata ) ) } );
+// 		}
+// 		else{//这里可以更新模块角色关系表相应行的20个按钮字段为N(目前看来没有这个必要性)
+// 		}
+	}
+	else{
+		alert('请选择角色！');
+	}
+};
+
+var editIndex = undefined;
+function endEditing(){
+	if (editIndex == undefined){return true}
+	if ($('#dg').datagrid('validateRow', editIndex)){
+		$('#dg').datagrid('endEdit', editIndex);
+		editIndex = undefined;
+		return true;
+	} else {
+		return false;
+	}
+};
+function onClickCell(index, field){
+	if (endEditing()){
+		$('#dg').datagrid('selectRow', index)
+				.datagrid('editCell', {index:index,field:field});
+		editIndex = index;
+	}
+};
+/** 增加判断： role节点有被选定， 且module节点也有被选定  */
+function onEndEditCheckbox(index,row,changes){
+	var t = $('#tt');
+	var roleNode = t.tree('getSelected');
+	var mt = $('#mt');
+	var mNode = $('#mt').tree('getSelected');
+
+// 	console.log($.toJSON(changes));
+	var i = count(changes);
+// 	var i= 0;
+// 	for(var f in changes){i++};
+// 	i=count(changes);
+	if(i==0){
+		return;
+	}
+	if( roleNode && mNode ){
+		for(var f in changes){
+			
+			VIRTUE.update.init();
+			VIRTUE.update.jdata.condition.rid = row.n_rid;
+			VIRTUE.update.jdata.condition.mid = row.n_mid;
+			VIRTUE.update.jdata.data[f] = changes[f];
+			
+			grantButton(VIRTUE.update.jdata, mNode, roleNode );
+// 			grantButton(VIRTUE.update.jdata);
+		};
+	}
+};
+</script>
+</body>
+</html>

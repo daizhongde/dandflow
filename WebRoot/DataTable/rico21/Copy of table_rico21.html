@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>数据表格 by rico21<</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link href="/rico21/examples/client/css/demo.css" type="text/css" rel="stylesheet" />
+<script src="/rico21/src/prototype.js" type="text/javascript"></script>
+<script src="/rico21/src/rico.js" type="text/javascript"></script>
+<script type="text/javascript" src="../../tree/tAuthorityModuleTREEquery_GubuSoft_TreeJS.action"></script>
+<script type='text/javascript'>
+var grid, buffer;
+Rico.loadModule('LiveGridAjax','LiveGridMenu','greenHdg.css');
+
+buffer=new Rico.Buffer.AjaxJSON("../../tree/tAuthorityModuleTREEquery_GubuSoft_Tree.action");
+
+
+Rico.onLoad( function() {
+  var opts = {  
+    frozenColumns : 1,
+    useUnformattedColWidth: false,
+    columnSpecs  : [{width:200}]
+  };
+  buffer=new Rico.Buffer.AjaxJSON(jsonUrl,options);
+  grid=new Rico.LiveGrid ('jsgrid', buffer, opts);
+  grid.menu=new Rico.GridMenu();
+});
+
+</script>
+
+<style type="text/css">
+
+</style>
+</head>
+
+<body>
+<p><div id='tree1' class='ricoTree'></div>
+</body>
+</html>

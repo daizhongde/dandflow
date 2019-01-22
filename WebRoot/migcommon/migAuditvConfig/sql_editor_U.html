@@ -1,0 +1,44 @@
+<!doctype html>
+<title>CodeMirror: editor_U</title>
+<meta charset="utf-8"/>
+
+<article>
+<form>
+		<textarea id="code_U" name="code"></textarea>
+</form>
+<script>
+jQuery(document).ready(function(){
+
+	if( isNotNvl(update.SQLValue) ){
+		$("#code_U").val( update.SQLValue );
+	};
+
+  var mime = 'text/x-mariadb';
+  // get mime type
+  if (window.location.href.indexOf('mime=') > -1) {
+    mime = window.location.href.substr(window.location.href.indexOf('mime=') + 5);
+  }
+  update.editor = CodeMirror.fromTextArea(document.getElementById('code_U'), {
+    mode: mime,
+    indentWithTabs: true,
+    smartIndent: true,
+    lineNumbers: true,
+    matchBrackets : true,
+    autofocus: true,
+    extraKeys: {"Ctrl-Space": "autocomplete",
+    	"F11": function(cm) {
+            cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+          },
+        "Esc": function(cm) {
+          if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+        }
+    },
+    hintOptions: {tables: {
+      users: {name: null, score: null, birthDate: null},
+      countries: {name: null, population: null, size: null}
+    }}
+  });
+  
+});
+</script>
+</article>

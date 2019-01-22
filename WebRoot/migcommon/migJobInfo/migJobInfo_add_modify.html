@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>作业设置</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+</head>
+<body>
+	<div class="easyui-layout" fit="true">
+	<form id="modifyJob_form" method="post" style="margin:0;padding:0;">
+		<div data-options="region:'north'" style="height:50px">
+			<table id="ujobTable0" width="100%" cellpadding="2">
+				<tr>
+					<td style='width:130px'>作业名称</td>
+					<td><input id="ujobName" class="easyui-validatebox"
+						data-options="required: true" type="text" name="dnodeName"
+						style='width:90%;' value="" /></td>
+				</tr>
+			</table>
+		</div>
+		<div data-options="region:'center',border:false" title=""
+			style="overflow:hidden" noheader="true">
+			<div class="easyui-tabs" fit="true" >
+				<div title="Job specification" style="padding:10px">
+					<table id="ujobTable1" width="100%" cellpadding="2">
+						<tr>
+							<td style='width:120px'>作业备注</td>
+							<td><textarea id="ujobRemark" rows="5" style='width:90%;'
+									name="dnodeRemark"></textarea></td>
+						</tr>
+					</table>
+				</div>
+				<div title="参数" style="padding:10px">
+					<table id="jobparam_grid"></table>
+				</div>
+			</div>
+		</div>
+	</form>
+	</div>
+<script type="text/javascript">
+jQuery(document).ready(function() {
+	$("#modifyJob_form").form("load", job);
+});
+
+/** 作业参数信息工具栏信息 */
+app.jobparam_toolbar = [ {
+	text : '新增',
+	disabled: false,
+	iconCls : 'icon-add',
+	handler : function() {
+		jobparam_append();
+		return false;
+	}
+}, '-', {
+	text : '删除',
+	disabled: false,
+	iconCls : 'icon-remove',
+	handler : function() {
+		jobparam_removeit();
+		return false;
+	}
+} , '-', {
+	text : '保存',
+	disabled: false,
+	iconCls : 'icon-save',
+	handler : function() {
+		jobparam_accept();
+		return false;
+	}
+}, '-', {
+	text : '撤销',
+	disabled: false,
+	iconCls : 'icon-undo',
+	handler : function() {
+		jobparam_reject();
+		return false;
+	}
+}];
+app.jobparaloaded=false;
+// 作业参数-表格
+$('#jobparam_grid').datagrid({
+	title : '',
+	toolbar : app.jobparam_toolbar,
+	width : 938,
+	height : 720,
+	nowrap : true,
+	striped : true,
+	fit : true,
+	collapsible : true,
+// 	url: getContextPath()+"/query/migJobParaJEasyUIQUERYdfind.action",
+	idField : "nodeId",
+	multiSort : true,
+	singleSelect : true,
+	onClickCell : jobparam_onClickRow,
+	onLoadSuccess: function(){
+		app.jobparaloaded=true;
+		if( job.paras.length != 0 ){//还没有设置过任务参数
+			for(var i=0; i < job.paras.length; i++ ){
+				$('#jobparam_grid').datagrid('insertRow',{
+					index: i,	// index start with 0
+					row: job.paras[i]
+				});
+			}
+		}
+	},
+	columns : [ [ 
+		{ title : '节点ID', field : 'nodeId', hidden: true }, 
+		{ title : '参数', field : 'para', editor : { type : 'text'}, width : 90 }, 
+		{ title : '参数值', field : 'paraValue', editor : { type : 'text'}, width : 90 }, 
+		{ title : '参数类型', field : 'paraType', editor : { type : 'text'}, width : 90 }, 
+		{ title : '参数中文名', field : 'paraName', editor : { type : 'text'}, width : 90 } 
+	] ],
+	pagination : false,
+	rownumbers : false,
+	queryParams : {
+		jdata : encodeURI($.toJSON({ act: VIRTUE.act.NOQUERY, condition: {nodeId: "" }, operator : {} })),
+	}
+});
+		
+/** 作业参数表格编辑 */
+var jobparam_editIndex = undefined;
+function jobparam_endEditing() {
+	if (jobparam_editIndex == undefined) 
+	{
+		return true
+	}
+	if ($('#jobparam_grid').datagrid('validateRow', jobparam_editIndex)) 
+	{
+		$('#jobparam_grid').datagrid('endEdit', jobparam_editIndex);
+		jobparam_editIndex = undefined;
+		return true;
+	}
+	else 
+	{
+		return false;
+	}
+};
+function jobparam_onClickRow(index) {
+	if (jobparam_editIndex != index) {
+		if (jobparam_endEditing()) {
+			$('#jobparam_grid').datagrid('selectRow', index).datagrid('beginEdit', index);
+			jobparam_editIndex = index;
+		} else {
+			$('#jobparam_grid').datagrid('selectRow', jobparam_editIndex);
+		}
+	}
+};
+
+function jobparam_append() {
+	if (jobparam_endEditing()) {
+		$('#jobparam_grid').datagrid('appendRow', { nodeId: "" });
+		jobparam_editIndex = $('#jobparam_grid').datagrid('getRows').length - 1;
+		$('#jobparam_grid').datagrid('selectRow', jobparam_editIndex).datagrid('beginEdit',
+				jobparam_editIndex);
+	}
+};
+function jobparam_removeit() {
+	if (jobparam_editIndex == undefined) {return}
+	$('#jobparam_grid').datagrid('cancelEdit', jobparam_editIndex).datagrid('deleteRow', jobparam_editIndex)
+	jobparam_editIndex = undefined;
+};
+function jobparam_accept() {
+	if (jobparam_endEditing()) {
+		$('#jobparam_grid').datagrid('acceptChanges');
+	}
+};
+function jobparam_reject() {
+	$('#jobparam_grid').datagrid('rejectChanges');
+	jobparam_editIndex = undefined;
+};
+
+</script>
+</body>
+</html>

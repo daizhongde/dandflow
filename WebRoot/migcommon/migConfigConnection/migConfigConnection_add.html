@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>新建</title>
+</head>
+<body>
+<div class="easyui-layout" data-options="fit:true">
+	<div data-options="region:'center',border:false" title="" noheader="true">
+		<div style="padding:10px 0 10px 10px">
+		    <form id="c_form" method="post" action="" style="margin:0;padding:0;">
+		    	<table align="center">
+		    		<tr>
+		    			<td>Name:</td>
+		    			<td><input class="easyui-validatebox" type="text" id="name_C" name="name" data-options="required:true" style="width:300px"></input></td>
+		    		</tr>
+		    		<tr>
+		    			<td>Connection URL:</td>
+		    			<td>
+		    				<input class="easyui-validatebox" type="text" id="url_C" name="url" data-options="required:true" 
+		    				onclick="add.open_dialog_url()" style="width:300px"></input>
+	    					<input type='button' value='Config' onclick="add.open_dialog_url()"/>
+		    			</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Connection Description:</td>
+		    			<td><textarea id="remark_C" name="remark" style="height:60px;width:300px;font-size: 12px;"></textarea></td>
+		    		</tr>
+		    	</table>
+		    </form>
+		</div>
+    </div>
+<script type="text/javascript">
+var add = VIRTUE.add;
+
+add.submitForm = function (){
+	if( ! $('#c_form').form("validate")  )
+	{
+		return;
+	}
+	if($('#c_form #remark_C').val() == ""){
+		alert("Connection Description is required！");
+		return;
+	}
+	var formData = $('#c_form').form( 'getData');
+	add.init();
+	for (var field in formData) {
+		add.jdata.data[field] = formData[field];
+	}
+
+	jQuery.post( getContextPath()+"/curd/commonCURDaddWithId.action", 
+		{
+			tableName : tableName,
+			jdata : encodeURI($.toJSON( add.jdata )) 
+		},
+		function(oResponse, status){
+			alert(oResponse.msg);
+
+			if(oResponse.success == true){
+				$('#grid').datagrid('reload',{
+					tableName : tableName,
+					jdata: encodeURI($.toJSON( query.jdata ) ) 
+				} );
+				$('#win').window('close');
+			}
+	});
+};
+add.clearForm = function (){
+	$('#c_form').form('clear');
+};
+add.open_dialog_url = function(){
+	var url = $('#url_C').val();	
+	if( url != '' ){
+		var temp = url.split(/\|/);
+		if(temp.length==6){
+			$('#dbtype_C').combobox("setValue", temp[0] );
+			$('#ip_C').textbox("setValue", temp[1]);
+			$('#username_C').textbox("setValue", temp[2]);
+			$('#password_C').textbox("setValue", temp[3]);
+			$('#instance_C').textbox("setValue", temp[4]);
+			$('#port_C').textbox("setValue", temp[5]);
+		}
+	}
+	$('#dlg-url_C').dialog('open');
+};
+</script>
+	<div data-options="region:'south',border:false" style="text-align:right;padding:5px 5px 5px 0;background:#F4F4F4;">
+		<a class="easyui-linkbutton" data-options="iconCls:'icon-ok'" href="javascript:void(0)" onclick="javascript:add.submitForm()" style="width:80px">Submit</a>
+		<a class="easyui-linkbutton" data-options="iconCls:'icon-cancel'" href="javascript:void(0)" onclick="javascript:$('#win').dialog('close');" style="width:80px">Cancel</a>
+	</div>
+	
+	<!-- 目标数据库连接串   ########################### -->
+	<div id="dlg-url_C" class="easyui-dialog"
+		title="DB Connection URL Config" style="width:550px;height:180px;"
+			data-options="
+				modal:true,closed:true,
+				iconCls: 'icon-edit',
+				buttons: [{
+					text:'Ok',
+					iconCls:'icon-ok',
+					handler:function(){
+						if( ! $('#form-migdstconn').form('validate') )
+						{
+							return;
+						}
+						var migdstconn = '';
+						var formData = $('#form-migdstconn').form( 'getData');
+						migdstconn = formData['dbtype']+'|'+formData['ip']+'|'+formData['username']+'|'
+							+formData['password']+'|'+formData['instance']+'|'+formData['port'];
+						$('#url_C').val( migdstconn );
+						$('#dlg-url_C').dialog('close');
+					}
+				},{
+					text:'Cancel',
+					handler:function(){
+						$('#dlg-url_C').dialog('close');
+					}
+				}]
+			">
+		<form id="form-migdstconn" method="post" action="" style="margin:0;padding:0;">
+	    	<table align="center" width="100%" border="1">
+				<tr>
+	    			<td>DB Type:</td>
+	    			<td colspan='1'>
+	    				<input class='easyui-combobox' id="dbtype_C"  name='dbtype' data-options="valueField:'code',textField:'value', 
+							editable:false,url:'../../cbb/dicCBBgetDic2ByType.action?dicType=db-type',method:'post',required:true"/>
+	    			</td>
+	    			<td>Port:</td>
+	    			<td>
+	    				<input class="easyui-textbox" type="text" id="port_C" name="port" data-options="required:true,value:'3306'"></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>IP:</td>
+	    			<td>
+	    				<input class="easyui-textbox" type="text" id="ip_C" name="ip" data-options="required:true"></input>
+	    			</td>
+	    			<td>Instance:</td>
+	    			<td>
+	    				<input class="easyui-textbox" type="text" id="instance_C" name="instance" data-options="required:true"></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Username:</td>
+	    			<td>
+	    				<input class="easyui-textbox" type="text" id="username_C" name="username" data-options="required:true"></input>
+	    			</td>
+	    			<td>Password:</td>
+	    			<td>
+	    				<input class="easyui-textbox" type="text" id="password_C" name="password" data-options="required:true"></input>
+	    			</td>
+	    		</tr>
+	    	</table>			
+	    </form>
+	</div>
+</div>
+</body>
+</html>

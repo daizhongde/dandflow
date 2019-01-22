@@ -1,0 +1,132 @@
+<html>
+<head>
+<title>菜单树 ext-3.4.1</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!-- <link rel="stylesheet" type="text/css" href="/ext-3.4.1/resources/css/ext-all.css" /> -->
+<style type="text/css">
+.x-tree-node {
+font-size:13px;
+}
+.x-tree-node-el{
+line-height:20px;
+}
+</style>
+<!-- <script type="text/javascript" src="/ext-3.4.1/adapter/ext/ext-base.js"></script> -->
+<!-- <script type="text/javascript" src="/ext-3.4.1/ext-all.js"></script> -->
+<link rel="stylesheet" type="text/css" href="http://dev.sencha.com/deploy/ext-3.4.0/resources/css/ext-all.css" />
+<script type="text/javascript" src="http://dev.sencha.com/deploy/ext-3.4.0/adapter/ext/ext-base.js"></script>
+<script type="text/javascript" src="http://dev.sencha.com/deploy/ext-3.4.0/ext-all.js"></script>
+<script type="text/javascript" >
+Ext.onReady(function(){
+    // shorthand
+    var Tree = Ext.tree;
+    
+	var sUrl = "../../tree/tAuthorityModuleTREEquery_Ext3_Tree.action";
+//     var sUrl = "../../tree/tAuthorityModuleTREEquery_Dojo_Tree_Async.action";
+//     var sUrl ="serverJsonObject1-debug.js";
+    
+    var myTreeLoader = new Ext.tree.TreeLoader({
+    	clearOnLoad: false,
+		nodeParameter : "node",
+// 		preloadChildren : false,
+		requestMethod : "POST",
+		dataUrl: sUrl
+// 		dataUrl: "../../tree/tAuthorityModuleTREEquery_Ext3_Tree_Async.action"
+	});
+ 
+    var tree = new Tree.TreePanel({
+        useArrows: true,
+        
+        autoScroll: true,
+        animate: true,
+        enableDD: true,
+        containerScroll: true,
+        border: false,
+        // auto create TreeLoader
+//      	dataUrl: '../../tree/tAuthorityModuleTREEquery_Ext3_Tree_Async.action',
+		loader: myTreeLoader,
+		
+		
+		listeners:{
+			click: function( node, e){
+// 				alert("click");
+				myTreeLoader.baseParams.id = node.id;
+// 				alert("click2");
+// 				myTreeLoader.load( node, function( response ){
+// 					alert("callback!");
+// 					alert("response:"+response);
+// 				},this);
+				console.log(node);
+			}
+		},
+		
+        root: {
+        	id: '1',
+            nodeType: 'async',
+//             hidden : true,
+            text: '湖南社保金融卡省内前置系统',
+            draggable: false            
+        }
+    });
+
+
+ 	//加载树数据
+	function loadNodeData( node ){
+		function callback ( oResponse ) {
+           	//alert( oResponse.responseText );
+//         	alert( "oResponse:"+oResponse );
+           	var data = eval("(" + oResponse.responseText + ")");
+//             alert( "data:"+data );
+	    	
+	    	node.childNodes = data;
+	    	alert(data[0].id+","+data[0].text);
+// 	    	for( var i=0, j=data.length; i<j; i++ ){
+// 	    		alert(i);
+				alert(1);
+	    		tree.getNodeById( node.id ).appendChild(  data  );
+	    		alert(2);
+// 	    	}
+		}
+		
+	    Ext.Ajax.request({
+	    	url: sUrl,
+	        success: callback,
+	        params: { id: node.id }
+	    });
+	}
+	myTreeLoader.on("beforeload", function(treeLoader, node) {
+		treeLoader.baseParams.id = node.attributes.id;
+//         alert("beforeload");
+//         alert("node.id:"+node.id);
+    }, this);
+	
+	myTreeLoader.on("load", function( treeLoader, node, response ) {
+//         alert("load");
+//         alert("node.id:"+node.id);
+    }, this);
+	
+	
+// 	myTreeLoader.on("beforeload", function( node ) {
+//     	myTreeLoader.baseParams.id = node.attributes.id;
+//     	myTreeLoader.baseParams.node = node.attributes.node;
+// 		myTreeLoader.baseParams.id = node.id;
+// 		alert("node.id:"+node.id);
+// 		if( node.id != 1 ){
+// 			loadNodeData( node );
+// 			tree.getNodeById( node.id ).appendChild( new Ext.tree.AsyncTreeNode({'id':1, 'text':'湖南社保金融卡省内前置系统', 'iconcls':'icon-web', 'children':true}) );
+// 		}
+//     });
+    
+    // render the tree
+    tree.render('tree-div');
+    tree.getRootNode().expand();
+});
+</script><!--
+<link rel="stylesheet" type="text/css" href="/ext-3.4.1/examples/shared/examples.css" /> -->
+</head>
+<body>
+<!-- 
+<script type="text/javascript" src="/ext-3.4.1/examples/shared/examples.js"></script> -->
+<div id="tree-div" style="overflow:auto; height:300px;width:250px;border:1px solid #c3daf9;"></div>
+</body>
+</html>

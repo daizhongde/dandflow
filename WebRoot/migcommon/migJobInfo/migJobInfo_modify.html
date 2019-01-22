@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>作业设置</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+</head>
+<body>
+	<div class="easyui-layout" fit="true">
+	<form id="modifyJob_form" method="post" style="margin:0;padding:0;">
+		<div data-options="region:'north'" style="height:50px">
+			<table id="ujobTable0" width="100%" cellpadding="2">
+				<tr>
+					<td style='width:130px'></td>
+					<td><input id="ujobId" class="easyui-validatebox"
+						data-options="required: true" type="hidden" name="jobId"
+						style='width:90%;' value="" /></td>
+				</tr>
+				<tr>
+					<td style='width:130px'>Job Name</td>
+					<td><input id="ujobName" class="easyui-validatebox"
+						data-options="required: true" type="text" name="jobName"
+						style='width:90%;' value="" /></td>
+				</tr>
+			</table>
+		</div>
+		<div data-options="region:'center',border:false" title=""
+			style="overflow:hidden" noheader="true">
+			<div class="easyui-tabs" fit="true" >
+				<div title="Job specification" style="padding:10px">
+					<table id="ujobTable1" width="100%" cellpadding="2">
+						
+						<tr>
+							<td style='width:120px'>Author</td>
+							<td><input id="ujobAuthor" class="easyui-validatebox"
+								data-options="required : false" type="text" name="jobAuthor"
+								style='width:90%;' value="" readonly="readonly" /></td>
+						</tr>
+						<tr>
+							<td style='width:120px'>Remark</td>
+							<td><textarea id="ujobRemark" rows="5" style='width:90%;'
+									name="jobRemark"></textarea></td>
+						</tr>
+						<tr>
+							<td style='width:120px'>Last Update Time</td>
+							<td><input id="ujobUpdate" class="easyui-validatebox"
+								data-options="required : false" type="text" name="jobUpdate"
+								style='width:90%;' value="" readonly="readonly" /></td>
+						</tr>
+					</table>
+				</div>
+				<div title="Variables" style="padding:10px">
+					<table id="ujobparam_grid"></table>
+				</div>
+			</div>
+		</div>
+	</form>
+	</div>
+<script type="text/javascript">
+jQuery(document).ready(function() {
+	$("#modifyJob_form").form("load", app.pojo);
+});
+
+/** 作业参数信息工具栏信息 */
+app.ujobparam_toolbar = [ {
+	text : 'New',
+	disabled: false,
+	iconCls : 'icon-add',
+	handler : function() {
+		ujobparam_append();
+		return false;
+	}
+}, '-', {
+	text : 'Remove',
+	disabled: false,
+	iconCls : 'icon-remove',
+	handler : function() {
+		ujobparam_removeit();
+		return false;
+	}
+} , '-', {
+	text : 'Save',
+	disabled: false,
+	iconCls : 'icon-save',
+	handler : function() {
+		ujobparam_accept();
+		return false;
+	}
+}, '-', {
+	text : 'Cancel',
+	disabled: false,
+	iconCls : 'icon-undo',
+	handler : function() {
+		ujobparam_reject();
+		return false;
+	}
+}];
+app.jobparaloaded=false;
+// 作业参数-表格
+$('#ujobparam_grid').datagrid({
+	title : '',
+	toolbar : app.ujobparam_toolbar,
+	width : 938,
+	height : 720,
+	nowrap : true,
+	striped : true,
+	fit : true,
+	collapsible : true,
+	url: getContextPath()+"/query/migJobParaJEasyUIQUERYdfind.action",
+	idField : "nodeId",
+	multiSort : true,
+	singleSelect : true,
+	onClickCell : ujobparam_onClickRow,
+	onLoadSuccess: function(){
+		app.jobparaloaded=true;
+	},
+	columns : [ [ 
+		{ title : 'ID', field : 'nodeId', hidden: true }, 
+		{ title : 'Variable', field : 'para', editor : { type : 'text'}, width : 90 }, 
+		{ title : 'Value', field : 'paraValue', editor : { type : 'text'}, width : 90 }, 
+		{ title : 'Type', field : 'paraType', editor : { type : 'text'}, width : 90 }, 
+		{ title : 'Chinese Name', field : 'paraName', editor : { type : 'text'}, width : 90 } 
+	] ],
+	pagination : false,
+	rownumbers : false,
+	queryParams : {
+		jdata : encodeURI($.toJSON({ act: VIRTUE.act.QUERY, condition: {nodeId: app.pojo.jobId }, operator : {} })),
+	}
+});
+		
+/** 作业参数表格编辑 */
+var ujobparam_editIndex = undefined;
+function ujobparam_endEditing() {
+	if (ujobparam_editIndex == undefined) 
+	{
+		return true
+	}
+	if ($('#ujobparam_grid').datagrid('validateRow', ujobparam_editIndex)) 
+	{
+		$('#ujobparam_grid').datagrid('endEdit', ujobparam_editIndex);
+		ujobparam_editIndex = undefined;
+		return true;
+	}
+	else 
+	{
+		return false;
+	}
+};
+function ujobparam_onClickRow(index) {
+	if (ujobparam_editIndex != index) {
+		if (ujobparam_endEditing()) {
+			$('#ujobparam_grid').datagrid('selectRow', index).datagrid('beginEdit', index);
+			ujobparam_editIndex = index;
+		} else {
+			$('#ujobparam_grid').datagrid('selectRow', ujobparam_editIndex);
+		}
+	}
+};
+
+function ujobparam_append() {
+	if (ujobparam_endEditing()) {
+		$('#ujobparam_grid').datagrid('appendRow', { nodeId: app.pojo.jobId });
+		ujobparam_editIndex = $('#ujobparam_grid').datagrid('getRows').length - 1;
+		$('#ujobparam_grid').datagrid('selectRow', ujobparam_editIndex).datagrid('beginEdit',
+				ujobparam_editIndex);
+	}
+};
+function ujobparam_removeit() {
+	if (ujobparam_editIndex == undefined) {return}
+	$('#ujobparam_grid').datagrid('cancelEdit', ujobparam_editIndex).datagrid('deleteRow', ujobparam_editIndex)
+	ujobparam_editIndex = undefined;
+};
+function ujobparam_accept() {
+	if (ujobparam_endEditing()) {
+		$('#ujobparam_grid').datagrid('acceptChanges');
+	}
+};
+function ujobparam_reject() {
+	$('#ujobparam_grid').datagrid('rejectChanges');
+	ujobparam_editIndex = undefined;
+};
+
+</script>
+</body>
+</html>

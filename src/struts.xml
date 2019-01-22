@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN" "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+	<constant name="struts.enable.DynamicMethodInvocation" value="true" />
+	<constant name="struts.i18n.encoding" value="UTF-8" />
+	<constant name="struts.i18n.resources" value="messageResource" />
+	<constant name="struts.locale" value="zh_CN" />
+	<constant name="struts.devMode" value="true" />
+	<!-- -->
+	<!-- <constant name="struts.objectFactory" value="spring" /> -->
+	<constant name="struts.objectFactory"
+		value="org.apache.struts2.spring.StrutsSpringObjectFactory" />
+	<constant name="struts.objectFactory.spring.autoWire" value="name" />
+	
+	<!-- REST and non-RESTful URL's Together Configuration -->
+<!-- xhtml,,xml,json,action  -->
+<constant name="struts.action.extension" value="xhtml,xml,action"/>
+<constant name="struts.mapper.class" value="org.apache.struts2.dispatcher.mapper.PrefixBasedActionMapper" />
+<!-- <constant name="struts.rest.defaultExtension" value="json" /> -->
+<constant name="struts.mapper.prefixMapping" value="/rest:rest,:struts"/>
+<constant name="struts.rest.namespace" value="/rest" /> 
+
+<!--  Overwrite Convention -->
+<constant name="struts.convention.action.suffix" value="Controller"/>
+<constant name="struts.convention.action.mapAllMatches" value="true"/>
+<constant name="struts.convention.default.parent.package" value="rest-default"/>
+<constant name="struts.convention.package.locators" value="example"/>
+
+	<package name="authority" extends="struts-default" strict-method-invocation="false">
+
+        <action name="loginServlet" class="loginAction">
+<!--             <result type="redirect">/Webmain/main.html</result> -->
+            <result type="redirect">frame-en.jsp</result>
+            <result name="error" type="redirect">/login-en.jsp</result>
+		</action>
+		<action name="logoutServlet" class="logoutAction">
+            <result type="redirect">/login-en.jsp</result>
+		</action>
+    </package>
+     
+	<package name="admin" namespace="/admin" extends="struts-default" strict-method-invocation="false">
+		<default-action-ref name="login" />
+		<global-results>
+			<!--下面定义的结果对所有的Action都有效 -->
+			<result name="login">login.jsp</result>
+			<result name="exception">/error.jsp</result>
+			<result name="success">/main.jsp</result>
+		</global-results>
+
+		<global-exception-mappings>
+			<!-- 指Action抛出Exception异常时，转入名为exception的结果。 -->
+			<exception-mapping exception="java.lang.Exception"
+				result="exception" />
+			<exception-mapping exception="java.lang.Throwable"
+				result="exception" />
+		</global-exception-mappings>
+
+		<!-- 默认类型 -->
+		<action name="*Admin*" class="{1}Action" method="{2}">
+			<result name="sResponse">/common/response/sResponse.jsp</result>
+			<result name="add">/admin/{1}/{1}_add.jsp</result>
+			<result name="modify">/admin/{1}/{1}_modify.jsp</result>
+			<result name="draftedit">/admin/{1}/{1}_draftedit.jsp</result>
+			<result name="browse">/admin/{1}/{1}_browse.jsp</result>
+			<result name="browse2">/admin/{1}/{1}_browse.jsp</result>
+			<result name="menu">/admin/{1}/{1}_menu.jsp</result>
+			<result name="draftbrowse">/admin/{1}/{1}_draftbrowse.jsp</result>
+			<result name="success">/admin/{1}/success_{2}.jsp</result>
+			<result name="success_add">/admin/{1}/success_add.jsp</result>
+			<result name="afterAddFromDraft">/admin/{1}/success_{2}.jsp</result>
+			<result name="repeatSubmit">/admin/{1}/{1}_repeatSubmit.jsp</result>
+			<result name="main">/admin/{1}/{1}_main.jsp</result>
+			<result name="login">login.jsp</result>
+			<result name="error">error.jsp</result>
+			<result name="input">/admin/{1}/{1}.jsp</result>
+		</action>
+
+		<action name="*">
+			<result>/login.jsp</result>
+		</action> 
+	</package>
+
+	<package name="common" namespace="/common" extends="struts-default" strict-method-invocation="false">
+		<default-action-ref name="login" />
+		<global-results>
+			<!--下面定义的结果对所有的Action都有效 -->
+			<result name="login">login.jsp</result>
+			<result name="exception">/error.jsp</result>
+			<result name="success">/main.jsp</result>
+		</global-results>
+
+		<global-exception-mappings>
+			<!-- 指Action抛出Exception异常时，转入名为exception的结果。 -->
+			<exception-mapping result="exception" exception="java.lang.Exception" />
+			<exception-mapping result="throwable" exception="java.lang.Throwable" />
+		</global-exception-mappings>
+		<!-- 默认类型 -->
+		<action name="*Common*" class="{1}Action" method="{2}">
+			<result name="add">/common/{1}/{1}_add.jsp</result>
+			<result name="modify">/common/{1}/{1}_modify.jsp</result>
+			<result name="modify2">/common/{1}/{1}_modify.html</result>
+			<result name="draftedit">/common/{1}/{1}_draftedit.jsp</result>
+			<result name="browse">/common/{1}/{1}_browse.jsp</result>
+			<result name="browse2">/common/{1}/{1}_browse2.jsp</result>
+			<result name="browse3">/common/{1}/{1}_browse3.jsp</result>
+			<result name="sResponse">/common/response/sResponse.jsp</result>
+			<result name="draftbrowse">/common/{1}/{1}_draftbrowse.jsp</result>
+			<result name="success">/common/{1}/success_{2}.jsp</result>
+			<result name="success_add">/common/{1}/success_add.jsp</result>
+			<result name="afterAddFromDraft">/common/{1}/success_{2}.jsp</result>
+			<result name="repeatSubmit">/common/{1}/{1}_repeatSubmit.jsp</result>
+			<result name="main">/common/{1}/main.jsp</result>
+			<result name="upload">/public/publicData.jsp</result>
+			<result name="login">/login.jsp</result>
+			<result name="error">/error.jsp</result>
+			<result name="input">/common/{1}/{1}.jsp</result>
+		</action>
+
+		<action name="*">
+			<result>/login.jsp</result>
+		</action>
+	</package>
+	
+	<package name="public" namespace="/public" extends="struts-default" strict-method-invocation="false">
+		<default-action-ref name="login" />
+		<global-results>
+			<!--下面定义的结果对所有的Action都有效 -->
+			<result name="login">login.jsp</result>
+			<result name="exception">/error.jsp</result>
+			<result name="success">/main.jsp</result>
+		</global-results>
+
+		<global-exception-mappings>
+			<!-- 指Action抛出Exception异常时，转入名为exception的结果。 -->
+			<exception-mapping result="exception" exception="java.lang.Exception" />
+			<exception-mapping result="exception" exception="java.lang.Throwable" />
+		</global-exception-mappings>
+		<!-- 默认类型 -->
+		<action name="*Public*" class="{1}Action" method="{2}">
+			<result name="add">/public/{1}/{1}_add.jsp</result>
+			<result name="modify">/public/{1}/{1}_modify.jsp</result>
+			<result name="draftedit">/public/{1}/{1}_draftedit.jsp</result>
+			<result name="browse">/public/{1}/{1}_browse.jsp</result>
+			<result name="browse2">/public/{1}/{1}_browse.jsp</result>
+			<result name="menu">/public/{1}/{1}_menu.jsp</result>
+			<result name="draftbrowse">/public/{1}/{1}_draftbrowse.jsp</result>
+			<result name="success">/public/{1}/success_{2}.jsp</result>
+			<result name="success_add">/public/{1}/success_add.jsp</result>
+			<result name="afterAddFromDraft">/public/{1}/success_{2}.jsp</result>
+			<result name="repeatSubmit">/public/{1}/{1}_repeatSubmit.jsp</result>
+			<result name="main">/public/{1}/main.jsp</result>
+			<result name="login">login.jsp</result>
+			<result name="error">error.jsp</result>
+			<result name="input">/public/{1}/{1}.jsp</result>
+		</action>
+
+		<action name="*">
+			<result>/index.html</result>
+		</action>
+	</package>
+
+	<package name="busi" namespace="/busi" extends="json-default" strict-method-invocation="false">
+		<action name="*BUSI*" class="{1}BUSIAction" method="{2}">
+			<result name="success" type="json">
+            	<param name="root">json</param>
+            	<param name="noCache">true</param>  
+		        <param name="ignoreHierarchy">false</param>
+			</result>
+			<result name="mig_browse">/migcommon/{1}/{1}_browse${pagePostfix}.jsp</result>
+			<result name="sResponse">/common/response/sResponse.jsp</result>
+		</action>
+	</package>
+	
+	<package name="cbb" namespace="/cbb" extends="json-default" strict-method-invocation="false">
+		<action name="*CBB*" class="{1}CBBAction" method="{2}">
+			<result name="sResponse">/common/response/sResponse.jsp</result>
+			<result name="success" type="json">
+            	<param name="root">json</param>
+            	<param name="noCache">true</param>  
+		        <param name="ignoreHierarchy">false</param>
+			</result>
+		</action>
+	</package>
+	<package name="tree" namespace="/tree" extends="json-default" strict-method-invocation="false">
+		<action name="*TREE*" class="{1}TREEAction" method="{2}">
+			<result name="sResponse">/common/response/sResponse.jsp</result>
+			<result name="map">/common/response/map.jsp</result>
+			<result name="input">error.jsp</result>
+			<result name="success" type="json">
+            	<param name="root">json</param>
+            	<param name="noCache">true</param>  
+		        <param name="ignoreHierarchy">false</param>
+			</result>
+		</action>
+	</package>
+	
+	<package name="query" namespace="/query" extends="json-default" strict-method-invocation="false">
+		<action name="*QUERY*" class="{1}QUERYAction" method="{2}">
+			<result type="json">
+				<!-- to support JSONP -->
+				<param name="callbackParameter">callback</param>
+			</result>
+			<result name="total" type="json">
+				<param name="root">total</param>
+            	<param name="noCache">true</param>  
+		        <param name="ignoreHierarchy">false</param>
+			</result>
+			<result name="json" type="json">
+				<param name="root">json</param>
+            	<param name="noCache">true</param>  
+		        <param name="ignoreHierarchy">false</param>
+			</result>
+		</action>
+	</package>
+	
+	<package name="print" namespace="/print" extends="struts-default" strict-method-invocation="false">
+		<action name="*PRINT*" class="{1}PRINTAction" method="{2}">
+			<result>/migcommon/{1}/{1}_print.jsp</result>
+			<result name="custom_print">/migcommon/{1}/{1}_print_${printName}.jsp</result>
+		</action>
+	</package>
+	
+	<!--
+	<package name="jeasyuiQuery" namespace="/jeasyuiQuery" extends="json-default">
+		<action name="*JEasyUIQuery*" class="{1}JEasyUIQUERYAction" method="{2}">
+			<result type="json">
+			    <param name="excludeProperties">DEFAULT_PARAM</param> 
+				<param name="noCache">true</param> 
+				<param name="contentType">text/html</param> 
+				<param name="encoding">UTF-8</param>
+				<param name="wrapPrefix">${callback}(</param>
+			    <param name="wrapSuffix">)</param>
+				<param name="callbackParameter">callback</param>
+				<param name="enableSMD">true</param>
+			</result>
+		</action>
+	</package>
+	
+	<package name="dojoQuery" namespace="/dojoQuery" extends="json-default">
+		<action name="*DojoQuery*" class="{1}DojoQUERYAction" method="{2}">
+			<result type="json">
+			</result>
+		</action>
+	</package>
+	
+	<package name="yui2Query" namespace="/yui2Query" extends="json-default">
+		<action name="*YUI2Query*" class="{1}YUI2QUERYAction" method="{2}">
+			<result type="json">
+			</result>
+		</action>
+	</package>
+    
+	<package name="yui3Query" namespace="/yui3Query" extends="json-default">
+		<action name="*YUI3Query*" class="{1}YUI3QUERYAction" method="{2}">
+			<result type="json">
+			  <param name="callbackParameter">callback</param>
+			</result>
+		</action>
+	</package>
+	
+	<package name="ext3Query" namespace="/ext3Query" extends="json-default">
+		<action name="*Ext3Query*" class="{1}Ext3QUERYAction" method="{2}">
+			<result type="json">
+			  <param name="callbackParameter">callback</param>
+			</result>
+		</action>
+	</package> -->
+	
+	<package name="curd" namespace="/curd" extends="json-default" strict-method-invocation="false">
+		<action name="*CURD*" class="{1}CURDAction" method="{2}">
+			<result type="json">
+				<param name="excludeProperties">
+					pojo,map,arr,frontPageName,jdata
+				</param>
+			</result>
+			<result name="json" type="json">
+            	<param name="root">json</param>
+            	<param name="noCache">true</param>  
+		        <param name="ignoreHierarchy">false</param>
+			</result>
+			<result name="modify">/common/{1}/{1}_modify.jsp</result>
+			<result name="modify2">/common/{1}/{1}_modify.html</result>
+			<result name="browse">/common/{1}/{1}_browse.jsp</result>
+			<result name="browse2">/common/{1}/{1}_browse2.jsp</result>
+			<result name="browse3">/common/{1}/{1}_browse3.jsp</result>
+			
+			<result name="mig_modify">/migcommon/{1}/{1}_modify.jsp</result>
+			<result name="mig_modifypara">/migcommon/{1}/{1}_modify_${controlId}.jsp</result>
+			<result name="mig_modify2">/migcommon/{1}/{1}_modify2.jsp</result>
+			<result name="mig_browse">/migcommon/{1}/{1}_browse.jsp</result>
+			<result name="mig_browsepara">/migcommon/{1}/{1}_browsepara_${controlId}.jsp</result>
+			<result name="common_modify">/migcommon/${frontPageName}/${frontPageName}_modify.jsp</result>
+			<result name="common_browse">/migcommon/${frontPageName}/${frontPageName}_browse.jsp</result>
+			<result name="common_modify2">/migcommon/${foldName}/${frontPageName}.jsp</result>
+			<result name="common_browse2">/migcommon/${foldName}/${frontPageName}.jsp</result>
+			</action>
+	</package>
+	
+	<package name="exp" namespace="/exp" extends="struts-default"  strict-method-invocation="false">
+		<default-action-ref name="login" />
+		<global-results>
+			<!--下面定义的结果对所有的Action都有效 -->
+			<result name="login">login.jsp</result>
+			<result name="exception">/error.jsp</result>
+			<result name="error">/error.jsp</result>
+			<result name="success">/main.jsp</result>
+		</global-results>
+
+		<global-exception-mappings>
+			<!-- 指Action抛出Exception异常时，转入名为exception的结果。 -->
+			<exception-mapping result="exception" exception="java.lang.Exception" />
+			<exception-mapping result="exception" exception="java.lang.Throwable" />
+		</global-exception-mappings>
+		<action name="*EXP*" class="{1}EXPAction" method="{2}">
+			<result name="success" type="stream">
+				<param name="bufferSize">4096</param>
+				<param name="inputName">targetFile</param>
+				<!-- 指定下载文件的内容类型，text/plain是默认类型  'txt' => 'text/plain'  -->
+				<param name="contentType">application/vnd.ms-excel;charset=UTF-8</param>
+				<!--动态获取文件名，从Action中的取得filename -->
+				<param name="contentDisposition">
+					attachment;filename="${fileName}"
+				</param>
+				<param name="contentCharSet">UTF-8</param>
+			</result>
+			<result name="xlsx" type="stream">
+				<param name="bufferSize">4096</param>
+				<param name="inputName">targetFile</param>
+				<param name="contentType">application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8</param>
+				<param name="contentDisposition">
+					attachment;filename="${fileName}"
+				</param>
+				<param name="contentCharSet">UTF-8</param>
+			</result>
+			<result name="txt" type="stream">
+				<param name="bufferSize">4096</param>
+				<param name="inputName">targetFile</param>
+				<param name="contentType">text/plain;charset=UTF-8</param>
+				<param name="contentDisposition">
+					attachment;filename="${fileName}"
+				</param>
+				<param name="contentCharSet">UTF-8</param>
+			</result>
+			<result name="login">/login.jsp</result>
+			<!-- for export progress display -->
+			<result name="map">/common/response/map.jsp</result>
+			<!-- for custom export use, return allColumns for choose -->
+			<result name="sResponse">/common/response/sResponse.jsp</result>
+		</action>
+		<!-- 加上这个配置是为了在调用同一个action的同一个方法时得到不同的响应 ,暂时没有用到异步导出-->
+		<action name="*Asyn*" class="{1}EXPAction" method="{2}">
+			<result name="login">/login.jsp</result>
+			<result name="success">/common/response/fileAbsPath.jsp</result>
+		</action>
+		<action name="*">
+			<result>/login.jsp</result>
+		</action>
+	</package>
+	
+	<package name="imp" namespace="/imp" extends="struts-default"  strict-method-invocation="false">
+		<default-action-ref name="login" />
+		<global-results>
+			<!--下面定义的结果对所有的Action都有效 -->
+			<result name="login">login.jsp</result>
+			<result name="exception">/error.jsp</result>
+			<result name="input">/error.jsp</result>
+			<result name="error">/error.jsp</result>
+			<result name="success">/main.jsp</result>
+		</global-results>
+
+		<global-exception-mappings>
+			<!-- 指Action抛出Exception异常时，转入名为exception的结果。 -->
+			<exception-mapping result="exception" exception="java.lang.Exception" />
+			<exception-mapping result="exception" exception="java.lang.Throwable" />
+		</global-exception-mappings>
+		<action name="*IMP*" class="{1}IMPAction" method="{2}">
+            <interceptor-ref name="fileUpload"> 
+                <!-- {1}小写开头，spring管理
+                firefox    image/jpeg   image/bmp   image/gif   image/png 
+					 ie 6  image/pjpeg  image/bmp   image/gif   image/x-png 
+					 ie 7  image/pjpeg  image/bmp   image/gif   image/x-png 
+					 ie 8  image/pjpeg  image/bmp   image/gif   image/x-png 
+                image/bmp,
+	                image/png,image/x-png
+	                image/gif,
+	                image/jpg,image/jpeg,image/pjpeg,
+	                text/bat,application/bat,application/x-bat,
+	                
+	                text/plain,
+	                application/excel
+	                application/vnd.ms-excel  2003 5.0/95
+	                application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+	                
+	                application/octet-stream,
+	                application/zip,
+	                application/x-zip-compressed,
+                 -->
+                <param name="allowedTypes">text/plain,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</param> 
+                <param name="maximumSize">60000000</param> 
+            </interceptor-ref> 
+            <interceptor-ref name="defaultStack"/>    
+            <!-- savePath not inject there, it is auto set config Value 
+            windows savePath 
+            <param name="savePath">C:\usr\authorityfile\</param>
+             -->
+            <!-- 
+            linux
+            <param name="savePath">/wls/authorityfile/</param>
+              -->
+            <result name="success">/common/response/sResponse.jsp</result>
+			<result name="login">/login.jsp</result>
+			<!-- for export progress display -->
+			<result name="map">/common/response/map.jsp</result>
+			<!-- for custom import use, return allColumns for choose -->
+			<result name="sResponse">/common/response/sResponse.jsp</result>
+		</action>
+		<action name="*">
+			<result>/login.jsp</result>
+		</action>
+	</package>
+	
+</struts>

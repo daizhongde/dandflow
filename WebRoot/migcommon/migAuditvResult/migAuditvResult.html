@@ -1,0 +1,388 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Legality audit report</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/icon.css"/>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+<!-- <script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/locale/easyui-lang-zh_CN.js"></script> -->
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/plugins/easyuiExtends.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+
+<script language="javascript" src="../../control/lodop/LodopFuncs.js"></script>
+<script type="text/javascript">
+var app = {};
+app.dryrunRow = {};
+
+var noquery = VIRTUE.noquery;
+var query = VIRTUE.query;
+var exp = VIRTUE.exp;
+var OPE = VIRTUE.operator;
+
+var tableName = "mig_auditv_result";
+
+var Envs = ajaxReqRespText("/cbb/dicCBBgetDicByType.action?dicType=DB-Env");
+	Envs = eval("(" + Envs + ")");
+
+var domains = ajaxReqRespText("/cbb/dicCBBgetDicByType.action?dicType=Busi-Domain");
+	domains = eval("(" + domains + ")");
+
+fmtDomain = function(value,row, index ){
+	for(var i=0, j=domains.length; i<j; i++){
+		if( domains[i].code == value ){
+			return domains[i].value;
+		}
+	}
+	return value;
+};
+
+function enterKeyDown(event)
+{
+    if(event.keyCode==13)
+    {
+    	submitForm();
+	}
+};
+
+/** validate and assign value **/
+function PackingParameter(){
+	var formData = $('#s_form').form( 'getData');
+
+	query.init();
+	for (var field in formData) {
+		if( formData[field] !== "" ){
+			query.jdata.condition[field] = formData[field];
+			if( field != "audit_name" ){
+				query.jdata.operator[field] = OPE.EQUAL;
+			}else{
+				query.jdata.operator[field] = OPE.CONTAIN;
+			}
+			
+		}
+	}
+	exp.jdata.condition = query.jdata.condition;
+	exp.jdata.operator = query.jdata.operator;
+	return true;
+};
+
+/** search data ,reload data  **/
+function submitForm(){
+   	if(!PackingParameter()){
+   		return;
+   	}
+   	$('#grid').datagrid( 'reload', {
+//    		columnNames : "id,audit_name,mig_sql,author,mig_sql_rep",
+   		tableName : tableName,
+   		jdata: encodeURI( $.toJSON( query.jdata ) ) 
+   	} );
+};
+
+/**  清空  **/
+function clearForm(){
+	$('#s_form').form('clear');
+};
+
+/** Export file by selected file extension name  */
+function exportSimply()
+{
+	//You must Packing parameter at last
+	if(!PackingParameter()){
+   		return;
+   	}
+	
+	var form = document.createElement("form");
+	form.action = "../../exp/migAuditvResultEXPexportXLS.action?_="+(new Date).getTime();
+	
+    document.body.appendChild(form);
+    var i = document.createElement("input");
+    i.type = "hidden";
+    i.name = "jdata";
+    i.value = encodeURI($.toJSON( exp.jdata ) );
+    form.appendChild(i);
+
+    form.method = "post";
+    
+//  一提交disable和show的效果立马就不见了哦
+    form.submit();
+};
+
+var read = {};
+read.jdata = { act: "read",condition: {id: ""}, operator : {id:1} };
+
+function browseRecord() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		$('#win').window('open').window('setTitle', 'View');
+		read.jdata.condition.id = row.id;
+		$('#win').window("refresh", getContextPath()+"/curd/migAuditvResultCURDbrowse.action?tableName="+tableName+"&jdata="+encodeURI($.toJSON( read.jdata )));
+	}
+};
+
+var toolbar = [{
+	text:'View',
+	iconCls:'icon-search',
+	disabled: false,
+	handler:function(){ 
+		browseRecord(); 
+	}
+}];
+
+$(function(){
+	$('#grid').datagrid({
+		title : 'Search Result',
+		toolbar : toolbar,
+		width : 938,
+		height : 720,
+		nowrap : true,
+		striped : true,
+		fit : true,
+		collapsible : true,
+		url: getContextPath()+"/query/migAuditvResultJEasyUIQUERYdfind.action",
+		idField : "audit_id",
+		remoteSort: true,
+		multiSort : false,
+		singleSelect : true,
+		frozenColumns:[ [{ title : 'level', field : 'audit_level', width : 40, styler: function(value,row,index){
+				if (value == 1){//高
+					return 'background-color:#ffee00;color:red;';
+				}
+				else if (value == 2){//中
+					return 'background-color:#ff8c00;color:orange;';
+				}else if (value == 3){//低
+					return 'background-color:#ffff00;color:yellow;';
+				}
+			},
+				formatter: function(val,row){
+					if (val == 1)
+						return '<span style="color:black;">high</span>';
+					else if (val == 2)
+						return '<span style="color:black;">mid</span>';
+					else if (val == 3)
+						return '<span style="color:black;">low</span>';
+				}
+				}  ] ],
+		columns : [ [
+			{ title : 'id', field : 'id', width : 80, hidden: true  },
+			{ title : 'audit_id', field : 'audit_id', width : 80, hidden: true  },
+			{ title : 'Audit Item', field : 'audit_name', width : 180, sortable: true  },
+			{ title : 'DryRunId', field : 'fares_dryrun_id', width : 80, sortable: true, hidden: true },
+			{ title : 'DryRun', field : 'dryrun_name', width : 100, sortable: true },
+			{ title : 'Environment', field : 'env', width : 80, sortable: true }, 
+			{ title : 'Domain Name', field : 'domain', width : 100, formatter: fmtDomain  },
+// 			{ title : 'Difference Reasons', field : 'min_analysis', width : 140
+// 				formatter: function(value,row, index ){
+// 					return value.length<=120 ? value : value.substring(0,120)+"...";
+// 				} 
+// 			},
+// 			{ title : 'DMP NO.', field : 'dmp_num', width : 200 },
+			{ title : 'Source Value', field : 'src_value', width : 120  },
+			{ title : 'Target Value', field : 'dst_value', width : 120  },
+			{ title : 'Difference Value', field : 'min_value', width : 120  },
+// 			{ title : '执行结果', field : 'result', width : 120,
+// 				formatter: function(n,row, index ){
+// 				 	n = new Number(n);
+// 					switch(n){
+// 					case 1: return '稽核正确'; break;
+// 					case 0: return '稽核错误'; break;
+// 					default: return n;
+// 					}
+// 				}
+// 			},
+			{ title : 'Auditor', field : 'audit_author', width : 80  },
+			{ title : 'Audit Time', field : 'hdate', width : 130, sortable: true  },
+			{ title : 'Remark', field : 'remark', width : 120  },
+			{ title : 'Result', field : 'success_flag', width : 80,
+				formatter: function(n,row, index ){
+					if(n==0){
+						return "<font color='red'>Error</font>";;
+					}else{
+						if(row.result==0){
+							return "<font color='red'>Unpass</font>";
+						}else{
+							return "<font color='green'>Pass</font>";
+						}
+					}
+				}
+			},
+			{ title : 'Error Msg', field : 'err_msg', width : 120  }
+		] ],
+		pagination : true,
+		rownumbers : false,
+		queryParams : {
+// 			columnNames : "id,audit_name,mig_sql,author,mig_sql_rep",
+			tableName : tableName,
+			jdata: encodeURI( $.toJSON( noquery.jdata ) ) 
+		},
+		onSelect: function(index,row){
+			var temp = $('#grid').datagrid('getSelected');	// get the selected row
+			app.dryrunRow = {
+				mig_dryrun_id: temp.fares_dryrun_id, 
+				mig_dryrun_name: temp.dryrun_name, 
+				remark: ""
+			};
+		}
+	});
+	
+	$('#fares_dryrun_id').combogrid({
+		url : "../../query/commonCBBQUERYdfind.action",
+		queryParams : {
+			tableName : "v_dryrun_config",
+			columns: "mig_dryrun_name"
+		},
+		panelWidth : 500,
+		panelHeight : 200,
+		idField : 'mig_dryrun_id',
+		textField : 'mig_dryrun_name',
+		pagination : true,
+		fitColumns : false,
+		required : true,
+		rownumbers : true,
+		mode : 'remote',
+		delay : 500,
+		sortName : 'mig_dryrun_id',
+		sortOrder : 'desc',
+		pageSize : 5,
+		pageList : [ 5, 10 ],
+		onSelect: function(index,row){
+			submitForm();
+		},
+		columns : [ [
+			{ title : 'ID', field : 'mig_dryrun_id',width : 90, sortable: true }, 
+			{ title : 'Dry Run', field : 'mig_dryrun_name', width : 120, sortable: true }, 
+			{ title : 'Description', field : 'remark',  width : 300 } 
+		] ],
+        onChange: function(newValue, oldValue){
+        	submitForm();
+        }
+	});
+});
+
+
+var LODOP; //声明为全局变量
+/** 打印查询结果 **/
+function PrintOneURL(strID){
+   	if(!PackingParameter()){
+   		return;
+   	}
+//    	$('#grid').datagrid( 'reload', {
+//    		tableName : tableName,
+//    		jdata: encodeURI( $.toJSON( query.jdata ) ) 
+//    	} );
+   	   	
+	LODOP=getLodop();
+	LODOP.PRINT_INIT("合法性稽核结果报告_按网址打印");
+
+	LODOP.ADD_PRINT_URL(30,20,746,"95%","../../print/migAuditvResultPRINTprint.action?jdata="+encodeURI( $.toJSON( query.jdata ) )  );
+	LODOP.SET_PRINT_STYLEA(0,"HOrient",3);
+	LODOP.SET_PRINT_STYLEA(0,"VOrient",3);
+// 	LODOP.SET_SHOW_MODE("MESSAGE_GETING_URL",""); //该语句隐藏进度条或修改提示信息
+// 	LODOP.SET_SHOW_MODE("MESSAGE_PARSING_URL","");//该语句隐藏进度条或修改提示信息
+	LODOP.ADD_PRINT_HTM(1,600,300,100,"总页号：<font color='#0000ff' format='ChineseNum'><span tdata='pageNO'>第##页</span>/<span tdata='pageCount'>共##页</span></font>");
+
+	LODOP.SET_PRINT_STYLEA(0,"ItemType",1);
+
+	LODOP.SET_PRINT_STYLEA(0,"Horient",1);	
+	LODOP.ADD_PRINT_TEXT(3,34,196,20,"总页眉：");
+	LODOP.SET_PRINT_STYLEA(0,"ItemType",1);		
+	LODOP.PREVIEW();			
+};	
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+    <div data-options="region:'north',border:true,split:true" style="height:121px;background:#B3DFDA;" title="(LA)Report--Search Condition" >  
+        <form id="s_form" method="post" style="margin:0;padding:0;">
+        <div style="padding:0px 0 0px 15px">
+            <table width="100%"> 
+                <tr>
+                	<td>DryRun:</td>
+                    <td>
+                        <input id="fares_dryrun_id" name="fares_dryrun_id" value="">
+                    </td>
+                     <td>Environment:</td>
+                    <td>
+                    	<input class="easyui-combobox" 
+		                        id='env' name="env" value="" 
+		                        data-options="valueField:'code', textField:'value',
+		                        editable:false,
+								data: Envs,
+				        onChange: function(newValue, oldValue){
+				        	submitForm();
+				        }"/>
+                        <!-- <select class="easyui-combobox" id="env" name="env" style="width:100px;"
+							data-options="onChange: function(newValue, oldValue){ submitForm(); }">
+                        	<option value="" selected="selected">--opt--</option>
+                        	<option value="C">Connextion</option>
+                        	<option value="R">Retail</option>
+                        </select> -->
+                    </td>
+                    <td>Domain Name:</td>
+                    <td>
+                        <input class="easyui-combobox" 
+		                        id='domain' name="domain" value="" 
+		                        data-options="valueField:'code', textField:'value',
+		                        editable:false,
+								data: domains,
+        onChange: function(newValue, oldValue){
+        	submitForm();
+        }"/>
+                    </td>
+                </tr>
+                <tr>
+               		<td>Audit Item:</td>
+                    <td>
+                    	<input id="audit_name" name="audit_name" value="" onkeydown="enterKeyDown(event)">
+                    </td>
+                    <td>Execute Result:</td>
+                    <td>
+                    	<select class="easyui-combobox" id="result" name="result" style="width:100px;"
+							data-options="onChange: function(newValue, oldValue){ submitForm(); }">
+                        	<option value="" selected="selected">--opt--</option>
+                        	<option value="1">Pass</option>
+                        	<option value="0">Unpass</option>
+                    	</select>
+                    </td>
+                    <td>Success Flag:</td>
+                    <td>
+                        <select class="easyui-combobox" id="success_flag" name="success_flag" style="width:100px;"
+							data-options="onChange: function(newValue, oldValue){ submitForm(); }">
+                        	<option value="" selected="selected">--opt--</option>
+                        	<option value="1">SQL Correct</option>
+                        	<option value="0">SQL Fault</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <table width="100%" border="0" align="center">
+			<tr bgcolor="#E2EEFE" valign="bottom">
+				<td height="23"><div align="center"><!-- default height='21'  -->
+					
+					<a class="easyui-linkbutton" data-options="iconCls:'icon-search'" href="javascript:void(0)" 
+               		onclick="submitForm()" style="width:80px">Submit</a>&nbsp;&nbsp;
+               		<a class="easyui-linkbutton" data-options="iconCls:'icon-print'" href="javascript:void(0)" 
+               		onclick="PrintOneURL()" style="width:80px">Print</a>&nbsp;&nbsp;
+               		               		
+               		<a class="easyui-linkbutton" data-options="iconCls:'icon-export'" href="javascript:void(0)" 
+               		onclick="exportSimply()" style="width:80px">Export</a>&nbsp;&nbsp;
+               		<a class="easyui-linkbutton" data-options="iconCls:'icon-clear'" href="javascript:void(0)" 
+               		onclick="clearForm()" style="width:80px">Clear</a>
+               		
+				</div></td>
+			</tr>
+		</table>
+		</form>
+    </div>
+    <div data-options="region:'center', border:false" title="" style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+	
+	<div id="win" class="easyui-window" title="添加" style="width:600px;height:400px"  
+        data-options="modal:true,closed:true">
+	</div>
+</body>
+</html>

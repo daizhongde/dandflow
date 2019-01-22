@@ -1,0 +1,301 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html dir="ltr">
+<head>
+	<title>数据表格 by dojo</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+	<link rel=stylesheet href="/dojo-1.9.1/dojox/grid/tests/enhanced/support/common.css"/>
+	<style type="text/css">
+		html, body {
+			width: 100%;	/* make the body expand to fill the visible window */
+			height: 100%;
+			overflow: hidden;	/* erase window level scrollbars */
+			padding: 0 0 0 0;
+			margin: 0 0 0 0;
+		}
+	</style>
+<script type="text/javascript" src="/dojo-1.9.1/dojo/dojo.js" data-dojo-config="isDebug:false, parseOnLoad: true"></script>
+<script type="text/javascript">
+dojo.require("dijit.dijit"); // optimize: load dijit layer
+dojo.require("dijit.layout.BorderContainer");
+dojo.require("dijit.layout.ContentPane");
+dojo.require('dijit.form.TextBox');
+dojo.require('dijit.form.NumberTextBox');
+dojo.require('dijit.form.Select');
+dojo.require('dijit.form.Button');
+dojo.require("dojox.data.QueryReadStore");
+dojo.require("dojox.grid.EnhancedGrid");
+dojo.require("dojox.grid.enhanced.plugins.DnD");
+dojo.require("dojox.grid.enhanced.plugins.Menu");
+dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+dojo.require("dojox.grid.enhanced.plugins.Pagination");
+dojo.require("dojo.parser");
+dojo.require("dojo.json");
+
+// http://dojotoolkit.org/reference-guide/1.7/dijit/Toolbar.html
+// http://dojotoolkit.org/reference-guide/1.7/dijit/MenuBar.html#dijit-menubar
+// http://localhost:8080/dojo-1.9.1/demos/grid/demo.html
+	
+var query = {};
+query.jdata = { act: "noquery", condition: {}, operator : {} };
+//query.jdata = { act: "query",condition: { nmlevel: [0,1,2,3] },operator : { nmlevel : 13 } };
+var request = { query: query };
+request.start = 0;
+request.count = 25;
+
+/** validate and assign value **/
+function PackingParameter(){
+// 	var nmlevel = dijit.byId("nmlevel").value;
+	var nmlevel = dijit.byId("nmlevel").get("value");
+	var cmleaf = dijit.byId('cmleaf').get("value");
+	var nmparent = dijit.byId('nmparent').get("value");
+	var cmname = dijit.byId('cmname').get("value");	
+	
+	query.jdata.condition = {};//解决了IE6下,undefined传到后台的问题
+	query.jdata.operator = {};
+	if(nmlevel !== ""){
+		query.jdata.condition.level = nmlevel;
+		query.jdata.operator.level = 1;
+	}
+	if(cmleaf !== ""){
+		query.jdata.condition.leaf = cmleaf;
+		query.jdata.operator.leaf = 1;
+	}
+	if(nmparent !== ""){
+		query.jdata.condition["t2.name"] = nmparent;
+		query.jdata.operator["t2.name"] = 11;
+	}
+	if(cmname !== ""){
+		query.jdata.condition.name = cmname;
+		query.jdata.operator.name = 11;
+	}
+	return true;
+};
+
+
+/** search data ,reload data **/
+function submitForm(){
+	query.jdata.act = "query";
+   	if(!PackingParameter()){
+   		return;
+   	}
+//  newSort();
+// 	store.fetch( { serverQuery:{
+// 		jdata: encodeURI( dojo.json.stringify( query.jdata ) ),
+// 		start: request.start, 
+// 		count: request.count 
+// 	} } );
+	grid.setStore(store);
+};
+/** 清空  **/
+function clearForm(){
+// 	dijit.byId('form').reset( e );
+	dijit.byId('nmlevel').set("value","");
+	dijit.byId('cmleaf').set("value","");
+};
+/** export data, don't search  **/
+function exportData(){
+	query.jdata.act = "exp";
+	if(!PackingParameter()){
+   		return;
+   	}
+    var form = document.createElement("form");
+    document.body.appendChild(form);
+    var i = document.createElement("input");
+    i.type = "hidden";
+    i.name = "jdata";
+    i.value = encodeURI( dojo.json.stringify( query.jdata ) );
+    form.appendChild(i);
+    form.action = "../../exp/tAuthorityModuleEXPexpModule.action";
+    form.method = "post";
+    form.submit();
+};
+
+function newSort(){
+	var sortFields = [{attribute: "level", descending: true },{attribute: "leaf", descending: false}];
+// 	var g = dijit.byId('grid');
+// 	g.setSortIndex(sortFields);
+	grid.setSortIndex( sortFields );
+}
+
+/** format level **/
+function fmtNmlevel(value, idx){
+// 	n = new Number(n);
+	switch( value ){
+		case 0: return '零级'; break;
+		case 1: return '一级'; break;
+		case 2: return '二级'; break;
+		case 3: return '三级'; break;
+		case 4: return '四级'; break;
+		default: return value;
+	}
+};
+/** format node type  **/
+function fmtCmleaf(value, idx){
+	value = new String(value);
+	if( value == "true" ){
+		return '叶子';
+	}else if( value == "false" ){
+		return '非叶子';
+	}else{
+		return value;
+	}
+};
+
+var fixlayout = {
+	noscroll: true,
+    cells: [
+		{ field: "id", name:"模块ID", datatype:"number", width: 4, hidden:true },
+		{ field: "name", name:"模块名称", datatype:"string", width: 15.5 }
+	]
+};
+    
+var mainlayout = {
+	cells: [
+		{ field: "level", name:"模块级别", datatype:"string", width: 6, formatter: fmtNmlevel },
+		{ field: "leaf", name:"模块类型", datatype:"string", width: 6, formatter: fmtCmleaf },
+		{ field: "order", name:"模块次序号", datatype:"string", width: 6},
+		{ field: "super", name:"上级模块", datatype:"string", width: 15.5},
+		{ field: "target", name:"链接目标", datatype:"string", hidden:true },
+		{ field: "iconcls", name:"模块图标样式", datatype:"string", hidden:true },
+		{ field: "expanded", name:"展开状态", datatype:"boolean", hidden:true },
+		{ field: "checked", name:"选定状态", datatype:"boolean", hidden:true },
+		{ field: "path", name:"模块路径", datatype:"string", width: 20},
+		{ field: "note", name: "模块备注", datatype:"string", width: 20},
+		{ field: "ctime", name: "创建时间", datatype:"date", hidden:true },
+		{ field: "cip", name: "创建者使用的IP", datatype:"string", hidden:true },
+		{ field: "cuser", name: "创建者", datatype:"string", hidden:true },
+		{ field: "mtime", name: "最后修改时间", datatype:"time", hidden:true },
+		{ field: "mip", name: "最后修改者使用的IP", datatype:"string", hidden:true },
+		{ field: "muser", name: "最后修改者", datatype:"string", hidden:true }
+	]
+};
+var layout = [ fixlayout, mainlayout ];
+	
+var plugins = {
+	pagination: {
+		pageSizes: [10, 25, 30, 50, 100, Infinity],// Array, custom the items per page button
+		description: true,	// boolean, custom whether or not the description will be displayed
+		sizeSwitch: true,	// boolean, custom whether or not the page size switch will be displayed
+		pageStepper: true,	// boolean, custom whether or not the page step will be displayed
+		gotoButton: true,	// boolean, custom whether or not the goto page button will be displayed
+		maxPageStep: 10,	// Integer, custom how many page step will be displayed
+		position: "bottom",	// String, custom the position of the pagination bar. There're two options: top, bottom
+		defaultPage: 1, 	// Integer, which page will be displayed by default 
+		defaultPageSize: 25 // Integer, what page size will be used by default
+	},
+	nestedSorting: true
+};
+
+var store = new dojox.data.QueryReadStore({
+	requestMethod:"post",
+	//url: "../../dojoQuery/tAuthorityModuleDojoQUERYdfind.action?start=0&count=20&jdata=" + encodeURI( dojo.json.stringify( jdata ) ),//for unit test
+	url: "../../query/tAuthorityModuleDojoQUERYdfind.action",
+	fetch: function( request ){
+		request.serverQuery = {
+			jdata: encodeURI( dojo.json.stringify( query.jdata ) ),
+			start: request.start, 
+			count: request.count 
+		};
+		return this.inherited("fetch", arguments);
+	}
+});
+
+/* dojo.addOnLoad(function(){
+	grid = new dojox.grid.EnhancedGrid({
+		id: "grid",
+		store: store,
+		structure: layout,
+		rowSelector: "20px",
+		sortFields: [{attribute: 'LEVEL_', descending: true },{attribute: 'LEAF', descending: false}],//default sorting order
+		canSort: function(colIndex, field){
+			return colIndex != 0 && field != "NAME" && field != "PATH" && field != "NOTE";
+		},
+		plugins: {nestedSorting: true}
+	});
+
+	dojo.byId("grid").appendChild(grid.domNode);
+	grid.startup();
+});
+ */
+
+</script>
+</head>
+<body class="claro">
+<!-- 
+liveSplitters="true" persist="false" id="borderContainer" design="sidebar"
+data-dojo-props="design:'sidebar', gutters:true, liveSplitters:true, persist:true, id='borderContainer'"
+ -->
+	<div dojoType="dijit/layout/BorderContainer" liveSplitters="true" persist="false"
+		          id="verticalSplitParam" design="sidebar" style="width: 100%; height: 100%;">
+	
+<!-- region="top" splitter="false" style="height:90px;background:#B3DFDA;"  -->
+	  <div dojoType="dijit/layout/ContentPane" id="mysearch" title="查询条件"
+		             region="top" splitter="true" style="height:50px;background:#B3DFDA;" >
+		  <div style="padding:0px 0 0px 0px">  
+	        <form id="form" method="post">
+<!-- 	            <table width="100%">   -->
+				<table>  
+	                <tr>	                    
+	                    <td>
+	                        <label for="nmlevel">模块级别:</label>
+							<select id="nmlevel" name="nmlevel" data-dojo-type="dijit/form/Select" style="width:200px;">
+								<option value="" selected="selected">--选择--</option>
+							    <option value="0">零级</option>
+							    <option value="1">一级</option>
+							    <option value="2">二级</option>
+							    <option value="3">三级</option>
+							    <option value="4">四级</option>
+							</select>
+	                    </td>
+	                    <td>
+	                        <label for="cmleaf">模块类型:</label>
+							<select id="cmleaf" name="cmleaf" data-dojo-type="dijit/form/Select" style="width:200px;"> 
+								<option value="" selected="selected">--选择--</option>
+							    <option value="true">叶子</option>
+							    <option value="false">非叶子</option>
+							</select>
+	                    </td>
+	                    <td>
+	                        <label for="nmparent">上级模块:</label>
+							<input type="text" id="nmparent" name="nmparent" value=""
+							    data-dojo-type="dijit/form/TextBox"
+							    data-dojo-props="trim:true, propercase:false" id="nmparent" />
+	                    </td>
+	                    <td>
+	                        <label for="cmname">模块名称:</label>
+							<input type="text" id="cmname" name="cmname" value=""
+							    data-dojo-type="dijit/form/TextBox"
+							    data-dojo-props="trim:true, propercase:false" id="cmname" />
+	                    </td>
+	                    <td>
+	                    	<div style="padding:0px 0 0px 15px">
+<!-- 	                    	onclick="clearForm()" -->
+	                        	<button data-dojo-type="dijit.form.Button" onclick="submitForm()">查询</button>
+								<button data-dojo-type="dijit.form.Button" type="reset" onclick="clearForm()">清空</button>
+								<button data-dojo-type="dijit.form.Button" onclick="exportData()">导出</button>
+	                        </div>
+	                    </td>
+	                </tr>
+	            </table>
+	        </form>
+	        </div>
+		</div>
+		<!-- style="width: 100%; height: 100%" 
+		<div id="grid" region="center" ></div>
+		-->
+		
+		<!-- 
+		sortFields="[{attribute: 'LEVEL_', descending: true },{attribute: 'LEAF', descending: false}]"
+		 -->
+		<div id="grid" jsId ="grid" dojoType="dojox/grid/EnhancedGrid" store="store" structure="layout" plugins="plugins" summary="A customized grid summary"
+			rowsPerPage="request.count" 
+			
+			data-dojo-props="canSort: function(colIndex, field){
+				return colIndex != 0 && field != 'name' && field != 'path' && field != 'note';
+			}"
+			region="center" ></div>
+	</div>
+</body>
+</html>

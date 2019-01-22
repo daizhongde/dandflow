@@ -1,0 +1,82 @@
+select * from t_columntype
+
+ColumnLabel  ColumnName  ColumnType  tColumnTypeName  Precision  Scale
+
+oracle11gR2
+(0) NUMBER_ID  |(1) BINARY_DOUBLE  |(2) BINARY_FLOAT  |(3) BLOB  |(4) CLOB  |(5) LONG1  |(6) RAW1  |(7) TIMESTAMP  |(8) TIMESTAMPWLTZ                   |(9) TIMESTAMPWTZ              |(10) CHAR0  |(11) DATE0  |(12) INTERVALD2S  |(13) INTERVALY2M  |(14) NCLOB  |(15) NVARCHAR2  |(16) VARCHAR20  |
+(0) NUMBER_ID  |(1) BINARY_DOUBLE  |(2) BINARY_FLOAT  |(3) BLOB  |(4) CLOB  |(5) LONG1  |(6) RAW1  |(7) TIMESTAMP  |(8) TIMESTAMPWLTZ                   |(9) TIMESTAMPWTZ              |(10) CHAR0  |(11) DATE0  |(12) INTERVALD2S  |(13) INTERVALY2M  |(14) NCLOB  |(15) NVARCHAR2  |(16) VARCHAR20  |
+(0) 2          |(1) 101            |(2) 100           |(3) 2004  |(4) 2005  |(5) -1     |(6) -3    |(7) 93         |(8) -102                            |(9) -101                      |(10) 1      |(11) 93     |(12) -104         |(13) -103         |(14) 2011   |(15) -9         |(16) 12         |
+(0) NUMBER     |(1) BINARY_DOUBLE  |(2) BINARY_FLOAT  |(3) BLOB  |(4) CLOB  |(5) LONG   |(6) RAW   |(7) TIMESTAMP  |(8) TIMESTAMP WITH LOCAL TIME ZONE  |(9) TIMESTAMP WITH TIME ZONE  |(10) CHAR   |(11) DATE   |(12) INTERVALDS   |(13) INTERVALYM   |(14) NCLOB  |(15) NVARCHAR2  |(16) VARCHAR2   |
+(0) 0          |(1) 0              |(2) 0             |(3) -1    |(4) -1    |(5) 2147483647|(6) 0  |(7) 0          |(8) 0                               |(9) 0                         |(10) 10     |(11) 0      |(12) 2            |(13) 2            |(14) -1     |(15) 20         |(16) 20         |
+(0) -127       |(1) 0              |(2) 0             |(3) 0     |(4) 0     |(5) 0      |(6) 0     |(7) 6          |(8) 6                               |(9) 6                         |(10) 0      |(11) 0      |(12) 6            |(13) 0            |(14) 0      |(15) 0          |(16) 0          |
+
+oracle11gR2: 
+12   VARCHAR2 
+-9   NVARCHAR2
+1    CHAR
+
+2    NUMBER
+100  BINARY_FLOAT
+101  BINARY_DOUBLE
+
+93   DATE  TIMESTAMP
+-101 TIMESTAMP WITH TIME ZONE
+-102 TIMESTAMP WITH LOCAL TIME ZONE
+
+
+sqlserver2008
+(0) bigint_id  |(1) binary  |(2) bit  |(3) char  |(4) date  |(5) datetime  |(6) datetime2  |(7) datetimeoffset  |(8) decimal  |(9) float  |(10) geography  |(11) geometry  |(12) hierarchyid  |(13) image  |(14) int  |(15) money  |(16) nchar  |(17) ntext  |(18) numeric  |(19) nvarchar  |(20) nvarchar_m  |(21) real  |(22) smalldatetime  |(23) smallint  |(24) smallmoney  |(25) text  |(26) time  |(27) timestamp  |(28) tinyint  |(29) uniqueidentifier  |(30) varbinary  |(31) varbinary_m  |(32) varchar  |(33) varchar_m  |(34) xml  |
+(0) bigint_id  |(1) binary  |(2) bit  |(3) char  |(4) date  |(5) datetime  |(6) datetime2  |(7) datetimeoffset  |(8) decimal  |(9) float  |(10) geography  |(11) geometry  |(12) hierarchyid  |(13) image  |(14) int  |(15) money  |(16) nchar  |(17) ntext  |(18) numeric  |(19) nvarchar  |(20) nvarchar_m  |(21) real  |(22) smalldatetime  |(23) smallint  |(24) smallmoney  |(25) text  |(26) time  |(27) timestamp  |(28) tinyint  |(29) uniqueidentifier  |(30) varbinary  |(31) varbinary_m  |(32) varchar  |(33) varchar_m  |(34) xml  |
+(0) -5         |(1) -2      |(2) -7   |(3) 1     |(4) 91    |(5) 93        |(6) 93         |(7) -155            |(8) 3        |(9) 8      |(10) -3         |(11) -3        |(12) -3           |(13) -4     |(14) 4    |(15) 3      |(16) -15    |(17) -16    |(18) 2        |(19) -9        |(20) -9          |(21) 7     |(22) 93             |(23) 5         |(24) 3           |(25) -1    |(26) 92    |(27) -2         |(28) -6       |(29) 1                 |(30) -3         |(31) -3           |(32) 12       |(33) 12         |(34) -16  |
+(0) bigint     |(1) binary  |(2) bit  |(3) char  |(4) date  |(5) datetime  |(6) datetime2  |(7) datetimeoffset  |(8) decimal  |(9) float  |(10) geography  |(11) geometry  |(12) hierarchyid  |(13) image  |(14) int  |(15) money  |(16) nchar  |(17) ntext  |(18) numeric  |(19) nvarchar  |(20) nvarchar    |(21) real  |(22) smalldatetime  |(23) smallint  |(24) smallmoney  |(25) text  |(26) time  |(27) timestamp  |(28) tinyint  |(29) uniqueidentifier  |(30) varbinary  |(31) varbinary    |(32) varchar  |(33) varchar    |(34) xml  |
+
+(0) 缴款书编号  |(1) 收费项目内码  |(2) 收费项目编码  |(3) 收费项目名称  |(4) 财政区划内码  |(5) 财政区划名称  |(6) 大厅内码   |(7) 大厅编码     |(8) 大厅名称   |(9) 执收单位内码   |(10) 执收单位编码  |(11) 执收单位名称  |(12) 开票日期  |(13) 缴款人         |(14) 缴款人开户银行  |(15) 缴款人帐号  |(16) 收款人开户行内码  |(17) 收款人开户行名称  |(18) 收款人帐号  |(19) 计量单位    |(20) 数量        |(21) 金额            |(22) 收费标准  |(23) 总金额   |(24) 减免标志      |(25) 作废标志          |(26) 打印标志      |(27) 刷卡确认标志  |(28) 开票人            |(29) 回执标志       |(30) 回执人            |(31) 回执日期  |(32) 开票方式        |(33) 缴款类型       |(34) 单位业务流水号  |(35) 银行交易流水号  |(36) 缴销状态       |(37) 票据状态       |(38) 传输标志      |(39) 预收标志       |(40) 财政记帐标志     |(41) 财政记帐时间  |(42) 记帐标志      |(43) 记帐时间  |(44) 商户号            |(45) 终端号           |(46) 系统参考号  |(47) 银行收款时间  |(48) 票据校验码  |(49) 调整标志       |(50) 备注                |(51) 上传时间  |(52) 收款人名称  |(53) 银联交易流水号  |
+(0) 缴款书编号  |(1) 收费项目内码  |(2) 收费项目编码  |(3) 收费项目名称  |(4) 财政区划内码  |(5) 财政区划名称  |(6) 大厅内码   |(7) 大厅编码     |(8) 大厅名称   |(9) 执收单位内码   |(10) 执收单位编码  |(11) 执收单位名称  |(12) 开票日期  |(13) 缴款人         |(14) 缴款人开户银行  |(15) 缴款人帐号  |(16) 收款人开户行内码  |(17) 收款人开户行名称  |(18) 收款人帐号  |(19) 计量单位    |(20) 数量        |(21) 金额            |(22) 收费标准  |(23) 总金额   |(24) 减免标志      |(25) 作废标志          |(26) 打印标志      |(27) 刷卡确认标志  |(28) 开票人            |(29) 回执标志       |(30) 回执人            |(31) 回执日期  |(32) 开票方式        |(33) 缴款类型       |(34) 单位业务流水号  |(35) 银行交易流水号  |(36) 缴销状态       |(37) 票据状态       |(38) 传输标志      |(39) 预收标志       |(40) 财政记帐标志     |(41) 财政记帐时间  |(42) 记帐标志      |(43) 记帐时间  |(44) 商户号            |(45) 终端号           |(46) 系统参考号  |(47) 银行收款时间  |(48) 票据校验码  |(49) 调整标志       |(50) 备注                |(51) 上传时间  |(52) 收款人名称  |(53) 银联交易流水号  |
+(0) 12        |(1) 12          |(2) 12          |(3) 12          |(4) 12          |(5) 12          |(6) 12       |(7) 12       |(8) 12       |(9) 12          |(10) 12          |(11) 12          |(12) 93      |(13) 12        |(14) 12           |(15) 12         |(16) 12             |(17) 12              |(18) 12        |(19) 12       |(20) 2      |(21) 2       |(22) 2       |(23) 2      |(24) 12        |(25) 12         |(26) 12        |(27) 12          |(28) 12        |(29) 12        |(30) 12        |(31) 93       |(32) 12        |(33) 12        |(34) 12            |(35) 12            |(36) 12        |(37) 12        |(38) 12        |(39) 12        |(40) 12           |(41) 93          |(42) 12        |(43) 93      |(44) 12        |(45) 12        |(46) 12        |(47) 93          |(48) 12        |(49) 12        |(50) 12        |(51) 93      |(52) 12        |(53) 12            |
+(0) VARCHAR2  |(1) VARCHAR2    |(2) VARCHAR2    |(3) VARCHAR2    |(4) VARCHAR2    |(5) VARCHAR2    |(6) VARCHAR2 |(7) VARCHAR2 |(8) VARCHAR2 |(9) VARCHAR2    |(10) VARCHAR2    |(11) VARCHAR2    |(12) DATE    |(13) VARCHAR2  |(14) VARCHAR2     |(15) VARCHAR2   |(16) VARCHAR2       |(17) VARCHAR2        |(18) VARCHAR2  |(19) VARCHAR2 |(20) NUMBER |(21) NUMBER  |(22) NUMBER  |(23) NUMBER |(24) VARCHAR2  |(25) VARCHAR2   |(26) VARCHAR2  |(27) VARCHAR2    |(28) VARCHAR2  |(29) VARCHAR2  |(30) VARCHAR2  |(31) DATE     |(32) VARCHAR2  |(33) VARCHAR2  |(34) VARCHAR2      |(35) VARCHAR2      |(36) VARCHAR2  |(37) VARCHAR2  |(38) VARCHAR2  |(39) VARCHAR2  |(40) VARCHAR2     |(41) DATE        |(42) VARCHAR2  |(43) DATE    |(44) VARCHAR2  |(45) VARCHAR2  |(46) VARCHAR2  |(47) DATE        |(48) VARCHAR2  |(49) VARCHAR2  |(50) VARCHAR2  |(51) DATE    |(52) VARCHAR2  |(53) VARCHAR2      |
+(0) 20        |(1) 5           |(2) 18          |(3) 100         |(4) 10          |(5) 100         |(6) 16       |(7) 3        |(8) 100      |(9) 16          |(10) 21          |(11) 100         |(12) 0       |(13) 80        |(14) 60           |(15) 40         |(16) 12             |(17) 60              |(18) 40        |(19) 20       |(20) 14     |(21) 14      |(22) 14      |(23) 14     |(24) 8         |(25) 6          |(26) 6         |(27) 6           |(28) 40        |(29) 6         |(30) 40        |(31) 0        |(32) 8         |(33) 8         |(34) 40            |(35) 40            |(36) 8         |(37) 4         |(38) 6         |(39) 2         |(40) 10           |(41) 0           |(42) 6         |(43) 0       |(44) 15        |(45) 8         |(46) 25        |(47) 0           |(48) 10        |(49) 6         |(50) 100       |(51) 0       |(52) 40        |(53) 25            |
+(0) 0         |(1) 0           |(2) 0           |(3) 0           |(4) 0           |(5) 0           |(6) 0        |(7) 0        |(8) 0        |(9) 0           |(10) 0           |(11) 0           |(12) 0       |(13) 0         |(14) 0            |(15) 0          |(16) 0              |(17) 0               |(18) 0         |(19) 0        |(20) 4      |(21) 2       |(22) 2       |(23) 2      |(24) 0         |(25) 0          |(26) 0         |(27) 0           |(28) 0         |(29) 0         |(30) 0         |(31) 0        |(32) 0         |(33) 0         |(34) 0             |(35) 0             |(36) 0         |(37) 0         |(38) 0         |(39) 0         |(40) 0            |(41) 0           |(42) 0         |(43) 0       |(44) 0         |(45) 0         |(46) 0         |(47) 0           |(48) 0         |(49) 0         |(50) 0         |(51) 0       |(52) 0         |(53) 0             |
+
+SQLServer2008R2
+12   varchar 
+-9   nvarchar
+1    char
+-15  nchar
+
+2    numeric
+3    money  smallmoney
+4    int
+5    smallint
+8    float
+-5   bigint
+
+91   date 
+92   time
+93   datetime datetime2
+-2   timestamp
+ 
+ 
+MySQL 5.1
+(0) integer0      |(1) float0  |(2) double0  |(3) tinyint           |(4) smallint  |(5) mediumint  |(6) int  |(7) integer  |(8) bigint  |(9) bit  |(10) real  |(11) double  |(12) float           |(13) decimal  |(14) numeric  |(15) char  |(16) varchar  |(17) date  |(18) time  |(19) year  |(20) timestamp  |(21) datetime  |(22) tinyblob  |(23) blob  |(24) mediumblob  |(25) longblob  |(26) tinytext  |(27) text     |(28) mediumtext  |(29) longtext  |(30) enum  |(31) set  |(32) binary  |(33) varbinary  |(34) varbinary2  |(35) point       |(36) linestring  |(37) polygon     |(38) geometry    |(39) multipoint  |(40) multilinestring  |(41) multipolygon  |(42) geometrycollection  |
+(0) integer0      |(1) float0  |(2) double0  |(3) tinyint           |(4) smallint  |(5) mediumint  |(6) int  |(7) integer  |(8) bigint  |(9) bit  |(10) real  |(11) double  |(12) float           |(13) decimal  |(14) numeric  |(15) char  |(16) varchar  |(17) date  |(18) time  |(19) year  |(20) timestamp  |(21) datetime  |(22) tinyblob  |(23) blob  |(24) mediumblob  |(25) longblob  |(26) tinytext  |(27) text     |(28) mediumtext  |(29) longtext  |(30) enum  |(31) set  |(32) binary  |(33) varbinary  |(34) varbinary2  |(35) point       |(36) linestring  |(37) polygon     |(38) geometry    |(39) multipoint  |(40) multilinestring  |(41) multipolygon  |(42) geometrycollection  |
+(0) 4             |(1) 7       |(2) 8        |(3) -6                |(4) 5         |(5) 4          |(6) 4    |(7) 4        |(8) -5      |(9) -7   |(10) 8     |(11) 8       |(12) 7               |(13) 3        |(14) 3        |(15) 1     |(16) 12       |(17) 91    |(18) 92    |(19) 91    |(20) 93         |(21) 93        |(22) -3        |(23) -4    |(24) -4          |(25) -4        |(26) -1        |(27) -1       |(28) -1          |(29) -1        |(30) 1     |(31) 1    |(32) -2      |(33) -3         |(34) -3          |(35) -2          |(36) -2          |(37) -2          |(38) -2          |(39) -2          |(40) -2               |(41) -2            |(42) -2                  |
+(0) INT UNSIGNED  |(1) FLOAT   |(2) DOUBLE   |(3) TINYINT UNSIGNED  |(4) SMALLINT  |(5) MEDIUMINT  |(6) INT  |(7) INT      |(8) BIGINT  |(9) BIT  |(10) DOUBLE|(11) DOUBLE  |(12) FLOAT UNSIGNED  |(13) DECIMAL  |(14) DECIMAL  |(15) CHAR  |(16) VARCHAR  |(17) DATE  |(18) TIME  |(19) YEAR  |(20) TIMESTAMP  |(21) DATETIME  |(22) TINYBLOB  |(23) BLOB  |(24) MEDIUMBLOB  |(25) LONGBLOB  |(26) VARCHAR   |(27) VARCHAR  |(28) VARCHAR     |(29) VARCHAR   |(30) CHAR  |(31) CHAR |(32) BINARY  |(33) VARBINARY  |(34) VARBINARY   |(35) GEOMETRY    |(36) GEOMETRY    |(37) GEOMETRY    |(38) GEOMETRY    |(39) GEOMETRY    |(40) GEOMETRY         |(41) GEOMETRY      |(42) GEOMETRY            |
+(0) 10            |(1) 10      |(2) 10       |(3) 20                |(4) 20        |(5) 4          |(6) 1    |(7) 1        |(8) 20      |(9) 1    |(10) 22    |(11) 11      |(12) 4               |(13) 10       |(14) 10       |(15) 255   |(16) 255      |(17) 10    |(18) 8     |(19) 4     |(20) 19         |(21) 19        |(22) 255       |(23) 65535 |(24) 16777215    |(25) 2147483647|(26) 85        |(27) 21845    |(28) 5592405     |(29) 715827882 |(30) 0     |(31) 0    |(32) 255     |(33) 255        |(34) 255         |(35) 2147483647  |(36) 2147483647  |(37) 2147483647  |(38) 2147483647  |(39) 2147483647  |(40) 2147483647       |(41) 2147483647    |(42) 2147483647          |
+(0) 0             |(1) 2       |(2) 2        |(3) 0                 |(4) 0         |(5) 0          |(6) 0    |(7) 0        |(8) 0       |(9) 0    |(10) 31    |(11) 0       |(12) 0               |(13) 0        |(14) 0        |(15) 0     |(16) 0        |(17) 0     |(18) 0     |(19) 0     |(20) 0          |(21) 0         |(22) 0         |(23) 0     |(24) 0           |(25) 0         |(26) 0         |(27) 0        |(28) 0           |(29) 0         |(30) 0     |(31) 0    |(32) 0       |(33) 0          |(34) 0           |(35) 0           |(36) 0           |(37) 0           |(38) 0           |(39) 0           |(40) 0                |(41) 0             |(42) 0                   |
+
+MySQL 5.1
+1  char
+12 varchar
+-1 varchar
+
+4  int unsigned,mediumint,int
+7  float,float undigned
+8  double
+-6 tinyint unsigned
+5  smallint
+-5 bigint
+3  deciaml
+
+91 date,year
+92 time
+93 timestamp,datetime

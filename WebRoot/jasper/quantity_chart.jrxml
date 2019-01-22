@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="quantity_chart" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="7d628648-78e2-4b29-bb35-4a5187e135d5">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DRYRUNID" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT b.name,COUNT(1) all_cnt,COUNT(IF(src_count=dst_count,NULL,1)) invalid_cnt FROM tool.mig_auditc_report_detail_result a,tool.v_busi_domain b
+WHERE a.entity=b.id  AND a.FARES_DRYRUN_ID=$P{DRYRUNID} GROUP BY b.name;]]>
+	</queryString>
+	<field name="name" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="all_cnt" class="java.lang.Long"/>
+	<field name="invalid_cnt" class="java.lang.Long"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnFooter>
+		<band height="125" splitType="Stretch">
+			<pie3DChart>
+				<chart>
+					<reportElement x="10" y="3" width="371" height="100" uuid="0b6e35a6-dab6-447c-aae8-a859e3aca9d2"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<keyExpression><![CDATA[$F{name}]]></keyExpression>
+					<valueExpression><![CDATA[$F{all_cnt}]]></valueExpression>
+				</pieDataset>
+				<pie3DPlot>
+					<plot/>
+					<itemLabel/>
+				</pie3DPlot>
+			</pie3DChart>
+			<pie3DChart>
+				<chart>
+					<reportElement x="381" y="3" width="367" height="100" uuid="22b2aa28-98a3-45b3-a0ff-426df4514533"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<keyExpression><![CDATA[$F{name}]]></keyExpression>
+					<valueExpression><![CDATA[$F{invalid_cnt}]]></valueExpression>
+				</pieDataset>
+				<pie3DPlot>
+					<plot/>
+					<itemLabel/>
+				</pie3DPlot>
+			</pie3DChart>
+			<staticText>
+				<reportElement x="510" y="103" width="149" height="20" uuid="3fb0dd8b-870c-4058-bb03-bff6b810c4a4"/>
+				<textElement>
+					<font isBold="true" isItalic="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[not passed domains]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="161" y="103" width="125" height="20" uuid="4c79075a-7d17-4803-bb06-403a61ec5f4f"/>
+				<textElement>
+					<font isBold="true" isItalic="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[all domains]]></text>
+			</staticText>
+		</band>
+	</columnFooter>
+</jasperReport>

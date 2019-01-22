@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+	
+	<bean id="commonAction" class="person.daizhongde.migration.struts2.action.common.CommonAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="commonService" />
+		</property>
+	</bean>
+	<bean id="commonJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.common.CommonJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="queryService">
+			<ref bean="queryService" />
+		</property>
+		<property name="commonService">
+			<ref bean="commonService" />
+		</property>
+	</bean>
+	<bean id="constantJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.ConstantJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="constantService" />
+		</property>
+	</bean>
+	
+	<bean id="commonCBBQUERYAction" class="person.daizhongde.migration.struts2.action.common.CommonCBBQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="queryService">
+			<ref bean="queryService" />
+		</property>
+		<property name="commonService">
+			<ref bean="commonService" />
+		</property>
+	</bean>
+	<bean id="commonCBBAction" class="person.daizhongde.migration.struts2.action.common.CommonCBBAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="queryService">
+			<ref bean="queryService" />
+		</property>
+		<property name="commonService">
+			<ref bean="commonService" />
+		</property>
+	</bean>
+	<bean id="commonCURDAction" class="person.daizhongde.migration.struts2.action.common.CommonCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="curdService">
+			<ref bean="curdService" />
+		</property>
+	</bean>
+	
+	<!-- 数据字典 | CBB -->
+	<bean id="dicCBBAction" class="person.daizhongde.migration.struts2.action.cbb.DictionaryCBBAction" autowire="no" autowire-candidate="false" scope="prototype">
+<!-- 		<property name="dataService"> -->
+<!-- 			<ref bean="tPubDictionaryService" /> -->
+<!-- 		</property> -->
+		<property name="codeDetailService">
+			<ref bean="migCodedetailDefineService" />
+		</property>
+		<property name="connectionService">
+			<ref bean="migConfigConnectionService" />
+		</property>
+	</bean>
+	
+	<!-- job import | IMP -->
+	<bean id="migJobInfoIMPAction" class="person.daizhongde.migration.struts2.action.imp.MigJobInfoIMPAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobInfoIMPService" />
+		</property>
+	</bean>
+	
+	<!-- legality audit config import | IMP -->
+	<bean id="migAuditvConfigIMPAction" class="person.daizhongde.migration.struts2.action.imp.MigAuditvConfigIMPAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditvConfigIMPService" />
+		</property>
+	</bean>
+	
+	<!-- 控件信息|Tree -->
+	<bean id="migTaskConfigTREEAction" class="person.daizhongde.migration.struts2.action.tree.MigTaskConfigTREEAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migTaskConfigService" />
+		</property>
+	</bean>
+	<!-- 控件信息|Tree -->
+	<bean id="migControlInfoTREEAction" class="person.daizhongde.migration.struts2.action.tree.MigControlInfoTREEAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migControlInfoService" />
+		</property>
+	</bean>
+	<!-- 控件信息|combobox -->
+	<bean id="controlCBBAction" class="person.daizhongde.migration.struts2.action.cbb.ControlCBBAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migControlInfoService" />
+		</property>
+	</bean>
+	
+	<!-- query -->
+	<bean id="migControlInfoJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigControlInfoJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migControlInfoService" />
+		</property>
+	</bean>
+	<!-- CURD -->
+	<bean id="migControlInfoCURDAction" class="person.daizhongde.migration.struts2.action.curd.MigControlInfoCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migControlInfoService" />
+		</property>
+	</bean>
+	
+	<!-- 作业参数|query -->
+	<bean id="migJobParaJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigJobParaJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobParaService" />
+		</property>
+	</bean>
+	<!-- CURD -->
+	<bean id="migJobParaCURDAction" class="person.daizhongde.migration.struts2.action.curd.MigJobParaCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobParaService" />
+		</property>
+	</bean>
+	
+	<!-- 作业实例参数|query -->
+	<bean id="migInsParaJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigInsParaJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migInsParaService" />
+		</property>
+	</bean>
+	
+	<!-- 作业内容 BUSI -->
+	<bean id="migJobContentBUSIAction" class="person.daizhongde.migration.struts2.action.busi.MigJobContentBUSIAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobContentService" />
+		</property>
+	</bean>
+	<!-- 作业内容 CURD -->
+	<bean id="migJobContentCURDAction" class="person.daizhongde.migration.struts2.action.curd.MigJobContentCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobContentService" />
+		</property>
+	</bean>
+	<!-- 作业信息|cbbquery -->
+	<bean id="migJobInfoCBBQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigJobInfoCBBQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobInfoService" />
+		</property>
+	</bean>
+	
+	<!-- 作业信息 CURD -->
+	<bean id="migJobInfoCURDAction" class="person.daizhongde.migration.struts2.action.curd.MigJobInfoCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobInfoService" />
+		</property>
+		<property name="jobContentService">
+			<ref bean="migJobContentService" />
+		</property>
+	</bean>
+	<!-- 作业信息|query -->
+	<bean id="migJobInfoJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigJobInfoJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobInfoService" />
+		</property>
+	</bean>
+	<!-- 作业信息 BUSI -->
+	<bean id="migJobInfoBUSIAction" class="person.daizhongde.migration.struts2.action.busi.MigJobInfoBUSIAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobInfoService" />
+		</property>
+	</bean>
+	<!-- 作业实例信息|query -->
+	<bean id="migJobInsJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigJobInsJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobInsService" />
+		</property>
+	</bean>
+	<!-- 作业实例信息|querycbb -->
+	<bean id="migJobInsCBBQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigJobInsCBBQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobInsService" />
+		</property>
+	</bean>
+	<!-- 作业实例信息|TreeGrid -->
+	<bean id="migJobInsTREEAction" class="person.daizhongde.migration.struts2.action.tree.MigJobInsTREEAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobInsService" />
+		</property>
+	</bean>
+	<!-- 作业实例信息|busi -->
+	<bean id="migJobInsBUSIAction" class="person.daizhongde.migration.struts2.action.busi.MigJobInsBUSIAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobInsService" />
+		</property>
+	</bean>
+	
+	<!-- Quartz 定进任务配置 -->
+	<bean id="migInsQuartzJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigInsQuartzJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migInsQuartzService" />
+		</property>
+	</bean>
+	<bean id="migInsQuartzCURDAction" class="person.daizhongde.migration.struts2.action.curd.MigInsQuartzCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migInsQuartzService" />
+		</property>
+	</bean>
+	
+	<!-- 任务信息 CURD -->
+	<bean id="migTaskInfoCURDAction" class="person.daizhongde.migration.struts2.action.curd.MigTaskInfoCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migTaskInfoService" />
+		</property>
+		<property name="migComInfoService">
+			<ref bean="migComInfoService" />
+		</property>
+	</bean>
+	<!-- 任务信息|cbbquery -->
+	<bean id="migTaskInfoJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigTaskInfoJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migTaskInfoService" />
+		</property>
+	</bean>
+	
+	<!-- 组件参数信息 CURD -->
+	<bean id="migComInsCURDAction" class="person.daizhongde.migration.struts2.action.curd.MigComInsCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migComInsService" />
+		</property>
+	</bean>
+	<!-- 组件参数信息 BUSI -->
+	<bean id="migComInfoBUSIAction" class="person.daizhongde.migration.struts2.action.busi.MigComInfoBUSIAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migComInfoService" />
+		</property>
+	</bean>
+	
+	<!-- 过程信息|query -->
+	<bean id="migJobProcessJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigJobProcessJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobProcessService" />
+		</property>
+	</bean>
+	<!-- 过程信息 BUSI -->
+	<bean id="migJobProcessBUSIAction" class="person.daizhongde.migration.struts2.action.busi.MigJobProcessBUSIAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobProcessService" />
+		</property>
+		<property name="jobInsService">
+			<ref bean="migJobInsService" />
+		</property>
+	</bean>
+	<!-- 过程信息|querycbb -->
+	<bean id="migJobProcessCBBQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigJobProcessCBBQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobProcessService" />
+		</property>
+	</bean>
+	<!-- 过程信息|CURD -->
+	<bean id="migJobProcessCURDAction" class="person.daizhongde.migration.struts2.action.curd.MigJobProcessCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobProcessService" />
+		</property>
+		<property name="jobInsService">
+			<ref bean="migJobInsService" />
+		</property>
+		<property name="migComInsService">
+			<ref bean="migComInsService" />
+		</property>
+	</bean>
+	
+	
+	<!-- 日志|query -->
+	<bean id="migJobLogJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigJobLogJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobLogService" />
+		</property>
+	</bean>
+	<!-- 日志BUSI -->
+	<bean id="migJobLogBUSIAction" class="person.daizhongde.migration.struts2.action.busi.MigJobLogBUSIAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migJobLogService" />
+		</property>
+	</bean>
+	
+	<!-- 业务参数配置 -->
+	<bean id="migTaskConfigCURDAction" class="person.daizhongde.migration.struts2.action.curd.MigTaskConfigCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migTaskConfigService" />
+		</property>
+	</bean>
+	
+	<!-- 字段稽核配置主表 -->
+	<!-- Tree -->
+	<bean id="migAuditfMainTREEAction" class="person.daizhongde.migration.struts2.action.tree.MigAuditfMainTREEAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditfMainService" />
+		</property>
+	</bean>
+	<bean id="migAuditfMainJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigAuditfMainJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditfMainService" />
+		</property>
+	</bean>
+	<bean id="migAuditfMainCURDAction" class="person.daizhongde.migration.struts2.action.curd.MigAuditfMainCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditfMainService" />
+		</property>
+	</bean>
+	<!-- querycbb -->
+	<bean id="migAuditfMainCBBQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigAuditfMainCBBQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditfMainService" />
+		</property>
+	</bean>
+	
+	<!-- 字段稽核配置从表 -->
+	<bean id="migAuditfSubJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigAuditfSubJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditfSubService" />
+		</property>
+	</bean>
+	<bean id="migAuditfSubCURDAction" class="person.daizhongde.migration.struts2.action.curd.MigAuditfSubCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditfSubService" />
+		</property>
+	</bean>
+	
+	<!-- 迁移内容稽核报告 -->
+	<bean id="migAuditfMainResultJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigAuditfMainResultJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditfMainResultService" />
+		</property>
+	</bean>
+	<bean id="migAuditfMainResultPRINTAction" class="person.daizhongde.migration.struts2.action.print.MigAuditfMainResultPRINTAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditfMainResultService" />
+		</property>
+	</bean>
+	<bean id="migAuditfMainResultEXPAction" class="person.daizhongde.migration.struts2.action.exp.MigAuditfMainResultEXPAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditfMainResultService_EXP" />
+		</property>
+		<property name="loginCheck">
+			<value>${download.login}</value>
+		</property>
+	</bean>
+	
+	<!-- 迁移内容稽核差异明细 -->
+	<bean id="migAuditfDetailResultJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigAuditfDetailResultJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditfDetailResultService" />
+		</property>
+	</bean>
+	<bean id="migAuditfDetailResultPRINTAction" class="person.daizhongde.migration.struts2.action.print.MigAuditfDetailResultPRINTAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditfDetailResultService" />
+		</property>
+	</bean>
+	<bean id="migAuditfDetailResultEXPAction" class="person.daizhongde.migration.struts2.action.exp.MigAuditfDetailResultEXPAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditfDetailResultService_EXP" />
+		</property>
+		<property name="loginCheck">
+			<value>${download.login}</value>
+		</property>
+	</bean>
+	<bean id="migAuditfFieldResultJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigAuditfFieldResultJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditfFieldResultService" />
+		</property>
+	</bean>
+	<bean id="migAuditfFieldResultEXPAction" class="person.daizhongde.migration.struts2.action.exp.MigAuditfFieldResultEXPAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditfFieldResultService_EXP" />
+		</property>
+		<property name="loginCheck">
+			<value>${download.login}</value>
+		</property>
+	</bean>
+	
+	<!-- 一致性稽核配置 -->
+	<bean id="migAuditcConsistencyCURDAction" class="person.daizhongde.migration.struts2.action.curd.MigAuditcConsistencyCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditcConsistencyService" />
+		</property>
+	</bean>
+	<!-- 一致性稽核结果 -->
+	<bean id="migAuditcReportDetailResultJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigAuditcReportDetailResultJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditcReportDetailResultService" />
+		</property>
+	</bean>
+	<bean id="migAuditcReportDetailResultCURDAction" class="person.daizhongde.migration.struts2.action.curd.MigAuditcReportDetailResultCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditcReportDetailResultService" />
+		</property>
+	</bean>
+	<bean id="migAuditcReportDetailResultPRINTAction" class="person.daizhongde.migration.struts2.action.print.MigAuditcReportDetailResultPRINTAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditcReportDetailResultService" />
+		</property>
+	</bean>
+	
+	<bean id="migAuditcReportDetailResultEXPAction" class="person.daizhongde.migration.struts2.action.exp.MigAuditcReportDetailResultEXPAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditcReportDetailResultService_EXP" />
+		</property>
+		<property name="loginCheck">
+			<value>${download.login}</value>
+		</property>
+	</bean>
+	
+	<!-- 合法性稽核配置 -->
+	<bean id="migAuditvConfigCURDAction" class="person.daizhongde.migration.struts2.action.curd.MigAuditvConfigCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditvConfigService" />
+		</property>
+	</bean>
+	<bean id="migAuditvConfigJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigAuditvConfigJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditvConfigService" />
+		</property>
+	</bean>
+	<bean id="migAuditvConfigCBBQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigAuditvConfigCBBQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditvConfigService" />
+		</property>
+	</bean>
+	<!-- 2 level Tree -->
+	<bean id="migAuditvConfigTREEAction" class="person.daizhongde.migration.struts2.action.tree.MigAuditvConfigTREEAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditvConfigService" />
+		</property>
+	</bean>
+	
+	
+	
+	<!-- muti-level tree -->
+	<bean id="migAuditvConfigtreeTREEAction" class="person.daizhongde.migration.struts2.action.tree.MigAuditvConfigtreeTREEAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditvConfigtreeService" />
+		</property>
+	</bean>
+	<bean id="migAuditvConfigtreeCURDAction" class="person.daizhongde.migration.struts2.action.curd.MigAuditvConfigtreeCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditvConfigtreeService" />
+		</property>
+	</bean>
+	
+	<!-- 合法性稽核结果 -->
+	<bean id="migAuditvResultJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigAuditvResultJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditvResultService" />
+		</property>
+	</bean>
+	<bean id="migAuditvResultCURDAction" class="person.daizhongde.migration.struts2.action.curd.MigAuditvResultCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditvResultService" />
+		</property>
+	</bean>
+	<bean id="migAuditvErrreasonBUSIAction" class="person.daizhongde.migration.struts2.action.busi.MigAuditvErrreasonBUSIAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditvErrreasonService" />
+		</property>
+	</bean>
+	<bean id="migAuditvResultPRINTAction" class="person.daizhongde.migration.struts2.action.print.MigAuditvResultPRINTAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditvResultService" />
+		</property>
+	</bean>
+	
+	<bean id="migAuditvResultEXPAction" class="person.daizhongde.migration.struts2.action.exp.MigAuditvResultEXPAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditvResultService_EXP" />
+		</property>
+		<property name="loginCheck">
+			<value>${download.login}</value>
+		</property>
+	</bean>
+	<!-- data count audit for  file\middle table\target table -->
+	<bean id="migAuditPrecheckJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigAuditPrecheckJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditPrecheckService" />
+		</property>
+	</bean>
+	<bean id="migAuditPrecheckEXPAction" class="person.daizhongde.migration.struts2.action.exp.MigAuditPrecheckEXPAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migAuditPrecheckService_EXP" />
+		</property>
+		<property name="loginCheck">
+			<value>${download.login}</value>
+		</property>
+	</bean>
+	
+	<!-- 聊天记录-->
+	<bean id="tChatMsgJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.TChatMsgJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="tChatMsgService" />
+		</property>
+	</bean>
+	
+	<!-- 亚信员工信息 query -->
+	<bean id="tAsiainfoEmployeeJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.TAsiainfoEmployeeJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="tAsiainfoEmployeeService" />
+		</property>
+	</bean>
+	<!-- 亚信员工信息  CURD -->
+	<bean id="tAsiainfoEmployeeCURDAction" class="person.daizhongde.migration.struts2.action.curd.TAsiainfoEmployeeCURDAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="tAsiainfoEmployeeService" />
+		</property>
+	</bean>
+	<!-- 亚信员工信息 |CBB -->
+	<bean id="tAsiainfoEmployeeCBBAction" class="person.daizhongde.migration.struts2.action.cbb.TAsiainfoEmployeeCBBAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="tAsiainfoEmployeeService" />
+		</property>
+	</bean>
+	<!-- 亚信员工信息 |Tree -->
+	<bean id="tAsiainfoEmployeeTREEAction" class="person.daizhongde.migration.struts2.action.tree.TAsiainfoEmployeeTREEAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="tAsiainfoEmployeeService" />
+		</property>
+	</bean>
+	
+	<!-- 迁移表清单配置| query -->
+	<bean id="migSyncConfigJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigSyncConfigJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migSyncConfigService" />
+		</property>
+	</bean>
+	<!-- 迁移表清单配置| import -->
+	<bean id="migSyncConfigIMPAction" class="person.daizhongde.migration.struts2.action.imp.MigSyncConfigIMPAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="migSyncConfigService_IMP" />
+		</property>
+		<property name="loginCheck">
+			<value>${download.login}</value>
+		</property>
+	</bean>
+	
+	
+	
+</beans>

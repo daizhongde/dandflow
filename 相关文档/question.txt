@@ -1,0 +1,2 @@
+SQLColumnF2B类中方法使用static与不使用static的区别
+hibernate HQL中使用decode函数和oracle字符拼装'||'

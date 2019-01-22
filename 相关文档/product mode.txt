@@ -1,0 +1,27 @@
+web.xml:
+	comment below:
+	    <context-param>
+	       <param-name>contextClass</param-name>
+	       <param-value>org.apache.struts2.spring.ClassReloadingXMLWebApplicationContext</param-value>
+	    </context-param> 
+	
+	set dwr debug=false
+	
+struts.xml
+	<constant name="struts.devMode" value="false" />
+	
+log4j.properties
+	log4j.logger.org.appfuse=DEBUG                   	 -> ERROR
+	log4j.logger.org.acegisecurity=WARN          	     -> ERROR
+	log4j.logger.org.springframework=WARN           	 -> ERROR
+	log4j.logger.org.springframework.security =DEBUG     -> ERROR
+	log4j.logger.org.hibernate=WARN                      -> ERROR
+	
+applicationContext.xml
+	hibernate.show_sql=true                           -> false  
+	hibernate.format_sql=true						-> false
+	
+	
+	数据库禁止表细表的触发器
+	alter table t_file_front_detail disable all triggers;
+	

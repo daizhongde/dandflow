@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- 以表格的形式展示（本页面是子页面，打开时需传入实例ID）
+主记录：正在运行的叶子任务
+列表：实例名｜叶子任务名称｜正在运行的叶子任务数量｜耗时｜启动时间
+使用了websocket, action 采用prototype 多实例
+ -->
+<meta charset="UTF-8">
+<title>监控某个实例正在运行的叶子任务数量</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.5.5.1/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.5.5.1/themes/icon.css"/>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.5.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.5.5.1/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../../scripts/const/const.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+
+
+<style type="text/css">  
+
+</style>   
+  
+    <script src="../../scripts/websocket/sockjs.min.js"></script>  
+
+<script type="text/javascript">
+var id = getUrlParam("id"), jid = getUrlParam("jid");
+console.log("id:"+id+",jid:"+jid);
+var interval = 3;// unit is second
+/**       websocket js begin         */    
+var websocket = null;  
+var username = "daizd";
+     
+//判断当前浏览器是否支持WebSocket  
+if ('WebSocket' in window) {
+	var url = "ws://" + document.location.host + "/migration/websocket/runningTask/" + username + "/";
+// 	console.log(url);
+    websocket = new WebSocket(url);  
+} else {  
+    alert('当前浏览器 Not support websocket')  
+}  
+  
+//连接发生错误的回调方法  
+websocket.onerror = function() {  
+	console.log("WebSocket连接发生错误");  
+};  
+  
+//连接成功建立的回调方法  
+websocket.onopen = function() {  
+	console.log("WebSocket连接成功");
+}
+
+//接收到消息的回调方法  
+websocket.onmessage = function(event) {
+// 	console.log("yes!");
+    setMessageInnerHTML(event.data);  
+}
+
+//连接关闭的回调方法  
+websocket.onclose = function() {  
+	console.log("WebSocket连接关闭");
+}
+
+//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。  
+window.onbeforeunload = function() {  
+    closeWebSocket();  
+}
+function setMessageInnerHTML(msg){
+	 //do something
+// 	 console.log("msg:"+jQuery.parseJSON( msg ));
+	 $('#grid').datagrid( 'loadData', jQuery.parseJSON( msg ));
+	 /* 页面间隔发起sendMessage 触发服务端推送 */
+	 setTimeout("sendMessage()", interval*1000);
+};
+//关闭WebSocket连接  
+function closeWebSocket() {
+    websocket.close();  
+}
+function sendMessage() {
+	var options = $('#grid').datagrid('options');
+// 	var jdata  = options.queryParams.jdata;
+// 	var page = options.pageNumber;
+// 	var rows = options.pageSize;
+// 	var sort = options.sortName;
+// 	var order = options.sortOrder;
+// 	console.log($.toJSON(options));
+	websocket.send($.toJSON(options));  
+}  
+   
+/**       websocket js end         */   
+    
+/** virtue js begin   */
+var noquery = VIRTUE.noquery;
+var query = VIRTUE.query;
+var OPE = VIRTUE.operator;
+
+var app={};
+app.selectedRow = {};//记录数据表格中选择中的行
+
+var jobType = ajaxReqRespText("/cbb/dicCBBgetDicByType.action?dicType=job_type" );
+jobType = eval ("(" + jobType + ")");
+
+var author = ajaxReqRespText("/common/commonCommoncurrentUserLogname.action");
+
+/* instance type : general
+ * status: not in init,finish, PAUSE
+  		 	in  EXECUTING   PAUSING_MANUAL  ERROR
+   */
+query.jdata.condition["job_ins_id"] = id;
+query.jdata.operator["job_ins_id"] = OPE.EQUAL;
+	
+query.jdata.condition["status"] = [JSTATE.EXECUTING, JSTATE.PAUSING_MANUAL, JSTATE.ERROR];
+query.jdata.operator["status"] = OPE.IN;
+
+query.jdata.condition["isleaf"] = 1;
+query.jdata.operator["isleaf"] = OPE.EQUAL;
+
+/** validate and assign value **/
+function PackingParameter(){
+	var isleaf = $('#isleaf').combobox("getValue");
+	
+	query.init();
+	if(isleaf != "" && isleaf != null){
+		query.jdata.condition.isleaf = isleaf;
+		query.jdata.operator.isleaf = OPE.EQUAL;
+	}
+	query.jdata.condition["job_ins_id"] = id;
+	query.jdata.operator["job_ins_id"] = OPE.EQUAL;
+		
+	query.jdata.condition["status"] = [JSTATE.EXECUTING, JSTATE.PAUSING_MANUAL, JSTATE.ERROR];
+	query.jdata.operator["status"] = OPE.IN;
+	
+
+	
+	return true;
+};
+
+/** search data ,reload data  **/
+function submitForm(){
+   	if(!PackingParameter()){
+   		return;
+   	}
+   	$('#grid').datagrid( 'reload', { jdata: encodeURI( $.toJSON( query.jdata ) ) } );
+};
+/**  清空  **/
+function clearForm(){
+	$('#s_form').form('clear');
+};
+
+/** format level **/
+function fmtStatus(n,row,index){
+	n = new String(n);
+	if(n=='0'){
+		return JSTATENAME[n]==undefined ? n : JSTATENAME[n];
+	}else{
+		return "<img src='../../images/job/"+PSTATEICON[n]+"'  alt='alt' />"+(JSTATENAME[n]==undefined ? n : JSTATENAME[n]);
+	}
+};
+
+//program component
+$(function(){
+	$('#grid').datagrid({
+		title: 'Search Result',
+		//iconCls:'icon-reload',
+// 		toolbar: toolbar,
+		width: 938,
+		height: 720,
+		nowrap: true,
+		striped: true,
+		fit: true,
+// 		collapsible: true,
+		url: "../../query/migJobProcessJEasyUIQUERYdfind.action",
+		idField: "process_id",
+		remoteSort: true,
+		sortName:"process_id",
+		sortOrder:"asc",
+		singleSelect: false,
+		columns: [[
+            {title :'Instance ID',field:"job_ins_id", hidden: true},
+            {title :'Job ID',field:"job_id", hidden: true},
+            {title :'Process ID', field : "process_id", width : 120 },
+            {title :'Node ID', field : "node_id", width : 120 },
+            {title :'Control ID',field:"control_id", width:100, sortable: true},
+		    {title :'Node Name',field:"node_name", width:320, sortable: true, formatter: function(value,row,index){
+		    	var clazz = row.control_id=='' ? 'icon-job':controlIcon3[row.control_id];
+// 				return '<span class="'+clazz+'"></span>'+value;
+// 				return '<span class="'+clazz+'"></span><span class="tree-title">'+value+'</span>';
+				return '<span class="tree-icon tree-folder '+clazz+'"></span><span class="tree-title">'+value+'</span>';
+// 				return clazz;
+//  <span class="tree-icon tree-folder icon-job"></span> 
+//  <span class="tree-icon tree-file icon-shell"></span>
+
+					//styler
+					//return 'background-color:#ffee00;color:red;';
+					// the function can return predefined css class and inline style
+					// return {class:'c1',style:'color:red'}
+			}},
+		    {title :'Com ID',field:"com_id", width:120, sortable: true},
+		    {title:'Status',field:"status",width:100, formatter: fmtStatus,sortable: true },
+// 		    {title:'Instance Type',field:"type", width:120, sortable: true, formatter: function(value,row, index ){
+// 				for(var i=0, j=jobType.length; i<j; i++){
+// 					if( jobType[i].code == value ){
+// 						return jobType[i].value
+// 					}
+// 				}
+// 			} },
+
+			{title:'Node Desc',field:"node_remark",width:280 },
+			{title:'Author',field:"author",width:80, sortable: true  },
+		    {title:'Description',field:"remark",width:280 },
+		    {title:'Begin Time',field:"begin_time",width:150, sortable: true }
+		]],
+		rownumbers:true,
+		pagination:true,
+		pageSize: 20,
+		queryParams:{
+			jdata: encodeURI($.toJSON( query.jdata )) 
+		},
+		onLoadSuccess: function(pageNumber, pageSize){
+			$('#grid').datagrid('clearSelections');
+		}
+	});
+
+});
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+    <div data-options="region:'north',border:true,split:true" style="height:145px;background:#B3DFDA;" title="Instance console--Search Condition" >
+        <form id="s_form" method="post" style="margin:0;padding:0;">
+        <div style="padding:0px 0 0px 15px">
+            <table width="100%">
+                <tr>
+                    <td  style="width:15%;">Task Type:</td>
+                    <td  style="width:15%;">
+                    	<select id="isleaf" class="easyui-combobox" name="isleaf" style="width:100%;">
+			                <option value="0" >非叶子</option>
+			                <option value="1" selected="selected">叶子</option>
+			            </select>
+                    </td>
+                    <td></td> <td></td>
+                    <td></td> <td></td>
+                    <td></td> <td></td>
+                </tr>
+            </table>
+        </div>
+        <table width="100%" border="0" align="center">
+			<tr bgcolor="#E2EEFE" valign="bottom">
+				<td height="23"><div align="center"><!-- default height='21'  -->
+					<a class="easyui-linkbutton" data-options="iconCls:'icon-search'" href="javascript:void(0)" 
+               		onclick="submitForm()" style="width:80px">Submit</a>
+               		&nbsp;&nbsp;
+               		<a class="easyui-linkbutton" data-options="iconCls:'icon-clear'" href="javascript:void(0)" 
+               		onclick="clearForm()" style="width:80px">Clear</a>
+				</div></td>
+			</tr>
+		</table>
+		</form>
+    </div>
+    <div data-options="region:'center',border:false" title="" style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+	<script type="text/javascript">
+	$(function () {
+// 		var t=setTimeout("sendMessage()", interval*1000);
+	})
+	</script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- 第一次尝试：尝试多种方式获取坐标值 -->
+	<meta charset="UTF-8">
+	<title>新建作业</title>
+	<link rel="stylesheet" type="text/css" href="../scripts/jquery-easyui/1.4.1/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../scripts/jquery-easyui/1.4.1/themes/icon.css">
+	<style type="text/css">
+	
+#demo_emdrap a,.renderMode a,#explanation a {
+	padding: 0.3em; border-radius: 0.2em; color: rgb(1, 163, 198); font-family: helvetica; font-weight: bold; text-decoration: none;
+}
+#demo_emdrap a,.renderMode a,#explanation a:hover {
+	color: rgb(27, 145, 27); background-color: rgb(240, 240, 240);
+}
+#explanation a {
+	background-color: transparent;
+}
+#explanation a:hover {
+	text-decoration: underline;
+}
+#explanation {
+	padding: 1em; border-radius: 1em; border: 0.25em solid rgb(221, 221, 221); top: 4em; width: 32em; right: 1em; color: black; font-family: helvetica; font-size: 90%; filter: alpha(opacity=90); position: absolute; z-index: 1000; opacity: 0.9; box-shadow: 2px 2px 19px #aaa; background-color: white; -o-box-shadow: 2px 2px 19px #aaa; -webkit-box-shadow: 2px 2px 19px #aaa; -moz-box-shadow: 2px 2px 19px #aaa; -moz-border-radius: 1em;
+}
+	</style>
+	<script type="text/javascript" src="../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+	<script type="text/javascript" src="../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="../scripts/json/jquery.json-2.2.min.js"></script>
+	<script type="text/javascript">
+var newCtrlNum=0;
+var x = 0;
+var y = 0;
+
+
+/** 专门记录鼠标的坐标   **/
+function showPosition(e) {
+	var x, y;
+	var e = e || window.event;
+
+	document.getElementById("x").value = e.clientX
+			+ document.body.scrollLeft
+			+ document.documentElement.scrollLeft;
+	document.getElementById("y").value = e.clientY
+			+ document.body.scrollTop + document.documentElement.scrollTop
+
+}
+
+	function createNode(){
+		var i = document.createElement("div");
+		i.id="dd1";
+		i["class"] = "easyui-draggable";
+		i["data-options"] = "onDrag:onDrag";
+		i.style="width:50px;height:50px;background:#fafafa;border:1px solid #ccc;";	
+		return i;
+	}
+	/** left: 100px;   **/
+	function createNode2(pageY){
+		newCtrlNum ++;
+		var i = "<div id='dd" + newCtrlNum + "' class='easyui-draggable' data-options='onDrag:onDrag' "
+		+"style='width:34px;height:34px;background:#fafafa;border:1px solid #ccc;position: absolute; top: "+pageY+"px;'>"
+		+"</div>";
+		
+		return i;
+	}
+	function createNode3(){
+		var i = "<div id='dd' class='easyui-draggable' data-options='handle:\"#title\"' style='width:100px;height:100px;'>"
+		+"<div id='title' style='background:#ccc;'>title</div></div>";	
+		return i;
+	}
+	
+	</script>
+</head>
+<body class="easyui-layout">
+	<div data-options="region:'west',split:true" title="控件" style="width:250px;">
+		<ul id="tt" class="easyui-tree" 
+			data-options="url:'../tree/migControlInfoTREEquery_JEasyUI_Tree.action',
+			animate:true, dnd:true, lines:true,mode: 'remote',revert: false,
+			onStopDrag: onStopDrag2
+			">
+		</ul>
+	</div>
+	<div data-options="region:'center',title:'noheader',iconCls:'icon-add'" noheader="true">
+		<div class="easyui-tabs" data-options="fit:true,border:false,plain:true">
+			<div id="tabPanel1" title="作业1" cache="true" style="overflow:hidden;">
+<!-- 				<iframe scrolling="yes" id="mtable" name="mtable" src="workspace.html" style="width:100%;height:100%" marginheight="0" marginwidth="0" frameborder="0"></iframe> -->
+				<div class="easyui-layout" data-options="fit:true">
+					<div noheader="true" class="easyui-droppable targetarea" onmousemove="showPosition(event)" 
+						data-options="region:'center',title:'noheader',iconCls:'icon-add',
+							accept: '.tree-node',
+		                    onDragEnter: function(e,source){
+		                        //$(this).html('enter');
+		                    },
+		                    onDragLeave: function(e,source){
+		                        //$(this).html('leave');
+		                    },
+		                    onDrop: function(e, source ){
+		                    	/**/
+		                    	alert('e:' + $.toJSON( e ) );
+		                    	//alert('window.event:' + $.toJSON( $(window.event) ) );
+		                    	//alert( 'X:'+ $(e.target).pageX +' Y:'+ $(e.target).offset().top );
+		                    	//alert( 'd.left:'+ $(e.target).offset().left +' d.top:'+ $(e.target).offset().top );
+		                    	//alert( 'd.left:'+ $(source).offset().left +' d.top:'+ $(source).offset().top );
+		                    	
+		                    	//alert('target:' + $.toJSON($(e.target)) );
+		                    	//alert('source:' + $.toJSON(source) );
+		                    	//alert('d.left:'+e.left);
+                  				//alert('d.top:'+e.top);
+                  		
+		                    	var node = $('#tt').tree( 'getNode', source );
+		                    	
+		                    	if(node.id.length !=1 ){
+		                    		//获取相对(父元素)位置: 
+									//var X = $(source).left; 
+									//var Y = $(source).right;
+									
+									//e = window.event;
+									//var X = e.clientX+document.body.scrollLeft+document.documentElement.scrollLeft;
+                					//var Y = e.clientY+document.body.scrollTop+document.documentElement.scrollTop
+                  
+									//alert( 'X:'+X+' Y:'+Y );
+									//alert( 'X1:'+ e.pageX +' Y1:'+ e.pageY );
+									
+		                    		$(this).append( createNode2(source.pageY) );
+		                    		$('#dd'+newCtrlNum ).draggable();
+		                    	}
+		                    }">
+				    	<div class="easyui-draggable" 
+				    	data-options="onDrag:onDrag, onStopDrag: onStopDrag"
+				    	style="width:34px;height:34px;background:#fafafa;border:1px solid #ccc;  
+				    		position: absolute; left: 269px; top: 64px;">
+				        </div>
+				        
+				        <div class="easyui-draggable" 
+				        data-options="onDrag:onDrag, onStopDrag: onStopDrag" 
+				        style="width: 34px; height: 34px; background: none repeat scroll 0% 0% rgb(250, 250, 250); 
+				        	border: 1px solid rgb(204, 204, 204); 
+				        	position: absolute; left: 100px; top: 64px;">
+				        </div>
+				        
+
+					</div>
+					
+				<script>
+
+				   function onDrag(e){
+				  	   var d = e.data; 
+				  	  alert('e:' + $.toJSON(e) );
+				       if (d.left < 0){d.left = 0}
+				       if (d.top < 0){d.top = 0}
+				       if (d.left + $(d.target).outerWidth() > $(d.parent).width()){
+				           d.left = $(d.parent).width() - $(d.target).outerWidth();
+				       }
+				       if (d.top + $(d.target).outerHeight() > $(d.parent).height()){
+				           d.top = $(d.parent).height() - $(d.target).outerHeight();
+				       }
+				   }
+				   function onStopDrag(e){
+					   //alert('e.data:' + $.toJSON(e.data) );
+				  	   var d = e.data;
+				 	   alert('d.left:'+d.left+' d.top:'+d.top);
+				   }
+				   function onStopDrag2(node){
+// 					   alert( 'X:'+ node.pageX +' Y:'+ node.pageY );
+					   //position   offset
+					   //alert('node:' + $.toJSON(node) );
+					   //var fus = document.selection.createRange();//获取光标位置 
+					   //alert('fus:' + $.toJSON(fus) );
+						//alert( 'd.left:'+ $(node.target).position().left +' d.top:'+ $(node.target).position().top );
+// 						alert( 'd.left:'+ $(node.target).offset().left +' d.top:'+ $(node.target).offset().top );
+// 				  	   var d = e.data;
+				 		//alert('d.left:'+d.left);
+				 		//alert( $(e).offset().left );
+		                    	//alert( $(e).offset().top );
+		                    	//alert( $(e).position().left );
+		                    	//alert( $(e).position().top );
+		                    	
+                  		//alert('d.top:'+d.top);
+				   }
+				</script>
+				
+					
+	<div id="explanation" class="easyui-draggable" >
+        <p>
+            初始化字符:
+        </p>
+        <p>
+            <textarea cols="32" rows="2" id="InitText">{"Position":{ "ID1001": "50px33"},{ "ID1002": "90px33"},"Relation":{ "firstName":"ID1001", "ID1002" }}
+            </textarea>
+        </p>
+        <p>
+            位置字符:
+        </p>
+        <p>
+            <textarea cols="32" rows="2" id="PositionText"></textarea>
+        </p>
+        <p>
+            关系字符:
+        </p>
+        <p>
+            <textarea cols="32" rows="2" id="RelationText"></textarea>
+        </p>
+        <p>
+           坐标:
+        </p>
+        <p>
+		x:<input id="x" type="text" value="" /> y:<input id="y" type="text" value="" />
+        </p>
+    </div>
+    
+				</div>
+			</div>
+		</div>
+	</div>
+
+<script type="text/javascript">
+jQuery(document).ready(function()
+{
+
+}); 
+</script>
+</body>
+</html>

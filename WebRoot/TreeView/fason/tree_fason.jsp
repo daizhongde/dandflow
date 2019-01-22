@@ -1,0 +1,126 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@page import="org.springframework.context.ApplicationContext"%>
+<%@page	import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@page	import="person.daizhongde.authority.spring.service.impl.TAuthorityModuleServiceImpl"%><%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://"
+			+ request.getServerName() + ":" + request.getServerPort()
+			+ path + "/";
+
+	ApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(session.getServletContext());
+	String jsonData = TAuthorityModuleServiceImpl.getFromApplicationContext(ctx).getData_GubuSoft_Tree();
+%><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+	<head>
+		<base href="<%=basePath%>">
+		<title>菜单树  by fason JSP</title>
+		<meta http-equiv="pragma" content="no-cache">
+		<meta http-equiv="cache-control" content="no-cache">
+		<meta http-equiv="expires" content="0">
+		<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+		<meta http-equiv="description" content="This is my page">
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<style type="text/css">
+body {
+    font-family:helvetica,tahoma,verdana,sans-serif;
+    font-size:13px;
+    background-color: #C3E3FF; 
+}
+TD {
+	FONT-SIZE: 9pt
+}
+A:link {
+	COLOR: #ff0000
+}
+.node {
+	FONT-SIZE: 12px;
+	WIDTH: 1px;
+	FONT-FAMILY: Verdana
+}
+.node A {
+	COLOR: #000000;
+	TEXT-DECORATION: none
+}
+.node A:hover {
+	COLOR: #ff0000;
+	TEXT-DECORATION: underline
+}
+SPAN {
+	CURSOR: hand;
+	HEIGHT: 17px
+}
+.disabled {
+	CURSOR: not-allowed;
+	HEIGHT: 17px;
+	COLOR: #666666;
+	BORDER: #666666
+}
+.highlight {
+	BORDER-RIGHT: #000000 1px solid;
+	BORDER-TOP: #000000 1px solid;
+	BORDER-LEFT: #000000 1px solid;
+	COLOR: #ffffff;
+	BORDER-BOTTOM: #000000 1px solid;
+	BACKGROUND-COLOR: activecaption
+}
+.highlight A {
+	COLOR: #ffffff
+}
+IMG {
+	BORDER-RIGHT: 0px;
+	BORDER-TOP: 0px;
+	BORDER-LEFT: 0px;
+	BORDER-BOTTOM: 0px
+}
+</style>
+<SCRIPT type="text/javascript">
+var ICONPATH = 'images/fason/';
+</SCRIPT>
+<script type="text/javascript" src="scripts/fason/treeview.min.js"></script>
+</head>
+<BODY marginheight="8">
+	<TABLE height="100%" cellSpacing=0 cellPadding=0 width=223 border=0 >
+		<TBODY>
+			<TR>
+				<TD vAlign=top>
+					<DIV noWrap>
+						<DIV>
+<script type="text/javascript">
+var jsonData = <%=jsonData %>;
+if(jsonData.length==0){
+	alert("没有找到根模块!");
+}
+
+var t = new TreeView('t', 'basefrm');
+t.add(true, jsonData[0].id, '', "<B>"+jsonData[0].text+"</B>", '', '', '',icon.root.src);
+
+/**  recursive create node. author: daizhongde dep.IT**/
+function gNode( o, pFolder )
+{
+   if(o.children===undefined){//create leaf node
+	   t.add(true, o.id, pFolder, o.text, o.url);
+   }else{//create noleaf node
+	   t.add(true, o.id, pFolder, o.text, '');
+       for (var i in o.children){//recursive call itself
+		   gNode( o.children[i], o.id );
+	   }
+   }
+}
+
+var childData = jsonData[0].children;
+for (var k in childData){
+	gNode( childData[k], jsonData[0].id );
+}
+document.write(t);
+</script>
+						</DIV>
+					</DIV>
+				</TD>
+			</TR>
+		</TBODY>
+	</TABLE>
+<SCRIPT type="text/javascript">
+t.expand(0);
+</SCRIPT>
+</body>
+</html>

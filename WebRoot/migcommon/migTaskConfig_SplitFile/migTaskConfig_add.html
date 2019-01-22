@@ -1,0 +1,338 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>新建</title>
+</head>
+<body>
+<div class="easyui-layout" data-options="fit:true">
+	<div data-options="region:'center',border:false" title="" noheader="true">
+	<div style="padding:10px 0 10px 5px">
+	    <form id="c_form" method="post" action="" style="margin:0;padding:0;">
+	    	<table align="center">
+	    		<tr>
+	    			<td>Config Type:</td>
+	    			<td>
+	    				<input class="easyui-combobox" 
+		                        id='mig_config_type_C' name="mig_config_type"
+		                        data-options="valueField:'code', textField:'value',
+		                        value:1,
+		                        editable:false,
+		                        readonly: true,
+								data:configType,
+		                        required:true"/>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Sub Type:</td>
+	    			<td>
+	    				<input type="button" value="Generate" >
+	    				<input type="button" value="Replace+Split" >
+	    				<input type="button" value="Split" >
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Pending Split File:</td>
+	    			<td>
+	    				<input id="mig_src_C" name="mig_src" class="easyui-validatebox"
+						data-options="required: true" type="text" style='width:99%;' value="" />
+<!-- 	    				<textarea id="mig_src_C" name="mig_src" style="font-size: 12px;" rows="1" cols="60"></textarea> -->
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Generate table I Rule:</td>
+	    			<td>
+	    				<textarea id="mig_dst_C" name="mig_dst" style="font-size: 12px;" 
+	    				rows="1" cols="60" ondblclick="add.open_dialog_migdst()"></textarea>
+	    			</td>
+	    		</tr>
+	    		<tr style="display:none">
+	    			<td>ID Replacement Rule:</td>
+	    			<td>
+	    				<textarea id="mig_dst_conn_C" name="mig_dst_conn" style="font-size: 12px;" 
+	    				rows="1" cols="60" ondblclick="add.open_dialog_migdstconn()"></textarea>
+	    			</td>
+	    		</tr>
+	    		<tr style="display:none">
+	    			<td>Split Rule:</td>
+	    			<td>
+	    				<textarea id="mig_where_C" name="mig_where" style="font-size: 12px;" rows="2" cols="60"></textarea>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Description:</td>
+	    			<td><textarea id="mig_desc_C" name="mig_desc" style="font-size: 12px;" rows="2" cols="60"></textarea></td>
+	    		</tr>
+	    	</table>			
+	    </form>
+	</div>
+    </div>
+<script type="text/javascript">
+var add = VIRTUE.add;
+
+add.submitForm = function (){
+	if( ! $('#c_form').form("validate") )
+	{
+		return;
+	}
+	
+	var formData = $('#c_form').form( 'getData');
+	add.init();
+	for (var field in formData) {
+		add.jdata.data[field] = formData[field];
+	}
+
+	jQuery.post( getContextPath()+"/curd/commonCURDaddWithId.action", 
+		{
+			tableName : tableName,
+			authorColumnName : "mig_author",
+			jdata : encodeURI($.toJSON( add.jdata )) 
+		},
+		function(oResponse, status){
+			alert(oResponse.msg);
+
+			if(oResponse.success == true){
+				$('#grid').datagrid('reload',{
+					tableName : tableName,
+					jdata: $.toJSON( query.jdata )
+				} );
+				$('#win').window('close');
+			}
+	});
+};
+add.clearForm = function (){
+	$('#c_form').form('clear');
+};
+add.open_dialog_migdst = function(){
+	var mig_dst = $('#mig_dst_C').val();
+	if( mig_dst != '' ){
+// 		var dst ='tablei:00001|* field1;$0|00009+seq field9';
+// 		var temp = dst.split(/:|\|\* |;\$0\||\+seq /);
+// 		console.log(temp.length);
+		var temp = mig_dst.split(/:|\|\* |;\$0\||\+seq /);
+		if(temp.length==5){
+			$('#tableiname').textbox("setValue", temp[0] );
+			$('#oldid').textbox("setValue", temp[1]);
+			$('#newid').textbox("setValue", temp[2]);
+			$('#oldidfieldname').textbox("setValue", temp[3]);
+			$('#newidfieldname').textbox("setValue", temp[4]);
+		}
+	}
+	$('#dlg-migdst').dialog('open');
+};
+add.open_dialog_migdstconn = function(){
+	var mig_dst_conn = $('#mig_dst_conn_C').val();
+	if( mig_dst_conn != '' ){
+		var temp = mig_dst.split(/:|\|\* |;\$0\||\+seq /);
+		if(temp.length==5){
+			$('#tableiname').textbox("setValue", temp[0] );
+			$('#oldid').textbox("setValue", temp[1]);
+			$('#newid').textbox("setValue", temp[2]);
+			$('#oldidfieldname').textbox("setValue", temp[3]);
+			$('#newidfieldname').textbox("setValue", temp[4]);
+		}
+	}
+	$('#dlg-migdstconn').dialog('open');
+};
+/** 任务参数表格编辑 */
+var replacefield_editIndex = undefined;
+function replacefield_endEditing() {
+	if (replacefield_editIndex == undefined) 
+	{
+		return true
+	}
+	if ($('#replacefield_grid').datagrid('validateRow', replacefield_editIndex)) 
+	{
+		$('#replacefield_grid').datagrid('endEdit', replacefield_editIndex);
+		replacefield_editIndex = undefined;
+		return true;
+	}
+	else 
+	{
+		return false;
+	}
+};
+function replacefield_onClickRow(index) {
+	if (replacefield_editIndex != index) {
+		if (replacefield_endEditing()) {
+			$('#replacefield_grid').datagrid('selectRow', index).datagrid('beginEdit', index);
+			replacefield_editIndex = index;
+		} else {
+			$('#replacefield_grid').datagrid('selectRow', replacefield_editIndex);
+		}
+	}
+};
+
+function replacefield_append() {
+	if (replacefield_endEditing()) {
+		$('#replacefield_grid').datagrid('appendRow', { nodeId: taskpojo.taskId });
+		replacefield_editIndex = $('#replacefield_grid').datagrid('getRows').length - 1;
+		$('#replacefield_grid').datagrid('selectRow', replacefield_editIndex).datagrid('beginEdit',
+				replacefield_editIndex);
+	}
+};
+function replacefield_removeit() {
+	if (replacefield_editIndex == undefined) {return}
+	$('#replacefield_grid').datagrid('cancelEdit', replacefield_editIndex).datagrid('deleteRow', replacefield_editIndex)
+	replacefield_editIndex = undefined;
+};
+function replacefield_accept() {
+	if (replacefield_endEditing()) {
+		$('#replacefield_grid').datagrid('acceptChanges');
+	}
+};
+function replacefield_reject() {
+	$('#replacefield_grid').datagrid('rejectChanges');
+	replacefield_editIndex = undefined;
+};
+</script>
+	<div data-options="region:'south',border:false" style="text-align:right;padding:5px 5px 5px 0;background:#F4F4F4;">
+		<a class="easyui-linkbutton" data-options="iconCls:'icon-ok'" href="javascript:void(0)" onclick="javascript:add.submitForm()" style="width:80px">Submit</a>
+		<a class="easyui-linkbutton" data-options="iconCls:'icon-cancel'" href="javascript:void(0)" onclick="javascript:$('#win').dialog('close');" style="width:80px">Cancel</a>
+	</div>
+	
+	<!-- 生成ID规则对话框   ########################### -->
+	<div id="dlg-migdst" class="easyui-dialog"
+		title="Generate table I Rule" style="width:550px;height:180px;"
+			data-options="
+				modal:true,closed:true,
+				iconCls: 'icon-edit',
+				buttons: [{
+					text:'Ok',
+					iconCls:'icon-ok',
+					handler:function(){
+						if( ! $('#form-migdst').form('validate') )
+						{
+							return;
+						}
+						var migdst='';
+						var formData = $('#form-migdst').form( 'getData');
+						migdst = formData['tableiname']+':'+formData['oldid']+'|* '+formData['oldidfieldname']+';$0|'
+							+formData['newid']+'+seq '+formData['newidfieldname'];
+						$('#mig_dst_C').val(migdst);
+						$('#dlg-migdst').dialog('close');
+					}
+				},{
+					text:'Cancel',
+					handler:function(){
+						$('#dlg-migdst').dialog('close');
+					}
+				}]
+			">
+		<form id="form-migdst" method="post" action="" style="margin:0;padding:0;">
+	    	<table align="center" border="1">
+<!-- 	    		<tr bgcolor="#B3DFDA"> -->
+				<tr>
+	    			<td>Table I Name:</td>
+	    			<td colspan='3'>
+	    				<input class="easyui-textbox" type="text" id="tableiname" name="tableiname" data-options="required:true"></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Old ID:</td>
+	    			<td>
+	    				<input class="easyui-textbox" type="text" id="oldid" name="oldid" data-options="required:true"></input>
+	    			</td>
+	    			<td>New ID:</td>
+	    			<td>
+	    				<input class="easyui-textbox" type="text" id="newid" name="newid" data-options="required:true"></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Old ID Field Name:</td>
+	    			<td>
+	    				<input class="easyui-textbox" type="text" id="oldidfieldname" name="oldidfieldname" data-options="required:true"></input>
+	    			</td>
+	    			<td>New ID Field Name:</td>
+	    			<td>
+	    				<input class="easyui-textbox" type="text" id="newidfieldname" name="newidfieldname" data-options="required:true"></input>
+	    			</td>
+	    		</tr>
+	    	</table>			
+	    </form>
+	</div>
+	<!-- ID 替换规则对话框    ###########################-->
+	<div id="dlg-migdstconn" class="easyui-dialog"
+		title="ID Replacement Rule" style="width:550px;height:380px;"
+			data-options="
+				modal:true,closed:true,
+				iconCls: 'icon-edit',
+				buttons: [{
+					text:'Ok',
+					iconCls:'icon-ok',
+					handler:function(){
+						if( ! $('#form-migdst').form('validate') )
+						{
+							return;
+						}
+						var migdst='';
+						var formData = $('#form-migdst').form( 'getData');
+						migdst = formData['tableiname']+':'+formData['oldid']+'|* '+formData['oldidfieldname']+';$0|'
+							+formData['newid']+'+seq '+formData['newidfieldname'];
+						$('#mig_dst_C').val(migdst);
+						$('#dlg-migdstconn').dialog('close');
+					}
+				},{
+					text:'Cancel',
+					handler:function(){
+						$('#dlg-migdstconn').dialog('close');
+					}
+				}]
+			">
+<!-- 			style="width:462px;height:268px" -->
+		<table id="replacefield_grid" class="easyui-datagrid" 
+			data-options="rownumbers:true,
+			singleSelect:true,
+			showHeader: true, 
+			showFooter: false, 
+			selectOnCheck:true,
+			checkOnSelect:true,
+			idField: 'fieldname',
+			url:'',
+			method:'post',
+			toolbar: [ {
+				text : 'New',
+				disabled: false,
+				iconCls : 'icon-add',
+				handler : function() {
+					replacefield_append();
+					return false;
+				}
+			}, '-', {
+				text : 'Remove',
+				disabled: false,
+				iconCls : 'icon-remove',
+				handler : function() {
+					replacefield_removeit();
+					return false;
+				}
+			} , '-', {
+				text : 'Save',
+				disabled: false,
+				iconCls : 'icon-save',
+				handler : function() {
+					replacefield_accept();
+					return false;
+				}
+			}, '-', {
+				text : 'Cancel',
+				disabled: false,
+				iconCls : 'icon-undo',
+				handler : function() {
+					replacefield_reject();
+					return false;
+				}
+			}]">
+			<thead>
+				<tr>
+					<th data-options="field:'ck',checkbox:true"></th>
+					<th data-options="field:'filename',width:120">File Name</th>
+					<th data-options="field:'tablei',width:200">Table I Name</th>
+					<th data-options="field:'fieldname',width:200">Replace Field</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+</div>
+</body>
+</html>

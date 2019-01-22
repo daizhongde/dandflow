@@ -1,0 +1,455 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>合法性稽核配置</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/icon.css"/>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/plugins/easyuiExtends.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+
+<script type="text/javascript" src="../../scripts/ajaxfileupload.js"></script>
+
+<link rel="stylesheet" href="../../scripts/codemirror-5.10/lib/codemirror.css" />
+<script src="../../scripts/codemirror-5.10/lib/codemirror.js"></script>
+<script src="../../scripts/codemirror-5.10/mode/sql/sql.js"></script>
+<link rel="stylesheet" href="../../scripts/codemirror-5.10/addon/hint/show-hint.css" />
+<script src="../../scripts/codemirror-5.10/addon/hint/show-hint.js"></script>
+<script src="../../scripts/codemirror-5.10/addon/hint/sql-hint.js"></script>
+
+<style type="text/css">
+<!--
+.CodeMirror {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+-->
+</style>
+
+<script type="text/javascript">
+var app={};
+var query = VIRTUE.query;
+var OPE = VIRTUE.operator;
+
+var domains = ajaxReqRespText("/cbb/dicCBBgetDicByType.action?dicType=Busi-Domain");
+	domains = eval("(" + domains + ")");
+
+var author = ajaxReqRespText("/common/commonCommoncurrentUserLogname.action");
+
+var buttons = ajaxReqRespText("/curd/tAuthorityRmrelationCURDfindUserButton4tb.action?id=10055");
+console.log("buttons:"+buttons);
+buttons = eval("(" + buttons + ")");
+
+var buttons2 = ajaxReqRespText("/curd/tAuthorityRbrelationCURDfindUserButton4tb2.action?id=10055");
+console.log("buttons2:"+buttons2);
+buttons2 = eval("(" + buttons2 + ")");
+
+var tableName = "mig_auditv_config";
+
+/** validate and assign value **/
+function PackingParameter(){
+	var formData = $('#s_form').form( 'getData');
+
+	query.init();
+	for (var field in formData) {
+		if( formData[field] !== "" && field != "ope" ){
+			query.jdata.condition[field] = formData[field];
+			query.jdata.operator[field] = OPE.CONTAIN;
+			if( field=="audit_name" && formData["ope"] != "" ){
+				query.jdata.operator[field] = formData["ope"];
+			}
+		}
+	}
+	return true;
+};
+
+/** search data ,reload data  **/
+function submitForm(){
+   	if(!PackingParameter()){
+   		return;
+   	}
+   	$('#grid').datagrid( 'reload', {
+//    		columnNames : "audit_id,audit_name,mig_sql,author,mig_sql_rep",
+   		tableName : tableName,
+   		jdata: encodeURI( $.toJSON( query.jdata ) ) 
+   	} );
+};
+/**  清空  **/
+function clearForm(){
+	$('#s_form').form('clear');
+};
+
+function create_Record(){  //使用一个window
+	$('#win').dialog('open').window('setTitle', 'New');
+	$('#win').dialog("refresh", "migAuditvConfig_add.html");
+};
+
+var read = {};
+read.jdata = { act: "read",condition: {audit_id: ""}, operator : {audit_id:1} };
+function update_Record() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		read.jdata.condition.audit_id = row.audit_id;
+		$('#win').dialog('open').window('setTitle', 'Edit');
+		$('#win').dialog("refresh", getContextPath()+"/curd/commonCURDinitModify.action?tableName="+tableName+"&jdata="+encodeURI($.toJSON( read.jdata )));
+	}
+};
+function update_Record1() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		if (row.audit_author != author) {
+			alert("Can't edit other's job!");
+			return;
+		};
+		read.jdata.condition.audit_id = row.audit_id;
+		$('#win').dialog('open').window('setTitle', 'Edit');
+		$('#win').dialog("refresh", getContextPath()+"/curd/commonCURDinitModify.action?tableName="+tableName+"&jdata="+encodeURI($.toJSON( read.jdata )));
+	}
+};
+function read_Record() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		$('#win').dialog('open').dialog('setTitle', 'View');
+		read.jdata.condition.audit_id = row.audit_id;
+		$('#win').dialog("refresh", getContextPath()+"/curd/migAuditvConfigCURDbrowse.action?tableName="+tableName+"&jdata="+encodeURI($.toJSON( read.jdata )));
+	}
+};
+
+var del = {};
+del.jdata = {act: "del",condition: { audit_id: "" },operator : {audit_id : 1} };
+function delete_Record(){
+	var row = $('#grid').datagrid('getSelected');
+	if (row){
+		$.messager.confirm('Confirm','Confirm Remove?',function(r){
+			if (r){
+				del.jdata.condition.audit_id = row.audit_id;
+				$.post( getContextPath()+"/curd/commonCURDdelete.action", {
+					tableName : tableName,
+					jdata: encodeURI($.toJSON( del.jdata )) 
+				}, function(result, status){
+					alert(result.msg);
+					if (result.success){
+						$('#grid').datagrid('reload',{
+// 							columnNames : "audit_id,audit_name,mig_sql,author,mig_sql_rep",
+							tableName : tableName,
+							jdata: encodeURI( $.toJSON( query.jdata ) )
+						} );	// reload data
+					}
+				});
+			}
+		});
+	}
+};
+del.jdata1 = {act: "del",condition: { audit_id: "" },operator : {audit_id : 1} };
+function delete_Record1(){
+	var row = $('#grid').datagrid('getSelected');
+	if (row){
+		if (row.audit_author != author) {
+			alert("Can't remove other's job!");
+			return;
+		};
+		$.messager.confirm('Confirm','Confirm Remove?',function(r){
+			if (r){
+				del.jdata1.condition.audit_id = row.audit_id;
+				$.post( getContextPath()+"/curd/commonCURDdelete.action", {
+					tableName : tableName,
+					jdata: encodeURI($.toJSON( del.jdata1 )) 
+				}, function(result, status){
+					alert(result.msg);
+					if (result.success){
+						$('#grid').datagrid('reload',{
+// 							columnNames : "audit_id,audit_name,mig_sql,author,mig_sql_rep",
+							tableName : tableName,
+							jdata: encodeURI( $.toJSON( query.jdata ) )
+						} );	// reload data
+					}
+				});
+			}
+		});
+	}
+};
+del.jdata2 = {act: "del",condition: { audit_author: "" },operator : {audit_author : 1} };
+function delete_Record2(){
+	$.messager.confirm("Confirm","Confirm Remove all "+author+"'s config ?",function(r){
+		if (r){
+			del.jdata2.condition.audit_author = author;
+			$.post( getContextPath()+"/curd/commonCURDdelete.action", {
+				tableName : tableName,
+				jdata: encodeURI($.toJSON( del.jdata2 )) 
+			}, function(result, status){
+				alert(result.msg);
+				if (result.success){
+					$('#grid').datagrid('reload',{
+						tableName : tableName,
+						jdata: encodeURI( $.toJSON( query.jdata ) )
+					} );	// reload data
+				}
+			});
+		}
+	});
+};
+/** Import legality audit config excel文件  */
+function import_Record() {
+	$("#import_Record").dialog(
+			{
+				title : "Import",
+				href : getContextPath()
+						+ "/migcommon/migAuditvConfig/migAuditvConfig_import.html",
+				iconCls : 'icon-edit',
+				modal : true,
+				closed : true,
+				resizable : true,
+				minimizable : true,
+				maximizable : true,
+				cache : false,
+				width : 800,
+				height : 150,
+				buttons : [ {
+					id: 'imp_btn',
+					text : 'OK',
+					iconCls : 'icon-ok',
+					handler : function() {
+						btnExcelI_onClick();
+						$('#imp_btn').linkbutton('disable');
+						return false;//for IE6 support
+					}
+				}, {
+					text : 'Cancel',
+					iconCls : 'icon-cancel',
+					handler : function() {
+						$('#import_Record').dialog('close');
+					}
+				} ]
+			});
+	$("#import_Record").dialog('open');
+};
+/**  上传前检查，并从数据库获取该批次的社保机构号   **/
+function btnExcelI_onClick() {
+	var path = document.getElementById("upload").value;
+	if (path == "") {
+		alert("Please select file！");
+		return;
+	}
+	ajaxFileUpload();
+};
+
+/**  上传  **/
+function ajaxFileUpload() {
+	$("#loading").ajaxStart(function() {
+		$(this).show();
+	}).ajaxComplete(function() {
+		$(this).hide();
+	});
+	$("#loading").show();
+	$.ajaxFileUpload({
+		url : getContextPath() + "/imp/migAuditvConfigIMPimportXLS.action",
+		secureuri : false,
+		fileElementId : 'upload',
+		//data: "",
+		dataType : 'text',
+		success : function(data, status) {
+			data = eval("(" + data + ")");
+			alert(data.msg);
+			if (data.success) {
+				$('#import_Record').dialog('close');
+				submitForm();
+			}
+			$("#loading").hide();
+		},
+		error : function(data, status, e) {
+			alert("Error:" + data + ",exception:" + e);
+			$("#loading").hide();
+		}
+	});
+};
+/*  四层权限，方式二（推荐）
+* 使用了四 层权限的三个菜单：
+作业、实例、合法性稽核
+*/
+var tb={};
+tb.create_btn={ text:'New Config', iconCls:'icon-add', handler:function(){ create_Record();  return false; } };
+tb.update_btn={ text:'Edit Config', iconCls:'icon-edit', handler:function(){ update_Record();  return false; } };
+tb.update_btn1={ text:'Edit Config1', iconCls:'icon-edit', handler:function(){ update_Record1();  return false; } };
+tb.read_btn={ text:'View Config', iconCls:'icon-search', handler:function(){ read_Record();  return false; } };
+tb.delete_btn={ text:'Remove Config', iconCls:'icon-remove', handler:function(){ delete_Record(); } };
+tb.delete_btn1={ text:'Remove Config1', iconCls:'icon-remove', handler:function(){ delete_Record1(); } };
+tb.delete_btn2={ text:'Remove All My config', iconCls:'icon-remove', handler:function(){ delete_Record2(); } };
+tb.import_btn={ text:'Import config', iconCls:'icon-import', handler:function(){ import_Record(); return false;} };
+
+var toolbar = [];
+if( buttons.create_btn==1 ){ toolbar.push(tb.create_btn) };
+if( buttons.update_btn==1 ){ toolbar.push(tb.update_btn) };
+if( buttons.update_btn1==1 ){ toolbar.push(tb.update_btn1) };
+if( buttons.read_btn==1 ){ toolbar.push(tb.read_btn) };
+if( buttons.delete_btn==1 ){ toolbar.push(tb.delete_btn) };
+if( buttons.delete_btn1==1 ){ toolbar.push(tb.delete_btn1) };
+if( buttons.delete_btn2==1 ){ toolbar.push(tb.delete_btn2) };
+if( buttons.import_btn==1 ){ toolbar.push(tb.import_btn) };
+
+//var toolbar = [{ text:'New Config',	iconCls:'icon-add',	handler:function(){	create_Record();  return false; }},
+//{ text:'Edit Config', iconCls:'icon-edit', handler:function(){ update_Record();  return false; }},
+//{ text:'Edit Config1', iconCls:'icon-edit', handler:function(){ update_Record1();  return false; }},
+//{ text:'View Config', iconCls:'icon-search',	handler:function(){	read_Record();  return false;}},
+//{ text:'Remove Config', iconCls:'icon-remove', handler:function(){ delete_Record();}},
+//{ text:'Remove Config1',	iconCls:'icon-remove', handler:function(){ delete_Record1(); }},
+//{ text:'Remove All My config', iconCls:'icon-remove', handler:function(){ delete_Record2();}},
+//{ text:'Import Config', iconCls : 'icon-import', handler : function() { import_Record(); return false;}}
+//];
+
+$(function(){
+	$('#grid').datagrid({
+		title : 'Search Result',
+		toolbar : toolbar,
+		width : 938,
+		height : 720,
+		nowrap : true,
+		striped : true,
+		fit : true,
+		collapsible : true,
+		url: getContextPath()+"/query/commonJEasyUIQUERYdfind.action",
+		idField : "audit_id",
+		remoteSort: true,
+		multiSort : false,
+		singleSelect : true,
+		columns : [ [
+			{ title : 'Audit ID', field : 'audit_id',width : 90,hidden: true  },
+			{ title : 'domain', field : 'domain', width : 80, sortable: true, formatter: function(value,row, index ){
+				for(var i=0, j=domains.length; i<j; i++){
+					if( domains[i].code == value ){
+						return domains[i].value;
+					}
+				}
+				return value;
+			} },
+			{ title : 'Item', field : 'audit_name', width : 120, sortable: true  },
+			{ title : 'Source DB Connection URL', field : 'src_db_connect', width : 220  },
+			{ title : 'Source Audit SQL', field : 'src_audit_sql', width : 120  },
+			{ title : 'Expectation', field : 'audit_value', width : 120  },
+			{ title : 'Operator', field : 'operator', width : 120  },
+			{ title : 'Auditor', field : 'audit_author', width : 60  },
+			{ title : 'Description', field : 'remark', width : 200, 
+				formatter: function(value,row, index ){
+					return value.length<=120 ? value : value.substring(0,120)+"...";
+				}
+			},
+			{ title : 'Parameter Template', field : 'mig_sql_rep', width : 200, 
+				formatter: function(value,row, index ){
+					return value.length<=120 ? value : value.substring(0,120)+"...";
+				}
+			}, {
+				title : 'Create time',
+				field : "ctime",
+				width : 130,
+				sortable : true
+			}
+		] ],
+		pagination : true,
+		rownumbers : false,
+		queryParams : {
+			tableName : tableName,
+			jdata: encodeURI( $.toJSON( query.jdata ) ) 
+		}
+	});
+});
+
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+    <div data-options="region:'north',border:true,split:true" style="height:125px;background:#B3DFDA;" title="(LA)Item configuration--Search Condition" >  
+    	<form id="s_form" method="post" style="margin:0;padding:0;">
+        <div style="padding:0px 0 0px 15px">
+            <table width="100%">
+                <tr>
+                    <td>Audit Item:</td>
+                    <td>
+                    	<input class="easyui-combobox" 
+		                        id='ope_C' name="ope"
+		                        data-options="valueField:'value', textField:'label',
+		                        value:VIRTUE.operator.STARTWITH,
+		                        editable:false,
+								data:VIRTUE.OPECBBDATA,width:120,
+		                        required:true"/>
+                        <input id="audit_name" name="audit_name" value="">
+                    </td>
+                    <td>Domain:</td>
+                    <td>
+                        <input class="easyui-combobox" 
+		                        id='domain' name="domain" value="" 
+		                        data-options="valueField:'code', textField:'value',
+		                        editable:false,
+								data: domains"/>
+                    </td>
+                    <td>Table Name:</td>
+                    <td>
+                        <input id="table_name" name="table_name" value="">
+                    </td>
+                </tr>
+                <tr>
+                    <td>Author:</td>
+                    <td>
+                        <input id="audit_author" name="audit_author" value="">
+                    </td>
+                    <td>SQL:</td>
+                    <td>
+                        <input id="src_audit_sql" name="src_audit_sql" value="">
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <table width="100%" border="0" align="center">
+			<tr bgcolor="#E2EEFE" valign="bottom">
+				<td height="23"><div align="center"><!-- default height='21'  -->
+					<a class="easyui-linkbutton" data-options="iconCls:'icon-search'" href="javascript:void(0)" 
+               			onclick="submitForm()" style="width:80px">Submit</a>&nbsp;&nbsp;
+<!--                		<a class="easyui-linkbutton" data-options="iconCls:'icon-export'" href="javascript:void(0)"  -->
+<!--                			onclick="$('#EXPdlg').dialog('open')" style="width:80px">Export</a>&nbsp;&nbsp; -->
+<!--                		<a class="easyui-linkbutton" data-options="iconCls:'icon-export'" href="javascript:void(0)"  -->
+<!--                			onclick="$('#EXPdlg1').dialog('open')" style="width:120px">Export Wizard</a>&nbsp;&nbsp; -->
+<!--                		<a class="easyui-linkbutton" data-options="iconCls:'icon-print'" href="javascript:void(0)"  -->
+<!--                			onclick="PrintOneURL()" style="width:80px">Print</a>&nbsp;&nbsp; -->
+<!--                		<a class="easyui-linkbutton" data-options="iconCls:'icon-print'" href="javascript:void(0)"  -->
+<!--                			onclick="PrintOneURL(1)" style="width:120px">Print Preview</a>&nbsp;&nbsp; -->
+               		<a class="easyui-linkbutton" data-options="iconCls:'icon-clear'" href="javascript:void(0)" 
+               			onclick="clearForm()" style="width:80px">Clear</a>
+               		
+<!--                	<input id='btnSearch' type='button' onclick='submitForm()' value='查 询'/>&nbsp; -->
+<!-- 					<input id='btnExpSimply' type='button' onclick="$('#EXPdlg').dialog('open')" value='导 出'/>&nbsp; -->
+<!-- 					<input id='btnExpWizard' type='button' onclick="$('#EXPdlg1').dialog('open')" value='导出向导'/>&nbsp; -->
+<!-- 					<input id='btnPrint' type='button' onclick="PrintOneURL()" value='打印'/>&nbsp; -->
+<!-- 					<input id='btnPrint1' type='button' onclick="PrintOneURL(1)" value='打印预览'/>&nbsp; -->
+<!-- 					<input type='button' onclick="clearForm()" value='清 空'/> -->
+					
+				</div></td>
+			</tr>
+		</table>
+		</form>
+    </div>
+    <div data-options="region:'center', border:false" title="" style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+
+	<div id="win" class="easyui-dialog" title="添加" style="width:600px;height:450px"  
+        data-options="modal:true,closed:true,resizable:true">
+	</div>
+	<div id="import_Record"></div>
+	
+	<!-- 	buttons: '#dlg-buttons-c'" 
+	<div id="dlg-buttons-c" style="text-align:center;">
+		<input type='button' onclick="add.submitForm()" value='提 交'/>&nbsp;
+		<input type='button' onclick="add.clearForm()" value='清 空'/>
+	</div>
+	<div id="dlg-buttons-u" style="text-align:center;">
+		<input type='button' onclick="add.submitForm()" value='提 交'/>&nbsp;
+		<input type='button' onclick="add.clearForm()" value='清 空'/>
+	</div>
+	<div id="dlg-buttons-r" style="text-align:center;">
+		<input type='button' onclick="read.close()" value='关 闭'/>
+	</div>-->
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html dir="ltr">
+<head>
+	<title>数据表格 by dojo</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+	<link rel=stylesheet href="/dojo-1.9.1/dojox/grid/tests/enhanced/support/common.css"/>
+	<style type="text/css">
+		html, body {
+			width: 100%;	/* make the body expand to fill the visible window */
+			height: 100%;
+			overflow: hidden;	/* erase window level scrollbars */
+			padding: 0 0 0 0;
+			margin: 0 0 0 0;
+		}
+	</style>
+	<script type="text/javascript" src="/dojo-1.9.1/dojo/dojo.js" data-dojo-config="isDebug:false, parseOnLoad: true"></script>
+	<script type="text/javascript">
+		dojo.require("dijit.dijit"); // optimize: load dijit layer
+		dojo.require("dojo.data.ItemFileWriteStore");
+		dojo.require("dijit.layout.BorderContainer");
+		dojo.require("dijit.layout.ContentPane");
+		dojo.require('dijit.form.TextBox');
+		dojo.require('dijit.form.NumberTextBox');
+		dojo.require('dijit.form.Select');
+		dojo.require('dijit.form.Button');
+		dojo.require("dojox.grid.EnhancedGrid");
+		dojo.require("dojox.grid.enhanced.plugins.Pagination");
+		//dojo.require(["dojo/parser", "dijit/form/Select"]);
+		//dojo.require(["dojo/parser", "dijit/form/TextBox"]);
+		//dojo.require(["dojo/parser", "dijit/form/Button"]);
+		dojo.require("dojo.parser");
+				
+		var layout = [{
+			cells: [
+				{ field: "id", name:"Identity", datatype:"number", width: 4},
+				{ field: "Genre", name:"Genre", datatype:"string", width: 10},
+				{ field: "Artist", name:"Artist", datatype:"string", width: 10},
+				{ field: "Year", name:"Year", datatype:"string", width: 2.5},
+				{ field: "Album", name:"Album", datatype:"string", width: 10},
+				{ field: "Name", name:"Name", datatype:"string", width: 8},
+				{ field: "Length", name:"Length", datatype:"string", width: 4},
+				{ field: "Track", name:"Track", datatype:"number", width: 3},
+				{ field: "Composer", name:"Composer", datatype:"string", width: 12},
+				{ field: "Download Date", name:"Download Date", datatype:"date", width: 12},
+				{ field: "Last Played", name:"Last Played", datatype:"time", width: 6},
+				{ field: "Heard", name: "Checked", datatype:"boolean", width: 6}
+			]
+		}];
+		var plugins = {
+			pagination: {
+				pageSizes: [10, 25, 30, 50, 100, Infinity],// Array, custom the items per page button
+				description: true,	// boolean, custom whether or not the description will be displayed
+				sizeSwitch: true,	// boolean, custom whether or not the page size switch will be displayed
+				pageStepper: true,	// boolean, custom whether or not the page step will be displayed
+				gotoButton: true,	// boolean, custom whether or not the goto page button will be displayed
+				maxPageStep: 10,	// Integer, custom how many page step will be displayed
+				position: "bottom",	// String, custom the position of the pagination bar. There're two options: top, bottom
+				defaultPage: 2, 	// Integer, which page will be displayed by default 
+				defaultPageSize: 25 // Integer, what page size will be used by default
+			}
+		};
+
+	</script>
+	<script type="text/javascript" src="/dojo-1.9.1/dojox/grid/tests/enhanced/support/test_write_store_music.js"></script>
+</head>
+<body class="claro">
+<!-- 
+liveSplitters="true" persist="false" id="borderContainer" design="sidebar"
+data-dojo-props="design:'sidebar', gutters:true, liveSplitters:true, persist:true, id='borderContainer'"
+ -->
+	<div dojoType="dijit/layout/BorderContainer" liveSplitters="true" persist="false"
+		          id="verticalSplitParam" design="sidebar" style="width: 100%; height: 100%;">
+	
+<!-- region="top" splitter="false" style="height:90px;background:#B3DFDA;"  -->
+	  <div dojoType="dijit/layout/ContentPane" id="mysearch" title="查询条件"
+		             region="top" splitter="true" style="height:50px;background:#B3DFDA;" >
+		  <div style="padding:0px 0 0px 0px">  
+	        <form id="ff" method="post">  
+	            <table>  
+	                <tr>
+	                    <td>
+	                        <label for="nmlevel">模块级别:</label>
+							<select name="nmlevel" data-dojo-type="dijit/form/Select" style="width:200px;">
+								<option value="" selected="selected">--选择--</option>
+							    <option value="0">零级</option>
+							    <option value="1">一级</option>
+							    <option value="2">二级</option>
+							    <option value="3">三级</option>
+							    <option value="4">四级</option>
+							</select>
+	                    </td>
+	                    <td>
+	                        <label for="cmleaf">模块类型:</label>
+							<select name="cmleaf" data-dojo-type="dijit/form/Select" style="width:200px;">
+								<option value="" selected="selected">--选择--</option>
+							    <option value="true">叶子</option>
+							    <option value="false">非叶子</option>
+							</select>
+	                    </td>
+	                    <td>
+	                        <label for="nmparent">上级模块:</label>
+							<input type="text" name="nmparent" value=""
+							    data-dojo-type="dijit/form/TextBox"
+							    data-dojo-props="trim:true, propercase:false" id="nmparent" />
+	                    </td>
+	                    <td>
+	                        <label for="cmname">模块名称:</label>
+							<input type="text" name="cmname" value=""
+							    data-dojo-type="dijit/form/TextBox"
+							    data-dojo-props="trim:true, propercase:false" id="cmname" />
+	                    </td>
+	                    <td>
+	                    	<div style="padding:0px 0 0px 15px">
+	                        	<button data-dojo-type="dijit.form.Button" onclick="submitForm()">查询</button>
+								<button data-dojo-type="dijit.form.Button" onclick="clearForm()">清空</button>
+								<button data-dojo-type="dijit.form.Button" onclick="exportData()">导出</button>
+	                        </div>
+	                    </td>
+	                </tr>
+	            </table>
+	        </form>
+	        </div>
+		</div>
+		<!-- style="width: 100%; height: 100%" 
+		<div id="grid" dojoType="dojox/grid/EnhancedGrid" store="test_store[0]" structure="layout" plugins="plugins" summary="A customized grid summary"
+			  region="center" ></div>
+			  -->
+		<div id="grid" dojoType="dojox/grid/EnhancedGrid" store="test_store[0]" structure="layout" plugins="plugins" summary="A customized grid summary"
+			  region="center" ></div>
+		
+	</div>
+</body>
+</html>

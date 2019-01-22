@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<style>
+/* body { */
+/* 	margin: 7px; */
+/* 	font: 12px Verdana, Arial, Helvetica, sans-serif; */
+/* } */
+
+/* * { */
+/* 	list-style-type: none; */
+/* 	margin: 0px; */
+/* 	padding: 0px; */
+/* 	border: thin none; */
+/* } */
+
+#nav {
+	position: absolute;
+	font-size: 12px;
+	opacity: 0.8;
+}
+
+#nav a {
+	display: block;
+	width: 100px;
+	height: 15px;
+	padding: 3px 5px 12px;
+	background: #666;
+	color: #fff;
+	text-decoration: none;
+}
+
+#nav a:hover {
+	background: #333;
+}
+
+#nav li {
+	float: left;
+	clear: left;
+	width: 120px;
+	background: #ccc;
+	padding-bottom: 3px;
+}
+
+#nav ul {
+	position: absolute;
+	margin-left: 115px;
+	margin-top: -30px;
+}
+
+#nav ul {
+	display: none;
+}
+
+#nav li.show ul {
+	display: block;
+}
+
+#nav li.show li ul {
+	display: none;
+}
+
+#nav li li.show ul {
+	display: block;
+}
+</style>
+<script language="javascript" type="text/javascript">
+	function menuFix() {
+		var sfEls = document.getElementById("nav").getElementsByTagName("li");
+		for ( var i = 0; i < sfEls.length; i++) {
+			sfEls[i].onmouseover = function() {
+				this.className += (this.className.length > 0 ? " " : "")
+						+ "show";
+			}
+			sfEls[i].onmouseout = function() {
+				this.className = this.className.replace(new RegExp(
+						"( ?|^)show\\b"), "");
+			}
+		}
+	}
+	window.onload = menuFix;
+</script>
+</head>
+<body>
+	<ul id="nav">
+		<li><a href="#">菜单</a>
+			<ul>
+				<li><a href="#">菜单树</a>
+					<ul>
+						<li><a href="#">GubuSoft</a></li>
+						<li><a href="#">Fason</a></li>
+						<li><a href="#">WebFxTree</a></li>
+						<li><a href="#">JQueryEasyUI</a></li>
+						<li><a href="#">Rico(Prototype)</a></li>
+						<li><a href="#">Dojo1.9</a></li>
+						<li><a href="#">YUI2.9.0</a></li>
+						<li><a href="#">YUI3.10.3</a></li>
+						<li><a href="#">EXT3</a></li>
+						<li><a href="#">YUI4</a></li>
+					</ul>
+				</li>
+				<li><a href="#">菜单条</a>    
+					<ul>
+						<li><a href="#">PureCSS</a></li>
+						<li><a href="#">JQueryEasyUI</a></li>
+						<li><a href="#">Rico(Prototype)</a></li>
+						<li><a href="#">Dojo1.9</a></li>
+						<li><a href="#">YUI2.9.0</a></li>
+						<li><a href="#">YUI3.10.3</a></li>
+						<li><a href="#">EXT3</a></li>
+						<li><a href="#">YUI4</a></li>
+					</ul>
+				</li>
+				<li><a href="#">手风琴</a>
+					<ul>
+						<li><a href="#">PureCSS</a></li>
+						<li><a href="#">JQueryEasyUI</a></li>
+						<li><a href="#">Rico(Prototype)</a></li>
+						<li><a href="#">Dojo1.9</a></li>
+						<li><a href="#">YUI2.9.0</a></li>
+						<li><a href="#">YUI3.10.3</a></li>
+						<li><a href="#">EXT3</a></li>
+						<li><a href="#">YUI4</a></li>
+					</ul>
+				</li>
+				<li><a href="#">企业风</a>
+					<ul>
+						<li><a href="#">nav item</a></li>
+						<li><a href="#">nav item</a></li>
+						<li><a href="#">nav item</a></li>
+						<li><a href="#">nav item</a></li>
+						<li><a href="#">nav item</a></li>
+						<li><a href="#">nav item</a></li>
+					</ul>
+				</li>
+			</ul>
+		</li>
+	</ul>
+</body>
+</html>

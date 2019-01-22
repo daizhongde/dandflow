@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>作业导入</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/icon.css"/>
+<script type="text/javascript" src="../../scripts/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+<!-- <script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/locale/easyui-lang-zh_CN.js"></script> -->
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+<script type="text/javascript" src="../../scripts/ajaxfileupload.js"></script>
+	
+<script type="text/javascript">
+//109上mapping测试文件目录 migration/bak/zwf/dfile/20150330_2/
+
+/**  上传前检查，并从数据库获取该批次的社保机构号   **/
+function btnExcelI_onClick(){
+	var path = document.getElementById("upload").value;
+	if(path==""){
+		alert("请选择文件！");
+		return;
+	}
+	ajaxFileUpload();
+};
+
+/**  上传  **/
+function ajaxFileUpload(){
+	$("#loading")
+	.ajaxStart(function(){
+		$(this).show();
+	})
+	.ajaxComplete(function(){
+		$(this).hide();
+	});
+
+	$.ajaxFileUpload({
+		url: getContextPath()+"/imp/migJobInfoIMPimportXLS.action",
+		secureuri:false,
+		fileElementId:'upload',
+		//data: "",
+		dataType: 'text',
+		success: function (data, status){
+			data = eval ("(" + data + ")");
+			alert(data.msg);
+			if(data.flag){
+// 				$('#dlg').dialog('close');
+			}
+		},
+		error: function (data, status, e){
+			alert("导入时出错:"+data+",exception:"+e);
+// 			$('#dlg').dialog('close');
+		}
+	});
+}
+</script>
+  </head>
+  
+  <body>
+    	<input type="file" id="upload" name="upload" title="社保回盘文件" size="80"  style="margin-left:2px;margin-top: 2px;height:29px;"></input>
+    	<input id="btnExcelI" type="button" value="开始导入" onclick="btnExcelI_onClick();" style="margin-left: 2px; margin-top:2px; height:29px;"/>
+		<img id="loading" src="../../images/loading.gif" style="display:none;">
+  </body>
+</html>

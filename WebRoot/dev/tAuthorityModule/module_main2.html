@@ -1,0 +1,642 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>模块管理(dev)-带按钮维护</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="keywords" content="jquery,ui,easy,easyui,web">
+	<meta name="description" content="easyui help you build your web page easily!">
+
+	<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/icon.css">
+	<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+<!-- <script type="text/javascript" src="../../scripts/jquery-1.4.4.min.js"></script> -->
+	<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/plugins/easyuiExtends.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+
+<style type="text/css">
+<!--
+body {
+    background-color: #C3E3FF;
+}
+#mylayer {
+  position: absolute;
+  left: 5px;
+  top: 30px;
+}
+	-->
+</style>
+<script type="text/javascript">
+var newNodeCount = 0;
+var appendFlag = 0;
+
+var noquery = VIRTUE.noquery;
+var query = VIRTUE.query;
+var OPE = VIRTUE.operator;
+var add = VIRTUE.add;
+
+//for test
+// query.jdata.condition.n_mid = 10021;
+// query.jdata.operator.n_mid = OPE.EQUAL;
+
+// var buttonCBBData = getDicBySQLName.action?dicType=buttonNo
+// var buttonCodeData = ajaxReqRespText("/cbb/dicCBBgetDicBySQLName.action?dicType=buttonNo" );
+var buttonCodeData = ajaxReqRespText("/cbb/tAuthorityFuncCBBgetCBBData_CodeAndName.action" );
+// console.log("buttonCodeData:"+buttonCodeData)
+buttonCodeData = eval ("(" + buttonCodeData + ")");
+
+/** format field audit type  **/
+function fmtButtonCode(n){
+// 	n  = new String(n);
+// 	n  = new Number(n);
+	for(var i=0, j=buttonCodeData.length; i<j; i++ ){
+		if( buttonCodeData[i].id == n ){
+			return buttonCodeData[i].text;
+		}
+	}
+	return n;
+};
+
+/** update right view panel  **/
+function updateView( node ){	
+	jQuery('#nmid').val( node.id );
+	jQuery('#cmname').val( node.text );
+	jQuery('#cmpath').val( node.attributes.url );
+// 	jQuery('#cmleaf').combobox( 'setValue', node.attributes.leaf );
+	document.getElementById("cmleaf").value= node.attributes.leaf;
+	
+	jQuery('#nmparent').combotree( 'setValue', node.attributes.parent );//pojo.NMparent.NMid
+	jQuery('#nmorder').numberbox( 'setValue', node.attributes.order );
+	jQuery('#nmlevel').combobox( 'setValue', node.attributes.level );
+	if( node.id == 1 ){
+		jQuery('#nmlevel').combobox( 'setValue', '0' );
+	}
+	jQuery('#cmnote').val( node.attributes.note ); 
+};
+
+/** update tree node's text  **/
+function onChangeCMname( o ){
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	if( node != null ){
+		node.text = o.value;
+// 		alert('name change excuted!');
+		t.tree('update', {
+			target: node.target,
+			text: o.value
+		});
+		//t.tree('reload');
+		VIRTUE.update.init();
+		VIRTUE.update.jdata.data.name = o.value;
+		VIRTUE.update.jdata.condition.id = node.id; 
+		VIRTUE.update.jdata.operator.id = VIRTUE.operator.EQUAL;//default,this line can comment
+		updateModel( VIRTUE.update.jdata );
+	}
+};
+
+/** update tree node's url  **/
+function onChangeCMpath( o ){
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	if( node != null ){
+		node.attributes.url = o.value;
+// 		alert('url change excuted!');
+		VIRTUE.update.init();
+		VIRTUE.update.jdata.data.path = o.value;
+		VIRTUE.update.jdata.condition.id = node.id; 
+		VIRTUE.update.jdata.operator.id = VIRTUE.operator.EQUAL;//default,this line can comment
+		updateModel( VIRTUE.update.jdata );
+	}
+};
+
+/** update tree node's leaf  **/
+function onChangeCMleaf( o ){
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	if( node != null && o.value!='' ){
+		node.attributes.leaf = o.value;
+		
+		VIRTUE.update.init();
+		VIRTUE.update.jdata.data.leaf = o.value;
+// 		VIRTUE.update.jdata.data.expanded = o.value;
+		VIRTUE.update.jdata.condition.id = node.id; 
+		VIRTUE.update.jdata.operator.id = VIRTUE.operator.EQUAL;//default,this line can comment
+		updateModel( VIRTUE.update.jdata, node );
+	}
+};
+
+/** update tree node's note  **/
+function onChangeCMnote( o ){
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	if( node != null ){
+		node.attributes.note = o.value;
+// 		alert('note change excuted!');
+		VIRTUE.update.init();
+		VIRTUE.update.jdata.data.note = o.value;
+		VIRTUE.update.jdata.condition.id = node.id; 
+		VIRTUE.update.jdata.operator.id = VIRTUE.operator.EQUAL;//default,this line can comment
+		updateModel( VIRTUE.update.jdata );
+	}
+};
+var btn_toolbar = [ {
+	text : 'New',
+	disabled: false,
+	iconCls : 'icon-add',
+	handler : function() {
+		if(!$('#tt').tree('getSelected')){
+			return false;
+		}
+		append();
+		return false;
+	}
+}, '-', {
+	text : 'Remove',
+	disabled: false,
+	iconCls : 'icon-remove',
+	handler : function() {
+		if(!$('#tt').tree('getSelected')){
+			return false;
+		}
+		removeit();
+		return false;
+	}
+} , '-', {
+	text : 'Save',
+	disabled: false,
+	iconCls : 'icon-save',
+	handler : function() {
+		if(!$('#tt').tree('getSelected')){
+			return false;
+		}
+		accept();
+		return false;
+	}
+}, '-', {
+	text : 'Cancel',
+	disabled: false,
+	iconCls : 'icon-undo',
+	handler : function() {
+		if(!$('#tt').tree('getSelected')){
+			return false;
+		}
+		reject();
+		return false;
+	}
+}, '-', {
+	text : 'GetChanges',
+	disabled: false,
+	iconCls : 'icon-search',
+	plain:true,
+	handler : function() {
+		getChanges();
+		return false;
+	}
+}];
+</script>
+</head>
+<body class="easyui-layout">
+	<div data-options="region:'east',border:true,split:true" style="width:520px;" title="所选模块的按钮" >
+		<table id="dg" class="easyui-datagrid" 
+			data-options="singleSelect:true,toolbar: btn_toolbar,
+			fit : true, 
+			onClickCell : onClickRow,
+			url:'../../query/tAuthorityButtonJEasyUIQUERYdfind.action',method:'get',
+			queryParams:{jdata: encodeURI( $.toJSON( noquery.jdata ) ) }">
+		  <thead>
+			<tr>
+				<th data-options="field:'NBid',width: 60,hidden:true">按钮ID</th>
+				<th data-options="field:'NMid',width:60,hidden:true">模块ID</th>
+				<th data-options="field:'CBcode',width:120,editor : {type : 'text', options: { required: true }  }
+				/* editor : {
+					type : 'combobox',
+					options : {
+						valueField:'id',
+						textField:'id',
+						data: buttonCodeData,
+						editable: true,
+						required : true
+					}
+				}*/
+				">按钮代码</th>
+				<th data-options="field:'CBname',width:140,editor : {type : 'text', options: { required: true }  }
+				/* editor : {
+					type : 'combobox',
+					options : {
+						valueField:'text',
+						textField:'text',
+						data: buttonCodeData,
+						editable: true,
+						required : true
+					}
+				}*/
+				" >按钮名称</th>
+				<th data-options="field:'url',width:300,editor : {type : 'text', options: { required: true }  }">请求URL</th>
+				<th data-options="field:'remark',width:200,editor : {type : 'text'}">备注</th>
+			</tr>
+		  </thead>
+		</table>
+	</div>
+	<div data-options="region:'center'" style="background-color: rgb(228, 235, 241)" title="模块信息详情" >
+		<!-- 信息已保存 -->
+		<div id="mylayer" style="display: none;background-color: #FFFFCC" ><font size="4" color="green">信息已保存!</font></div>
+	
+	    <form id="add.form" method="post" action="">
+	    	<table align="center">
+	    		<tr>
+	    			<td>模块ID:</td>
+	    			<td><input type="text" id="nmid" name="pojo.NMid" data-options="required: true" 
+	    				style="width:200px;" disabled="disabled"></input>
+					</td>
+	    		</tr>
+	    		<tr>
+	    			<td>模块名称:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="cmname" name="pojo.CMname" data-options="required: true" 
+	    					onchange="onChangeCMname(this)" style="width:200px;"></input>
+					</td>
+	    		</tr>
+	    		<tr>
+	    			<td>模块路径:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="cmpath" name="pojo.CMpath" data-options="required:false" onchange="onChangeCMpath(this)" style="width:450px;"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>叶子节点:</td>
+	    			<td><select id="cmleaf" name="pojo.CMleaf" style="width:200px;" onchange="onChangeCMleaf(this)">
+	    					<option value="" selected="selected">--选择--</option>
+                        	<option value="true">是</option>
+                        	<option value="false">否</option>
+                        </select>
+                    </td>
+	    		</tr>
+	    		<tr>
+	    			<td>模块级别:</td>
+	    			<td><select class="easyui-combobox" id="nmlevel" name="pojo.NMlevel" data-options="required: true" 
+	    						 style="width:200px;" disabled="disabled">
+	    					<option value="" selected="selected">--选择--</option>
+	    					<option value="0">零级模块</option>
+                        	<option value="1">一级模块</option>
+                        	<option value="2">二级模块</option>
+                        	<option value="3">三级模块</option>
+                        	<option value="4">四级模块</option>
+                        </select>
+                     </td>
+	    		</tr>
+	    		<tr>
+	    			<td>上级模块:</td>
+	    			<td>
+						<input class="easyui-combotree" 
+	                        id="nmparent" name="pojo.NMparent" 
+	                        data-options="url:'../../tree/tAuthorityModuleTREEquery_JEasyUI_CBT.action',method:'post',required:true" 
+	                        style="width:260px;" disabled="disabled">
+                    </td>
+	    		</tr>
+	    		<tr>
+	    			<td>模块次序:</td>
+	    			<td><input class="easyui-numberbox" id="nmorder" name="pojo.NMorder" data-options="required: true, disabled: true" style="width:200px;"></input>
+					</td>
+	    		</tr>	    		
+	    		<tr>
+	    			<td>模块说明:</td>
+	    			<td><textarea id="cmnote" name="pojo.CMnote" style="width:300px; height:100px; font-size: 12px;" onchange="onChangeCMnote(this)"></textarea></td>
+	    		</tr>
+	    	</table>
+	    </form>
+	</div>
+	<!-- serverJsonData.json  ../../tree/tAuthorityModuleTREEquery_JEasyUI_Tree.action -->
+	<div data-options="region:'west',border: true,split:true" title="菜单树" style="padding:10px 0 0 0;width:300px;" noheader="false">
+		<ul id="tt" class="easyui-tree" data-options="url:'../../tree/tAuthorityModuleTREEquery_JEasyUI_Dndtree.action',
+				method:'post', animate:true, dnd:true, lines:true,mode: 'remote',revert:true,
+				onContextMenu: function(e,node){
+					e.preventDefault();
+					$(this).tree('select',node.target);
+					$('#mm').menu('show',{
+						left: e.pageX,
+						top: e.pageY
+					});
+				},
+				
+				onDragEnter: function(target, source){
+					if(jQuery(target).attr( 'node-id' )==1){
+						//target.droppable('options').disabled;
+					}
+				},
+				onDragLeave: function(target, source){
+					if(jQuery(target).attr( 'node-id' )==1){
+						//target.droppable('options').disabled;
+					}
+				},
+				
+				onDrop: function( target, source, point ) {
+					if(jQuery(target).attr( 'node-id' )==1 && point!='append' ){
+						alert('只允许存在一个零级模块!')
+					}
+					
+					//position: after, before, in -- insertAfter insertBefore append 
+					//point: indicate the drop operation, posible values are: 'append','top' or 'bottom'.
+					dndNode( jQuery(target).attr( 'node-id' ), source.id, point );
+				},
+				onExpand: function(node){
+					if(appendFlag==1){
+						append_F();
+						appendFlag=0;
+					}
+				},
+				onClick: updateView,
+				onSelect: onSelectModule"
+		></ul>
+	</div>
+
+	<div id="mm" class="easyui-menu" style="width:120px;">
+		<div onclick="append()" data-options="iconCls:'icon-add'">添加</div>
+		<div onclick="removeit()" data-options="iconCls:'icon-remove'">删除</div>
+		<div class="menu-sep"></div>
+		<div onclick="expand()">展开</div>
+		<div onclick="collapse()">折叠</div>
+		<div class="menu-sep"></div>
+		<div onclick="expandAll()">全部展开</div>
+		<div onclick="collapseAll()">全部折叠</div>
+	</div>
+<script type="text/javascript">
+/** add a module event hander */
+function append() {
+	newNodeCount ++;
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	if(node.state=="closed")//deal with asyc node
+	{
+		appendFlag = 1;
+		t.tree('expand', node.target);
+	}
+	else
+	{
+		append_F();
+	}
+};
+/** add a module,append a node finally */
+function append_F() {
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+
+	var newNode = {
+		id: 'newNode' + newNodeCount,
+		text : '新建模块' + newNodeCount,
+		state: 'open',
+		attributes :{
+			url: 'test/new.html',
+			leaf: 'true',
+			parent: node.id,
+			level: node.attributes.level + 1,
+			order: t.tree( 'getData', node.target ).children.length + 1,
+			note: '备注...'
+		}
+	};
+	
+	t.tree('append', {
+		parent : (node ? node.target : null),
+		data : [ newNode ]
+	} );
+	
+// 	find a node and then select it
+	var newNode1 = t.tree( 'find', 'newNode'+newNodeCount );
+	
+	VIRTUE.add.init();
+	VIRTUE.add.jdata.data.name = newNode1.text;
+	VIRTUE.add.jdata.data.path = newNode1.attributes.url;
+	VIRTUE.add.jdata.data.leaf = newNode1.attributes.leaf;
+	VIRTUE.add.jdata.data.parent = newNode1.attributes.parent;
+	VIRTUE.add.jdata.data.level = newNode1.attributes.level;
+	VIRTUE.add.jdata.data.order = newNode1.attributes.order;
+	VIRTUE.add.jdata.data.note = newNode1.attributes.note;
+	
+	createModel( VIRTUE.add.jdata, newNode1 );
+}
+ /**
+  * del a module:
+  	1:cud.jdata.del.rows.push(1);
+  */
+function removeit() {
+	var node = $('#tt').tree('getSelected');
+	
+	VIRTUE.del.init();
+	VIRTUE.del.jdata.condition.id = node.id; 
+	VIRTUE.del.jdata.operator.id = VIRTUE.operator.EQUAL;//default,this line can comment
+	destroyModel( VIRTUE.del.jdata, node );
+// 	$('#tt').tree('remove', node.target);
+}
+function collapse() {
+	var node = $('#tt').tree('getSelected');
+	$('#tt').tree('collapse', node.target);
+}
+function expand() {
+	var node = $('#tt').tree('getSelected');
+	$('#tt').tree('expand', node.target);
+};
+function collapseAll() {
+	$('#tt').tree('collapseAll');
+}
+function expandAll() {
+	$('#tt').tree('expandAll');
+}
+/** create db model 
+ *
+ @param jdata for sqlassembel
+ @param id new node's id
+ */
+function createModel( jdata, newNode1 ){
+	var t = $('#tt');
+// 	var newNode1 = t.tree( 'find', id );
+	
+	jQuery.post("../../curd/tAuthorityModuleCURDaddRetId.action", {
+		jdata : encodeURI( jQuery.toJSON( jdata ) )
+	}, function(oResponse, status) {
+// 		oResponse = eval("(" + oResponse + ")");
+// 		alert(oResponse.msg);
+		if (oResponse.success == true) {
+			t.tree('update', {
+	 			target: newNode1.target,
+	 			id: oResponse.id
+	 		});
+			var newNode = t.tree( 'find', oResponse.id );
+		 	t.tree('select', newNode.target);
+		 	t.tree('scrollTo',newNode.target);
+		 	updateView( newNode );
+		}else{
+			alert(oResponse.msg);
+			t.tree( 'remove', newNode1.target );
+		}
+	});
+};
+
+/** update db model **/
+function updateModel( jdata, node ){
+	jQuery.post("../../curd/tAuthorityModuleCURDmodify.action", {
+		jdata : encodeURI( jQuery.toJSON( jdata ) )
+	}, function(oResponse, status) {
+		var t = jQuery('#tt');
+// 		oResponse = eval("(" + oResponse + ")");
+// 		alert(oResponse.msg);
+		if (oResponse.success == true) {
+			//弹出一个层一秒钟后消失
+		    document.getElementById("mylayer").style.display="inline";
+		    var t=setTimeout("document.getElementById('mylayer').style.display='none'",1000);
+		    
+			if( node != null && node != undefined )
+			{
+				t.tree( 'reload' );
+			}
+		}else if (oResponse.success == false) {
+			alert(oResponse.msg);
+			t.tree( 'reload' );
+		}
+	});
+};
+
+/** delete db model 
+ *@param jdata for sqlassembel
+  @param node to judge whether delete node is last node
+ */
+function destroyModel( jdata, node ){
+// 	t.tree( 'getData', node.target ).children.length
+
+	/** there two post request, You can use a delete request do all back process, but it with Low efficiency  **/
+	jQuery.post("../../curd/tAuthorityModuleCURDremove.action", {
+		id : node.id,
+		jdata : encodeURI( jQuery.toJSON( jdata ) )
+	}, function(oResponse, status) {
+		var t = $('#tt');
+// 		oResponse = eval("(" + oResponse + ")");
+// 		alert(oResponse.msg);
+		if (oResponse.success == true) {
+// 			var parent = t.tree( 'getParent', node.target );
+// 			var children = t.tree( 'getData', parent.target ).children;
+// 			var order = node.attributes.order;
+			t.tree( 'reload' );//for node icon
+		}else{
+			alert(oResponse.msg);
+			t.tree( 'reload' );
+		}
+	});
+};
+
+/** 
+ * move node.
+ * @param target target id
+ * @param source source id
+ * @param point indicate the drop operation, posible values are: 'append','top' or 'bottom'. 
+ */
+function dndNode( target, source, point ){
+	jQuery.post("../../tree/tAuthorityModuleTREEdndNode.action", {
+		target : target,
+		id : source,
+		point : point
+	}, function(oResponse, status) {
+		oResponse = eval("(" + oResponse + ")");
+		var t = $('#tt');
+		if (oResponse.success == false) {
+			alert(oResponse.msg);
+// 			t.tree( 'reload' );
+		}
+// 		t.tree( 'reload' );
+	});
+};
+
+/** node 模块树被选定的节点  */
+function onSelectModule(node){
+	var t = $('#tt');
+	var mNode = t.tree('getSelected');
+	
+// 	console.log($.toJSON(mNode))
+	query.jdata.condition.n_mid = node.id;
+	$('#dg').datagrid( 'reload', { jdata: encodeURI( $.toJSON( query.jdata ) ) } );
+};
+
+/** 按钮信息表格编辑 */
+var editIndex = undefined;
+function endEditing() {
+	if (editIndex == undefined) {
+		return true
+	}
+	if ($('#dg').datagrid('validateRow', editIndex)) {
+		$('#dg').datagrid('endEdit', editIndex);
+		editIndex = undefined;
+		return true;
+	} else {
+		return false;
+	}
+};
+function onClickRow(index) {
+	if (editIndex != index) {
+		if (endEditing()) {
+			$('#dg').datagrid('selectRow', index).datagrid('beginEdit', index);
+			editIndex = index;
+		} else {
+			$('#dg').datagrid('selectRow', editIndex);
+		}
+	}
+}
+
+function append() {
+	var moduleId = $('#tt').tree('getSelected').id;
+// 	var buttonNo = $('#dg').datagrid('getRows').length-1;
+	var buttonNo = $('#dg').datagrid('getRows').length;
+	console.log("moduleId:"+moduleId+",buttonNo:"+buttonNo);
+	
+	if (endEditing()) {
+		$('#dg').datagrid('appendRow', { NMid: moduleId, CBcode: buttonCodeData[buttonNo]["id"],
+			CBname: buttonCodeData[buttonNo]["text"],
+			url:"", remark:""});
+		editIndex = $('#dg').datagrid('getRows').length - 1;
+		$('#dg').datagrid('selectRow', editIndex).datagrid('beginEdit',
+				editIndex);
+	}
+};
+function removeit() {
+	if (editIndex == undefined) {return}
+	$('#dg').datagrid('cancelEdit', editIndex).datagrid('deleteRow', editIndex)
+	editIndex = undefined;
+}
+function accept() {
+// 	console.log("endEditing():"+endEditing());
+	if (endEditing()) {
+		var rows = $('#dg').datagrid('getChanges');
+		$('#dg').datagrid('acceptChanges');
+		if(rows.length>0){
+			mergeRecords();
+		}
+	}
+}
+function reject() {
+	$('#dg').datagrid('rejectChanges');
+	editIndex = undefined;
+}
+function getChanges() {
+	var rows = $('#dg').datagrid('getChanges');
+	alert(rows.length + ' rows are changed!');
+};
+/** 将当前表格数据与后台数据合并  */
+function mergeRecords(){
+	var rows = $('#dg').datagrid('getRows');
+	var moduleId = $('#tt').tree('getSelected').id;
+	
+	jQuery.post( getContextPath()+"/curd/tAuthorityButtonCURDmergeRecords.action", 
+		{
+			jdata : $.toJSON( rows ),
+			id : moduleId
+		},
+		function(oResponse, status){
+			if(oResponse.success == false){
+				alert(oResponse.msg);
+			}
+			$('#dg').datagrid('reload',{
+				jdata: encodeURI( $.toJSON( query.jdata ) )
+			} );
+	});
+};
+</script>
+</body>
+</html>

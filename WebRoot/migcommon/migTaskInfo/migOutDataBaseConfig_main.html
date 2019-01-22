@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>out_data_base配置</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+<script type="text/javascript">
+
+/** check nodes  */
+app.checkNodes = function ()
+{
+	if( isNotNvl(app.idstr) ){
+		var tree = $('#tree-out_data_base');
+		
+		var idarr = app.idstr.split(",");
+		
+		for(var i=0, j = idarr.length; i<j; i++ ){
+			tree.tree( 'check',  tree.tree('find', idarr[i]).target );
+		}
+	}
+};
+</script>
+<div class="easyui-layout" fit="true">
+    <div data-options="region:'center', border:false" title="" style="overflow:auto;" noheader="true">
+		<ul id="tree-out_data_base" class="easyui-tree" data-options="
+			url:getContextPath()+'/tree/migTaskConfigTREEquery_JEasyUI_Tree.action?type=4',
+				method:'post', 
+				checkbox: true,
+				animate:true,
+				lines:true, 
+				mode: 'remote',
+				onLoadSuccess: app.checkNodes"
+		></ul>
+	</div>
+</div>
+</body>
+</html>

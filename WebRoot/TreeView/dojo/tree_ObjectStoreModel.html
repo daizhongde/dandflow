@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html >
+<head>
+	<title>菜单树 ObjectStoreModel-未实现</title>
+	<meta name="content-type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="/dojo-1.9.1/dijit/themes/claro/claro.css">
+	
+	<script>dojoConfig = {async: true}</script>
+	<!-- 
+	http://ajax.googleapis.com/ajax/libs/dojo/1.9.1/dojo/dojo.js
+	http://dojotoolkit.org/reference-guide/1.9/_static/js/dojo/dojo.js
+	http://demos.dojotoolkit.org/dojo/dojo.js 
+	/dojo-1.9.1/dojo/dojo.js
+	 -->
+	<script src='http://ajax.googleapis.com/ajax/libs/dojo/1.9.1/dojo/dojo.js'></script>
+	
+	<script>
+require([
+    "dojo/_base/window", 
+    "dojo/data/ItemFileReadStore",
+    "dojo/data/ObjectStore",
+    "dijit/tree/ObjectStoreModel", 
+    "dijit/Tree",
+    "dojo/domReady!"
+], function(win, ItemFileReadStore, ObjectStore, ObjectStoreModel, Tree){
+
+    // Create test store, adding the getChildren() method required by ObjectStoreModel
+    var myStore = new Memory({
+        data: [
+            { id: 'world', name:'The earth', type:'planet', population: '6 billion'},
+            { id: 'AF', name:'Africa', type:'continent', population:'900 million', area: '30,221,532 sq km',
+                    timezone: '-1 UTC to +4 UTC', parent: 'world'},
+                { id: 'EG', name:'Egypt', type:'country', parent: 'AF' },
+                { id: 'KE', name:'Kenya', type:'country', parent: 'AF' },
+                    { id: 'Nairobi', name:'Nairobi', type:'city', parent: 'KE' },
+                    { id: 'Mombasa', name:'Mombasa', type:'city', parent: 'KE' },
+                { id: 'SD', name:'Sudan', type:'country', parent: 'AF' },
+                    { id: 'Khartoum', name:'Khartoum', type:'city', parent: 'SD' },
+            { id: 'AS', name:'Asia', type:'continent', parent: 'world' },
+                { id: 'CN', name:'China', type:'country', parent: 'AS' },
+                { id: 'IN', name:'India', type:'country', parent: 'AS' },
+                { id: 'RU', name:'Russia', type:'country', parent: 'AS' },
+                { id: 'MN', name:'Mongolia', type:'country', parent: 'AS' },
+            { id: 'OC', name:'Oceania', type:'continent', population:'21 million', parent: 'world'},
+            { id: 'EU', name:'Europe', type:'continent', parent: 'world' },
+                { id: 'DE', name:'Germany', type:'country', parent: 'EU' },
+                { id: 'FR', name:'France', type:'country', parent: 'EU' },
+                { id: 'ES', name:'Spain', type:'country', parent: 'EU' },
+                { id: 'IT', name:'Italy', type:'country', parent: 'EU' },
+            { id: 'NA', name:'North America', type:'continent', parent: 'world' },
+            { id: 'SA', name:'South America', type:'continent', parent: 'world' }
+        ],
+        getChildren: function(object){
+            return this.query({parent: object.id});
+        }
+    });
+
+    // Create the model
+    var myModel = new ObjectStoreModel({
+        store: myStore,
+        query: {id: '1'}
+    });
+
+    // Create the Tree.
+    var tree = new Tree({
+        model: myModel
+    });
+    tree.placeAt(win.body());
+    tree.startup();
+});
+</script>
+</head>
+<body class="claro">
+</body>
+</html>

@@ -1,0 +1,225 @@
+/*
+ *	 Author:	Fason(阿信)										  *
+ *	 Version:v1.0													  *
+ *  You may use this code on a public web site only *
+ *  this entire copyright notice appears unchanged   *
+ *  and you clearly display a link to						   *
+ *  http://fason.nease.net/                                     *
+ *                                                                        *
+ *                                                                        *
+ *     Please send questions and bug reports to:       *
+ *             fason_p@163.com					               *
+*******************************************/
+
+//var ICONPATH = '../../images/fason/';
+//var ABSPATH = 'images/fason/';
+
+var icon={
+	root		:ICONPATH+'web.gif',
+	open		:ICONPATH+'open.png',
+	close		:ICONPATH+'close.png',
+	file		:ICONPATH+'file.png',
+	join		:ICONPATH+'T.gif',
+	joinbottom	:ICONPATH+'L.gif',
+	plus		:ICONPATH+'Tplus.gif',
+	plusbottom	:ICONPATH+'Lplus.gif',
+	minus		:ICONPATH+'Tminus.gif',
+	minusbottom	:ICONPATH+'Lminus.gif',
+	blank		:ICONPATH+'empty.gif',
+	line		:ICONPATH+'I.gif'
+}
+
+function PreLoad(n){
+	for(i in icon){
+	var tem=n?icon[i]:icon[i].src
+	icon[i]=new Image()
+	icon[i].src=tem
+	}
+	setTimeout("PreLoad()",20000)
+}
+PreLoad(true)
+
+/*
+obj "a"
+target 目标frame
+*/
+function TreeView(obj,target){
+	this.obj=obj;
+	this.Tree=new Node(true,0)
+	this.Root=null
+	this.Nodes=new Array()
+	this.target=target?target:"_blank"
+}
+
+/*
+id 当前节点号
+pid 父节点号
+txt 文字描述
+link 链接
+title 名称
+target 显示的目标frame
+xicon 节点icon
+enabled 是否允许访问
+*/
+function Node(enabled,id,pid,txt,link,title,target,xicon){
+	this.enabled=enabled?enabled:false ;
+	this.id=id;
+	this.pid=pid
+	this.txt=txt?txt:"&nbsp;"
+	this.link=link
+	this.title=title?title:this.txt
+	this.target=target
+	this.xicon= xicon
+	this.indent=""
+	this.hasChild=false;
+	this.lastNode=false;
+	this.open=false;
+}
+
+TreeView.prototype.add=function(enabled,id,pid,txt,link,title,target,xicon){
+	target=target?target:this.target
+	this.Nodes[this.Nodes.length]=new Node(enabled,id,pid,txt,link,title,target,xicon)
+	if(pid==this.Tree.id)this.Nodes[this.Nodes.length-1].open=true
+}
+
+TreeView.prototype.InitNode=function(oNode){
+	var last;
+	for(i=0;i<this.Nodes.length;i++){
+		if(this.Nodes[i].pid==oNode.id)
+		{
+			oNode.hasChild=true;
+			//if( this.Nodes[i].enabled == true )
+			//	oNode.enabled = true ;
+		}
+		
+		
+		if(this.Nodes[i].pid==oNode.pid)last=this.Nodes[i].id
+	}
+	if(last==oNode.id)oNode.lastNode=true
+}
+
+TreeView.prototype.DrawLine=function(pNode,oNode){
+		oNode.indent=pNode.indent+(oNode.pid!=this.Tree.id&&oNode.pid!=this.Root.id?("<img align='absmiddle' src='"+(pNode.lastNode?icon.blank.src:icon.line.src)+"'>"):'')
+}
+
+TreeView.prototype.DrawNode=function(nid,pNode){
+	var str=""
+	var indents=""
+	var nNode=this.Nodes[nid]
+	this.DrawLine(pNode,nNode)
+	if(nNode.hasChild)
+	{
+		indents=nNode.indent+"<a href='javascript:void(0)' onclick='"+this.obj+".Click("+nid+",this)' >"+(this.Tree.id!=nNode.pid?("<img align='absmiddle' src='"+(nNode.lastNode?(nNode.open?icon.minusbottom.src:icon.plusbottom.src):(nNode.open?icon.minus.src:icon.plus.src))+"' id='icon"+nid+"' border=0>"):"");
+		indents+="<img id='folder"+nid+"' align='absmiddle' src='"+(nNode.xicon?nNode.xicon:(nNode.open?icon.open.src:icon.close.src))+"'></a>";
+	}
+	else
+	{
+		indents=nNode.indent+(nNode.pid==this.Tree.id?'':("<img align='absmiddle' src='"+(nNode.lastNode?icon.joinbottom.src:icon.join.src)+"'>"));
+		indents+="<img align='absmiddle' src='"+(nNode.xicon?nNode.xicon:icon.file.src)+"'>";
+	}
+	
+	str+="<div class='node'><nobr>"+indents+this.DrawLink(nid)+"</nobr></div>";
+	if(nNode.hasChild)
+	{
+		str+="<div id='Child"+nid+"' style='display:"+(nNode.open?"":"none")+"'>"
+		str+=this.DrawTree(nNode)
+		str+="</div>"
+	}
+	return str;
+}
+
+TreeView.prototype.DrawTree=function(pNode){
+	var str="";
+
+	for(var i=0;i<this.Nodes.length;i++){
+		if(this.Nodes[i].pid==pNode.id)
+			str+=this.DrawNode(i,pNode)
+	}
+	return str
+}
+
+TreeView.prototype.DrawLink=function(nid){
+	var str="";
+	var oNode=this.Nodes[nid]
+	str+=" <span tabindex='1' title='"+oNode.title;
+
+	if(oNode.enabled)
+	{
+		str+="' onclick='"+this.obj+".select(this)'>" ;
+		str+=(oNode.link?("<a href='"+oNode.link+"' target='"+oNode.target+"'>"+oNode.txt+"</a>"):oNode.txt);
+	}
+	else
+	{
+		str+="' class='disabled'>" ;
+		str+=oNode.txt;
+
+	}
+	str+= "</span>";
+
+	return str;
+}
+
+
+TreeView.prototype.toString=function(){
+	var str=""
+	for(var i=0;i<this.Nodes.length;i++){
+	if(!this.Root)
+	if(this.Nodes[i].pid==this.Tree.id)this.Root=this.Nodes[i]
+
+	this.InitNode(this.Nodes[i])
+
+	}
+	str+=this.DrawTree(this.Tree);
+	
+	return str
+}
+
+TreeView.prototype.Click=function(nid,o){
+	var nNode=this.Nodes[nid]
+	o.blur();
+	if(!nNode.hasChild)return;
+	if(nNode.open)this.collapse(nid)
+	else this.expand(nid)
+}
+
+TreeView.prototype.expand=function(nid){
+	var node=this.getObj('Child'+nid)
+	var oicon=this.getObj('icon'+nid)
+	var nNode=this.Nodes[nid]
+	node.style.display=''
+	if(oicon)oicon.src=(nNode.lastNode?icon.minusbottom.src:icon.minus.src)
+	if(!nNode.xicon)this.getObj("folder"+nid).src=icon.open.src
+	nNode.open=true
+}
+
+TreeView.prototype.collapse=function(nid){
+	var node=this.getObj('Child'+nid)
+	var oicon=this.getObj('icon'+nid)
+	var nNode=this.Nodes[nid]
+	node.style.display='none'
+	if(oicon)oicon.src=(nNode.lastNode?icon.plusbottom.src:icon.plus.src)
+	if(!nNode.xicon)this.getObj("folder"+nid).src=icon.close.src
+	nNode.open=false
+}
+
+TreeView.prototype.expandAll=function(){
+	for(i=0;i<this.Nodes.length;i++)
+		if(this.Nodes[i].hasChild)this.expand(i)
+}
+
+TreeView.prototype.collapseAll=function(){
+	for(i=0;i<this.Nodes.length;i++)
+		if(this.Nodes[i].hasChild&&this.Nodes[i].pid!=this.Tree.id&&this.Nodes[i]!=this.Root)this.collapse(i)
+}
+
+TreeView.prototype.select=function(o){
+	if(!this.current)this.current=o
+	this.current.className=""
+	o.className="highlight"
+	this.current=o
+	o.focus()
+}
+
+TreeView.prototype.getObj=function(uid){
+	return document.all?document.all(uid):document.getElementById(uid)
+}

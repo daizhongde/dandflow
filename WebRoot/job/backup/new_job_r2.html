@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--画布上绘制箭头 -->
+	<meta charset="UTF-8">
+	<title>新建作业</title>
+	<link rel="stylesheet" type="text/css" href="../scripts/jquery-easyui/1.4.1/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../scripts/jquery-easyui/1.4.1/themes/icon.css">
+	<style type="text/css">
+	
+#demo_emdrap a,.renderMode a,#explanation a {
+	padding: 0.3em; border-radius: 0.2em; color: rgb(1, 163, 198); font-family: helvetica; font-weight: bold; text-decoration: none;
+}
+#demo_emdrap a,.renderMode a,#explanation a:hover {
+	color: rgb(27, 145, 27); background-color: rgb(240, 240, 240);
+}
+#explanation a {
+	background-color: transparent;
+}
+#explanation a:hover {
+	text-decoration: underline;
+}
+#explanation {
+	padding: 1em; border-radius: 1em; border: 0.25em solid rgb(221, 221, 221); 
+	top: 4em; width: 32em; right: 1em; color: black; font-family: helvetica; font-size: 90%; 
+	filter: alpha(opacity=90); position: absolute; z-index: 1000; opacity: 0.9; box-shadow: 2px 2px 19px #aaa; 
+	background-color: white; 
+	-o-box-shadow: 2px 2px 19px #aaa; -webkit-box-shadow: 2px 2px 19px #aaa; -moz-box-shadow: 2px 2px 19px #aaa; 
+	-moz-border-radius: 1em;
+}
+.draw-line{      
+    font-size: 1px;      
+} 
+	</style>
+	<script type="text/javascript" src="../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+	<script type="text/javascript" src="../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="../scripts/json/jquery.json-2.2.min.js"></script>
+<script type="text/javascript" src="../scripts/utils/line2.js"></script>
+
+<script type="text/javascript">
+var newCtrlNum=0;
+var x = 0;//光标绝对坐标
+var y = 0;//光标绝对坐标
+var px = 0;//工作区的坐标-取工作区左上角的坐标
+var py = 0;//工作区的坐标
+
+var rx = 0;//光标相对工作区的坐标
+var ry = 0;//光标相对工作区的坐标
+
+/** 箭头起点  **/
+var s = {x:0,y:0};//shift按下并且左键单击时初始化
+/** 箭头终点 **/
+var e = {x:0,y:0};//鼠标移动时实时更新
+/** 上次画线终点 **/
+var b4 = {x:0,y:0};//没次画完线更新
+
+/** 画线开关 **/
+var drawflag = false;
+
+/** 专门记录鼠标的坐标   **/
+function showPosition(e) {
+	var e = e || window.event;
+
+	x = e.clientX
+			+ document.body.scrollLeft
+			+ document.documentElement.scrollLeft;
+	y = e.clientY
+			+ document.body.scrollTop + document.documentElement.scrollTop;
+	rx = x-px;
+	ry = y-py;
+	
+	document.getElementById("x").value = rx;
+	document.getElementById("y").value = ry;
+	
+	//如果划线开关为开，鼠标移动时就划线，线以s为起点，以鼠标当前位置e为终点
+	if(drawflag){
+		
+		var line = new Line();   
+		line.drawArrowLine(s.x, s.y, e.x, e.y);
+	}
+};
+window.onkeydown=showkeyCode;
+/** 显示按键代码  **/
+function showkeyCode(e){
+	document.getElementById("dcode").value=e.keyCode;
+};
+/** 在工作区指定位置创建一个可拖放的元素   
+ * pageX 相对于工作区的X坐标
+ * pageY 相对于工作区的Y坐标
+ */
+function createNode2(pageX, pageY){
+	newCtrlNum ++;
+	var i = "<div id='dd" + newCtrlNum + "' class='easyui-draggable' data-options='onDrag:onDrag' "
+	+"style='width:34px;height:34px;background:#fafafa;border:1px solid #ccc; "
+	+"position: absolute; left: "+pageX+"px; top: "+pageY+"px;'>"
+	+"</div>";
+	
+	return i;
+};
+function onStopDragNode(node){
+
+};
+</script>
+</head>
+<body class="easyui-layout">
+	<div id="explanation" class="easyui-draggable" >
+        <p>
+            初始化字符:
+        </p>
+        <p>
+            <textarea cols="52" rows="2" id="InitText">{"Position":{ "ID1001": "50px33"},{ "ID1002": "90px33"},"Relation":{ "firstName":"ID1001", "ID1002" }}
+            </textarea>
+        </p>
+        <p>
+            位置字符:
+        </p>
+        <p>
+            <textarea cols="52" rows="2" id="PositionText"></textarea>
+        </p>
+        <p>
+            关系字符:
+        </p>
+        <p>
+            <textarea cols="52" rows="2" id="RelationText"></textarea>
+        </p>
+        <p>
+          相对坐标:
+        </p>
+        <p>
+		x:<input id="x" type="text" value="" /> y:<input id="y" type="text" value="" />
+        </p>
+        <p>
+          按键代码:<input id="dcode" type="text" value="" />
+        </p>
+    </div>
+    
+	<div data-options="region:'west',split:true" title="控件" style="width:250px;">
+		<ul id="tt" class="easyui-tree" 
+			data-options="url:'../tree/migControlInfoTREEquery_JEasyUI_Tree.action',
+			animate:true, dnd:true, lines:true,mode: 'remote',revert: false,
+			onLoadSuccess: function(node, data){
+				$(this).tree('expandAll');
+			}
+			">
+		</ul>
+	</div>
+	<div data-options="region:'center',title:'noheader',iconCls:'icon-add'" noheader="true">
+		<div class="easyui-tabs" data-options="fit:true,border:false,plain:true">
+			<div id="tabPanel1" title="作业1" cache="true" style="overflow:hidden;">
+				<div class="easyui-layout" data-options="fit:true">
+				
+					<div id="workspace" noheader="true" class="easyui-droppable targetarea" 
+						onmousemove="showPosition(event)" 
+						data-options="region:'center',title:'noheader',iconCls:'icon-add',
+							accept: '.tree-node',
+		                    onDrop: function(e, source ){
+		                    
+		                    	var node = $('#tt').tree( 'getNode', source );
+		                    	
+		                    	if(node.id.length !=1 ){									
+		                    		$(this).append( createNode2(x - px ,source.pageY - py) );
+		                    		$('#dd'+newCtrlNum ).draggable();
+		                    	}
+		                    }">
+		                    
+				        <canvas id="myCanvas" width="800" height="500" style="border:1px solid #c3c3c3;">
+						Your browser does not support the canvas element.
+						</canvas>
+						
+						<div id="DA" onmousedown="onmousedownTask(this,event)"
+				        data-options="onDrag:onDragTask, onBeforeDrag:onBeforeDragTask, onStopDrag: onStopDragTask" 
+				        style="width: 34px; height: 34px; background: none repeat scroll 0% 0% rgb(250, 250, 250); 
+				        	border: 1px solid rgb(204, 204, 204); 
+				        	position: absolute; left: 100px; top: 64px;">
+				        	任务一
+				        </div>
+				        
+				    	<div id="DB" 
+				    	data-options="onDrag:onDragTask, onStartDrag:onStartDragTask, onStopDrag: onStopDragTask"
+				    	style="width:34px;height:34px;background:#fafafa;border:1px solid #ccc;  
+				    		position: absolute; left: 269px; top: 64px;">
+				    		任务二
+				        </div>
+				        
+				        
+					</div><!-- center   class="easyui-draggable"  -->
+					
+<script>
+function onmousedownTask(o, event){
+// 	alert(o.id);
+// 	alert(event.shiftKey);
+// 	event.stopPropagation();//阻止事件冒泡。不再派发事件。
+// 	event.preventDefault(); //阻止默认行为 ( 表单提交 ),通知浏览器不要执行与事件关联的默认动作。
+	if(e.shiftKey==1){
+		s.x = rx;
+		s.y = ry;
+		drawflag = true;
+	}
+};
+
+function onDragTask(e){
+   var d = e.data; 
+    if (d.left < 0){d.left = 0}
+    if (d.top < 0){d.top = 0}
+    if (d.left + $(d.target).outerWidth() > $(d.parent).width()){
+        d.left = $(d.parent).width() - $(d.target).outerWidth();
+    }
+    if (d.top + $(d.target).outerHeight() > $(d.parent).height()){
+        d.top = $(d.parent).height() - $(d.target).outerHeight();
+    }
+};
+
+function onBeforeDragTask(e){
+	try{
+// 		alert( "ce.data:"+$.toJSON(e.data) );
+	}catch(ex){
+		alert("ex:"+ex);
+	}
+	
+// 	alert(e.shiftKey);
+	if (e.shiftKey==1)
+    {
+// 		$('#DA').droppable("disable");
+// 		alert("disabled");
+//     alert("The shift key was pressed!")
+    e.stopPropagation();//阻止事件冒泡。不再派发事件。
+    e.preventDefault(); //阻止默认行为 ( 表单提交 ),通知浏览器不要执行与事件关联的默认动作。
+    
+    }
+  else
+    {
+//     alert("The shift key was NOT pressed!")
+    }
+// 	alert("hello world");
+// 	alert( e );
+};
+
+function onStartDragTask(e){
+	
+}
+function onStopDragTask(e){
+   var d = e.data;
+};
+</script>
+				</div><!-- layout -->
+			</div>
+		</div>
+	</div>
+
+<script type="text/javascript">
+jQuery(document).ready(function()
+{	
+	px = $('#workspace').offset().left;
+	py = $('#workspace').offset().top;
+	
+	document.getElementById("myCanvas").width = $('#workspace').width()-5;
+	document.getElementById("myCanvas").height = $('#workspace').height()-5;
+});
+</script>
+</body>
+</html>

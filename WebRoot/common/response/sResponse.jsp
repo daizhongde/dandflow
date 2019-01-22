@@ -1,0 +1,4 @@
+<%@ page language="java" pageEncoding="UTF-8"%><%
+// System.out.println("request.getAttribute(\"sResponse\"):"+request.getAttribute("sResponse"));
+out.print(request.getAttribute("sResponse"));
+%>

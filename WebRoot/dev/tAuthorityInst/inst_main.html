@@ -1,0 +1,432 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>机构管理(dev)</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="keywords" content="jquery,ui,easy,easyui,web">
+	<meta name="description" content="easyui help you build your web page easily!">
+
+	<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.3.5/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.3.5/themes/icon.css">
+<!-- 	<link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/demo/demo.css"> -->
+	
+<!-- 	<script type="text/javascript" src="../../scripts/jquery-easyui/1.3.5/jquery.min.js"></script> -->
+	<script type="text/javascript" src="../../scripts/jquery-1.4.4.min.js"></script>
+	<script type="text/javascript" src="../../scripts/jquery-easyui/1.3.5/jquery.easyui.min.js"></script>
+<!-- <script type="text/javascript" src="http://www.jeasyui.com/easyui/jquery-1.8.0.min.js"></script> -->
+<!-- <script type="text/javascript" src="http://www.jeasyui.com/easyui/jquery.easyui.min.js"></script> -->
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.3.5/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+
+<style type="text/css">
+<!--
+body {
+    background-color: #C3E3FF;
+}
+#mylayer {
+  position: absolute;
+  left: 5px;
+  top: 30px;
+}
+	-->
+</style>
+<script type="text/javascript">
+var newNodeCount = 0;
+var appendFlag = 0;
+
+/** update right view panel  **/
+function updateView( node ){
+		
+	jQuery('#id').val( node.id );
+	jQuery('#name').val( node.text );
+	jQuery('#code').val( node.attributes.code );
+	jQuery('#level').combobox( 'setValue', node.attributes.level );
+	
+// 	jQuery('#type').combobox( 'setValue', node.attributes.type );
+	document.getElementById("type").value= node.attributes.type;
+// 	jQuery('#leaf').combobox( 'setValue', node.attributes.leaf );
+	document.getElementById("leaf").value= node.attributes.leaf;
+	
+	jQuery('#superior').combotree( 'setValue', node.attributes.superior );//pojo.NIparent.NIid
+	
+	jQuery('#manager').val( node.attributes.manager );
+	jQuery('#mtel').val( node.attributes.mtel );
+	jQuery('#memail').val( node.attributes.memail );
+	jQuery('#mqq').val( node.attributes.mqq );
+	
+	jQuery('#linkman').val( node.attributes.linkman );
+	jQuery('#ltel').val( node.attributes.ltel );
+	jQuery('#lemail').val( node.attributes.lemail );
+	jQuery('#lqq').val( node.attributes.lqq );
+	
+	jQuery('#address').val( node.attributes.address ); 
+	jQuery('#description').val( node.attributes.description ); 
+};
+
+/** update tree node's text  **/
+function onChangeInstField( o ){
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	
+// 	alert("onChangeInstField!");
+	if( node != null )
+	{
+// 		if(node.text != o.value ){
+		if( o.id=='name' )
+		{
+			//Don't refresh tree every change, update node in front
+// 			alert('name change excuted!');
+// 			node.text = o.value;
+			t.tree('update', {
+				target: node.target,
+				text: o.value
+			});
+		}
+		
+		//t.tree('reload');
+		//do reload after updateModel when necessary
+		node.attributes[o.id] = o.value;//node's attribute would be effected
+		
+		VIRTUE.update.init();
+		VIRTUE.update.jdata.data[o.id] = o.value;
+		VIRTUE.update.jdata.condition.id = node.id; 
+		VIRTUE.update.jdata.operator.id = VIRTUE.operator.EQUAL;//default,this line can comment
+		updateModel( VIRTUE.update.jdata );
+	}
+};
+
+</script>
+</head>
+<body class="easyui-layout">
+	<div data-options="region:'east',border:true,split:true" style="width:600px;padding:10px;background-color: rgb(228, 235, 241)" title="机构信息详情" >
+		<!-- 信息已保存 -->
+		<div id="mylayer" style="display: none;background-color: #FFFFCC" ><font size="4" color="green">信息已保存!</font></div>
+	
+	    <form id="add.form" method="post" action="">
+	    	<table align="center">
+	    		<tr>
+	    			<td>机构ID:</td>
+	    			<td><input type="text" id="id" name="pojo.NIid" data-options="required: true" 
+	    				style="width:200px;" disabled="disabled"></input>
+					</td>
+	    		</tr>
+	    		<tr>
+	    			<td>机构编码:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="code" name="pojo.CIcode" data-options="required: true" 
+	    					onchange="onChangeInstField(this)" style="width:200px;"></input>
+					</td>
+	    		</tr>
+	    		<tr>
+	    			<td>机构名称:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="name" name="pojo.CIname" data-options="required: true" 
+	    					onchange="onChangeInstField(this)" style="width:200px;"></input>
+					</td>
+	    		</tr>
+	    		<tr>
+	    			<td>机构级别:</td>
+	    			<td><select class="easyui-combobox" id="level" name="pojo.NIlevel" data-options="required: true" 
+	    						 style="width:200px;" disabled="disabled">
+	    					<option value="" selected="selected">--选择--</option>
+	    					<option value="0">零级机构</option>
+                        	<option value="1">一级机构</option>
+                        	<option value="2">二级机构</option>
+                        	<option value="3">三级机构</option>
+                        	<option value="4">四级机构</option>
+                        </select>
+                     </td>
+	    		</tr>
+	    		<tr>
+	    			<td>机构类型:</td>
+<!-- 	    		0:直属支行;1:银行;2:邮政;3:管理机构  -->
+	    			<td><select id="type" name="pojo.NItype" style="width:200px;" onchange="onChangeInstField(this)">
+	    					<option value="" selected="selected">--选择--</option>
+	    					<option value="0">直属支行</option>
+                        	<option value="1">银行</option>
+                        	<option value="2">邮政</option>
+                        	<option value="3">管理机构</option>
+                        </select>
+                     </td>
+	    		</tr>
+	    		<tr>
+	    			<td>是否某级:</td>
+	    			<td><select id="leaf" name="pojo.CIleaf" style="width:200px;" onchange="onChangeInstField(this)">
+	    					<option value="" selected="selected">--选择--</option>
+                        	<option value="true">是</option>
+                        	<option value="false">否</option>
+                        </select>
+                    </td>
+	    		</tr>
+	    		<tr>
+	    			<td>上级机构:</td>
+	    			<td>
+<!-- 						<input id="niparent" class="easyui-combobox" name="pojo.NIparent" style="width:200px;" disabled="disabled" -->
+<!-- 							data-options="required: false, mode: 'remote',  -->
+<!-- 							valueField:'ID',textField:'TEXT',url:'../../cbb/tAuthorityInstCBBgetComboboxData_Parent_JEasyUI.action'"> -->
+                        <input class="easyui-combotree" 
+	                        id="superior" name="pojo.NIsuperior" 
+	                        data-options="url:'../../tree/tAuthorityInstTREEquery_JEasyUI_CBT_L3.action',method:'post',mode: 'remote', required:true" 
+	                        style="width:260px;" disabled="disabled">
+                    </td>
+	    		</tr>
+	    		<tr>
+	    			<td>机构领导:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="manager" name="pojo.CImanager" data-options="required:false" 
+	    			onchange="onChangeInstField(this)" style="width:200px;"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>领导电话:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="mtel" name="pojo.CImtel" data-options="required:false" 
+	    			onchange="onChangeInstField(this)" style="width:200px;"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>领导邮箱:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="memail" name="pojo.CImemail" data-options="required:false" 
+	    			onchange="onChangeInstField(this)" style="width:200px;"></input></td>
+	    		</tr>
+				<tr>
+	    			<td>领导QQ:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="mqq" name="pojo.CImqq" data-options="required:false" 
+	    			onchange="onChangeInstField(this)" style="width:200px;"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>机构联系人:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="linkman" name="pojo.CIlinkman" data-options="required:false" 
+	    			onchange="onChangeInstField(this)" style="width:200px;"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>联系人电话:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="ltel" name="pojo.CIltel" data-options="required:false" 
+	    			onchange="onChangeInstField(this)" style="width:200px;"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>联系人邮箱:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="lemail" name="pojo.CIlemail" data-options="required:false" 
+	    			onchange="onChangeInstField(this)" style="width:200px;"></input></td>
+	    		</tr>
+				<tr>
+	    			<td>联系人QQ:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="lqq" name="pojo.CIlqq" data-options="required:false" 
+	    			onchange="onChangeInstField(this)" style="width:200px;"></input></td>
+	    		</tr>
+	    		
+    			<tr>
+	    			<td>机构地址:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="address" name="pojo.CIaddress" data-options="required:false" 
+	    			onchange="onChangeInstField(this)" style="width:200px;"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>机构简介:</td>
+	    			<td><textarea id="description" name="pojo.CIdescription" style="width:300px; height:30px; font-size: 12px;" 
+	    			onchange="onChangeInstField(this)"></textarea></td>
+	    		</tr>
+	    	</table>
+	    </form>
+	</div>
+	<!-- serverJsonData.json  ../../tree/tAuthorityInstTREEquery_JEasyUI_Tree.action -->
+	<div data-options="region:'center',border: true" title="机构树" style="padding:10px 0 0 0;" noheader="false">
+		<ul id="tt" class="easyui-tree" data-options="url:'../../tree/tAuthorityInstTREEquery_JEasyUI_FullTree_Async.action',
+				method:'post', 
+				animate:true,
+				lines:true, 
+				mode: 'remote', 
+				onContextMenu: function(e,node){
+					e.preventDefault();
+					$(this).tree('select',node.target);
+					$('#mm').menu('show',{
+						left: e.pageX,
+						top: e.pageY
+					});
+				},
+				onExpand: function(node){
+					if(appendFlag==1){
+						append_F();
+						appendFlag=0;
+					}
+				},				
+				onClick: updateView"
+		></ul>
+	</div>
+	<div id="mm" class="easyui-menu" style="width:120px;">
+		<div onclick="append()" data-options="iconCls:'icon-add'">添加</div>
+		<div onclick="removeit()" data-options="iconCls:'icon-remove'">删除</div>
+		<div class="menu-sep"></div>
+		<div onclick="expand()">展开</div>
+		<div onclick="collapse()">折叠</div>
+<!-- 		<div class="menu-sep"></div> -->
+<!-- 		<div onclick="collapseAll()">全部折叠</div> -->
+<!-- 		<div onclick="expandAll()">全部展开</div> -->
+	</div>
+<script type="text/javascript">
+/** add a module event hander */
+function append() {
+	newNodeCount ++;
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	if(node.state=="closed")//deal with asyc node
+	{
+		appendFlag = 1;
+		t.tree('expand', node.target);
+	}
+	else
+	{
+		append_F();
+	}
+};
+/** add a module,append a node finally */
+function append_F() {
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	
+	var newNode = {
+		id: 'newNode' + newNodeCount,
+		text : '新建机构' + newNodeCount,
+		state: 'open',
+		attributes :{
+			code: "",
+			level: node.attributes.level + 1,
+			type: node.attributes.type + 1,
+			leaf: 'true',
+			superior: node.id
+		}
+	};
+	
+	t.tree('append', {
+		parent : (node ? node.target : null),
+		data : [ newNode ]
+	} );
+	
+// 	find a node and then select it
+	var newNode1 = t.tree( 'find', 'newNode'+newNodeCount );
+// 	t.tree('select', newNode1.target);
+// 	t.tree('scrollTo',newNode1.target);
+// 	updateView( newNode1 );
+	
+	VIRTUE.add.init();
+	VIRTUE.add.jdata.data.name = newNode1.text;
+	VIRTUE.add.jdata.data.level = newNode1.attributes.level;
+	VIRTUE.add.jdata.data.type = newNode1.attributes.type;
+	VIRTUE.add.jdata.data.leaf = newNode1.attributes.leaf;
+	VIRTUE.add.jdata.data.superior = newNode1.attributes.superior;
+	
+	createModel( VIRTUE.add.jdata, newNode1 );
+}
+ /**
+  * del a module:
+  	1:cud.jdata.del.rows.push(1);
+  */
+function removeit() {
+	var node = $('#tt').tree('getSelected');
+	
+	VIRTUE.del.init();
+	VIRTUE.del.jdata.condition.id = node.id; 
+	VIRTUE.del.jdata.operator.id = VIRTUE.operator.EQUAL;//default,this line can comment
+	destroyModel( VIRTUE.del.jdata, node );
+// 	$('#tt').tree('remove', node.target);
+}
+function collapse() {
+	var node = $('#tt').tree('getSelected');
+	$('#tt').tree('collapse', node.target);
+}
+function expand() {
+	var node = $('#tt').tree('getSelected');
+	$('#tt').tree('expand', node.target);
+};
+function collapseAll() {
+	$('#tt').tree('collapseAll');
+}
+function expandAll() {
+	$('#tt').tree('expandAll');
+}
+/** create db model 
+ *
+ @param jdata for sqlassembel
+ @param id new node's id
+ */
+function createModel( jdata, newNode1 ){
+	var t = $('#tt');
+	
+	jQuery.post("../../curd/tAuthorityInstCURDaddRetId.action", {
+		jdata : encodeURI( jQuery.toJSON( jdata ) )
+	}, function(oResponse, status) {
+// 		oResponse = eval("(" + oResponse + ")");
+// 		alert(oResponse.msg);
+		if (oResponse.success == true) {
+			
+			var code = new String("00000000"+oResponse.id);
+			code = code.substring(code.length-9);
+			
+			t.tree('update', {
+	 			target: newNode1.target,
+	 			id: oResponse.id,
+	 			state: 'open',
+	 			attributes:{
+	 				code: code,
+	 				level: newNode1.attributes.level,
+	 				type: newNode1.attributes.type,
+	 				leaf: 'true'
+	 			}
+	 		});
+			
+			var newNode = t.tree( 'find', oResponse.id );
+		 	t.tree('select', newNode.target);
+		 	t.tree('scrollTo',newNode.target);
+		 	updateView( newNode );
+		 	
+		}else{
+			alert(oResponse.msg);
+			t.tree( 'remove', newNode1.target );
+		}
+	});
+};
+
+/** update db model **/
+function updateModel( jdata ){
+	jQuery.post("../../curd/tAuthorityInstCURDmodify.action", {
+		jdata : encodeURI( jQuery.toJSON( jdata ) )
+	}, function(oResponse, status) {
+		var t = jQuery('#tt');
+// 		oResponse = eval("(" + oResponse + ")");
+// 		alert(oResponse.msg);
+		if (oResponse.success == true) {
+			if( jdata.data.leaf != null && jdata.data.leaf != undefined ){
+				t.tree( 'reload' );
+			}
+			//弹出一个层一秒钟后消失
+		    document.getElementById("mylayer").style.display="inline";
+		    var t=setTimeout("document.getElementById('mylayer').style.display='none'",1000);
+		}else if (oResponse.success == false) {
+			alert(oResponse.msg);
+			t.tree( 'reload' );
+		}
+	});
+};
+
+/** delete db model 
+ *@param jdata for sqlassembel
+  @param node to judge whether delete node is last node
+ */
+function destroyModel( jdata, node ){
+// 	t.tree( 'getData', node.target ).children.length
+
+	/** there two post request, You can use a delete request do all back process, but it with Low efficiency  **/
+	jQuery.post("../../curd/tAuthorityInstCURDdelete.action", {
+// 		id : node.id,
+		jdata : encodeURI( jQuery.toJSON( jdata ) )
+	}, function(oResponse, status) {
+		var t = $('#tt');
+// 		oResponse = eval("(" + oResponse + ")");
+// 		alert(oResponse.msg);
+		if (oResponse.success == true) {
+			t.tree( 'reload' );//for node icon
+		}else{
+			alert(oResponse.msg);
+			t.tree( 'reload' );
+		}
+	});
+};
+
+</script>
+</body>
+</html>

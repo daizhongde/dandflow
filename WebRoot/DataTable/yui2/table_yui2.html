@@ -1,0 +1,472 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>数据表格 by YUI 2.9.0</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<style type="text/css">
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link rel="stylesheet" type="text/css" href="/yui_2.9.0/build/fonts/fonts-min.css" />
+<link rel="stylesheet" type="text/css" href="/yui_2.9.0/build/autocomplete/assets/skins/sam/autocomplete.css" />
+<link rel="stylesheet" type="text/css" href="/yui_2.9.0/build/paginator/assets/skins/sam/paginator.css" />
+<link rel="stylesheet" type="text/css" href="/yui_2.9.0/build/datatable/assets/skins/sam/datatable.css" />
+<link rel="stylesheet" type="text/css" href="/yui_2.9.0/build/resize/assets/skins/sam/resize.css" />
+<link rel="stylesheet" type="text/css" href="/yui_2.9.0/build/layout/assets/skins/sam/layout.css" />
+<link rel="stylesheet" type="text/css" href="/yui_2.9.0/build/button/assets/skins/sam/button.css" />
+<link rel="stylesheet" type="text/css" href="/yui_2.9.0/build/container/assets/skins/sam/container.css" />
+
+<script type="text/javascript" src="/yui_2.9.0/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/connection/connection-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/json/json-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/yahoo/yahoo-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/event/event-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/dom/dom-min.js"></script>
+<!-- dragdrop一定要放在element-min.js的前面   http://yui.yahooapis.com/2.9.0/ -->
+<script type="text/javascript" src="/yui_2.9.0/build/dragdrop/dragdrop-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/element/element-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/paginator/paginator-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/event-delegate/event-delegate-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/datatable/datatable-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/button/button-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/resize/resize-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/animation/animation-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/datasource/datasource-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/autocomplete/autocomplete-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/layout/layout-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/container/container-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/utilities/utilities.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<style type="text/css">
+/* custom styles for inline instances */
+INPUT#nmparent.yui-ac-input { position: static;width:10em; vertical-align:middle;}
+INPUT#nmparent.yui-ac-container { width:10em;left:0px;}
+
+/* DIV#myAutoComplete.yui-ac { z-index:9001;}  
+DIV#myContainer.yui-ac-container{ z-index:9001;} */
+/* .myContainer{ width:20em;} */
+#myContainer{ z-index:9001;} 
+</style>
+
+<script type="text/javascript">
+var app = {};
+
+var noquery = VIRTUE.noquery;
+var query = VIRTUE.query;
+var exp = VIRTUE.exp;
+
+/** validate and assign value **/
+function PackingParameter(){
+	var nmlevel = YAHOO.util.Dom.get("nmlevel").value;
+	var cmleaf = YAHOO.util.Dom.get('cmleaf').value;
+	var nmparent = YAHOO.util.Dom.get('nmparent').value;
+	var cmname = YAHOO.util.Dom.get('cmname').value;	
+	
+// 	query.jdata.condition = {};//解决了IE6下,undefined传到后台的问题
+// 	query.jdata.operator = {};
+	query.init();
+	if(nmlevel !== ""){
+		query.jdata.condition.level = nmlevel;
+		query.jdata.operator.level = 1;
+	}
+	if(cmleaf !== ""){
+		query.jdata.condition.leaf = cmleaf;
+		query.jdata.operator.leaf = 1;
+	}
+	if(nmparent !== ""){
+		query.jdata.condition["t2.name"] = nmparent;
+		query.jdata.operator["t2.name"] = 11;
+	}
+	if(cmname !== ""){
+		query.jdata.condition.name = cmname;
+		query.jdata.operator.name = 11;
+	}
+	exp.jdata.condition = query.jdata.condition;
+	exp.jdata.operator = query.jdata.operator;
+	return true;
+};
+
+/** 搜索 "click" event handler for search Button instance **/
+function onButton1Click(p_oEvent) {
+	YAHOO.log("You clicked button: " + this.get("id"), "info", "example1");
+	query.jdata.act = "query";
+   	if(!PackingParameter()){
+   		return;
+   	}
+	//app.myDataSource.sendRequest();
+	app.myDataTable.load({
+		request : app.generateRequest()
+	});
+};
+/**  清空  **/
+function onButton2Click(){
+
+};
+/** export data, don't search **/
+function onButton3Click(){
+	if(!PackingParameter()){
+   		return;
+   	}
+    var form = document.createElement("form");
+    document.body.appendChild(form);
+    var i = document.createElement("input");
+    i.type = "hidden";
+    i.name = "jdata";
+    i.value = encodeURI(  YAHOO.lang.JSON.stringify( exp.jdata ) );
+    form.appendChild(i);
+    form.action = "../../exp/tAuthorityModuleEXPexpModule.action";
+    form.method = "post";
+    form.submit();
+};
+
+/** format level **/
+function fmtNmlevel( elLiner, oRecord, oColumn, oData ){
+// 	oData = new Number(oData);
+	switch( oData ){
+		case 0: elLiner.innerHTML = '零级'; break;
+		case 1: elLiner.innerHTML = '一级'; break;
+		case 2: elLiner.innerHTML = '二级'; break;
+		case 3: elLiner.innerHTML = '三级'; break;
+		case 4: elLiner.innerHTML = '四级'; break;
+		default: elLiner.innerHTML = oData;
+	}
+};
+
+/** format node type  **/
+function fmtCmleaf( elLiner, oRecord, oColumn, oData ){
+	oData = new String(oData);
+	if( oData == "true" ){
+		elLiner.innerHTML = '叶子'; return;
+	}else if( oData == "false" ){
+		elLiner.innerHTML = '非叶子'; return;
+	}else{
+		elLiner.innerHTML = oData; return;
+	}
+};
+
+app.DynamicData = function() {
+	
+	// "contentready" event handler for the "buttons" <fieldset>
+    YAHOO.util.Event.onContentReady("buttons", function () {
+        // Create Buttons using existing <input> elements as a data source
+        var button1 = new YAHOO.widget.Button("button1", { onclick: { fn: onButton1Click } });//查询
+        var button2 = new YAHOO.widget.Button("button2", { onclick: { fn: onButton2Click } });//重置
+        var button3 = new YAHOO.widget.Button("button3", { onclick: { fn: onButton3Click } });//导出
+    });
+
+    //../../cbb/tAuthorityModuleCBBgetCBBData_Parent.action
+    app.oDS = new YAHOO.util.XHRDataSource("../../cbb/tAuthorityModuleCBBgetCBBData_Parent.action");
+    // Set the responseType
+    app.oDS.responseType = YAHOO.util.XHRDataSource.TYPE_JSARRAY;
+    // Define the schema of the delimited results
+    app.oDS.responseSchema = {
+    	fields: [ "text", "id" ]//label, value
+    };
+    // Enable caching
+    app.oDS.maxCacheEntries = 5;
+    // Instantiate AutoCompletes
+    app.oConfigs = {
+        prehighlightClassName: "yui-ac-prehighlight",
+        useShadow: true,
+        queryDelay: 0,
+        minQueryLength: 0,
+        animVert: .01
+    }
+    // Instantiate the AutoComplete
+    app.oAC = new YAHOO.widget.AutoComplete("nmparent", "myContainer", app.oDS, app.oConfigs);
+
+    var myColumnDefs = [
+        {key:"id", label: "模块ID", sortable : true },//可实现客户端排序
+        {key:"name", label: "模块名称", width:180, resizeable : true},//,resizeable : true ,editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})
+        {key:"level", label: "模块级别", width:70, sortable : true, resizeable : true, formatter: fmtNmlevel },
+        {key:"leaf", label: "模块类型", width:70, sortable : true, formatter: fmtCmleaf },
+        {key:"order", label: "模块次序号", width:65, sortable : true},
+        {key:"super", label: "上级模块", width:180, sortable : true},
+        {key:"target", label: "链接目标", hidden: true },
+        {key:"iconcls", label: "模块图标样式", resizeable : true, hidden: true },
+        {key:"expanded", label: "展开状态", resizeable : true, hidden: true },
+        {key:"checked", label: "选定状态", sortable : true, hidden: true },
+        {key:"path", label: "模块路径", width: 300 },
+        {key:"note", label : "模块备注", width: 300, resizeable : true },
+        {key:"ctime", label: "创建时间", sortable : true, hidden: true },
+        {key:"cip", label: "创建者使用的IP", resizeable : true, hidden: true },
+        {key:"cuser", label: "创建者",  hidden: true },
+        {key:"mtime", label: "最后修改时间", hidden: true },
+        {key:"mip", label: "最后修改者使用的IP", hidden: true },
+        {key:"muser", label: "最后修改者", hidden: true }
+    ];
+    
+    // DataSource instance
+    app.myDataSource = new YAHOO.util.DataSource("../../query/tAuthorityModuleYUI2QUERYdfind.action?");
+    app.myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+    app.myDataSource.responseSchema = {
+        resultsList: "records",
+        fields: [
+            {key:"id", parser:"number" },
+            {key:"name"},
+            {key:"level", parser:"number" },
+            {key:"leaf"},
+            {key:"order", parser:"number"},
+            {key:"super"},
+            {key:"target"},
+            {key:"iconcls"},
+            {key:"expanded"},
+            {key:"checked"},
+            {key:"path"},
+            {key:"note"},
+            {key:"ctime"},
+            {key:"cip"},
+            {key:"cuser"},
+            {key:"mtime" },
+            {key:"mip"},
+            {key:"muser"}
+        ],
+            
+        metaFields: {
+            totalRecords: "totalRecords", 
+            startIndex: "startIndex"
+        }
+    };
+    
+    app.initialRequest = function(oState, oSelf) {
+        oState = oState || { pagination: null, sortedBy: null };
+        var sort = (oState.sortedBy) ? oState.sortedBy.key : "id";
+        var dir = (oState.sortedBy && oState.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc";
+        var startIndex = (oState.pagination) ? oState.pagination.recordOffset : 0;
+        var results = (oState.pagination) ? oState.pagination.rowsPerPage : 25;
+        return  "sort=" + sort +
+                "&dir=" + dir +
+                "&startIndex=" + startIndex +
+                "&pageSize=" + results +
+                "&jdata=" + encodeURI( YAHOO.lang.JSON.stringify( noquery.jdata ) );
+    };
+    
+    // Customize request sent to server to be able to set total # of records
+    app.generateRequest = function(oState, oSelf) {
+        // Get states or use defaults
+        oState = oState || { pagination: null, sortedBy: null };
+        var sort = (oState.sortedBy) ? oState.sortedBy.key : "id";
+        var dir = (oState.sortedBy && oState.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc";
+        var startIndex = (oState.pagination) ? oState.pagination.recordOffset : 0;
+        var results = (oState.pagination) ? oState.pagination.rowsPerPage : 25;
+        
+        // Build custom request
+        return  "sort=" + sort +
+                "&dir=" + dir +
+                "&startIndex=" + startIndex +
+//				"&results =" + (startIndex + results) +
+// 				"&total=" + total +
+                "&pageSize=" + results +
+                "&jdata=" + encodeURI( YAHOO.lang.JSON.stringify( query.jdata ) );
+    };
+
+    app.config = {
+		rowsPerPage: query.count,
+    	containers  : "pag",
+	    initialPage : 1,
+	
+	    containerClass : 'yui-pg-container', // default
+	
+	    template :
+	        '<label>&nbsp;&nbsp;每页：{RowsPerPageDropdown}</label>' +
+	        '<span class="pg-nav">' +
+	            '{FirstPageLink} {PreviousPageLink} ' +
+	            '{PageLinks} ' +
+	            '{NextPageLink} {LastPageLink}' +
+	        '</span>' +
+	        '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;第&nbsp;{JumpToPageDropdown}&nbsp;页 ' +
+	        '{CurrentPageReport}',
+	
+	    alwaysVisible : true, // default
+	
+	    updateOnChange : false, // default
+		
+		firstPageLinkLabel:"&lt;&lt; 第一页",
+		firstPageLinkTitle:"第一页",
+		lastPageLinkLabel:"第末页 &gt;&gt;",
+		lastPageLinkTitle:"最后一页",
+		nextPageLinkLabel:"下一页 &gt;",
+		nextPageLinkTitle:"下一页",
+		previousPageLinkLabel:"&lt; 上一页",
+		previousPageLinkTitle:"上一页",
+		pageTitleBuilder:function (page, paginator) { return "第 " + page + " 页"; },
+		pageReportTemplate : "共&nbsp;{totalPages}&nbsp;页&nbsp;&nbsp;显示第 {startIndex} 到 {endIndex} 条&nbsp;&nbsp;共 {totalRecords} 条",
+		rowsPerPageOptions : [5,25,50,100]
+    };
+	
+	
+	// Create the Paginator for our DataTable to use
+	app.paginator = new YAHOO.widget.Paginator( app.config );
+	
+    // DataTable configuration
+    app.myConfigs = {
+    	//caption   : 'Area Codes by State',
+    	width:"100%",
+    	height:"32em",
+        generateRequest: app.generateRequest,
+        initialRequest: app.initialRequest(), // Initial request for first page of data
+        dynamicData: true, // Enables dynamic server-driven data
+        MSG_EMPTY: "没有记录!",
+        sortedBy : { key: "level", dir:YAHOO.widget.DataTable.CLASS_ASC }, // Sets UI initial sort arrow, (dzd)this is not only client sort
+        paginator : app.paginator
+    };
+    
+    // DataTable instance
+    app.myDataTable = new YAHOO.widget.ScrollingDataTable("datatable", myColumnDefs, app.myDataSource, app.myConfigs);
+    // Update totalRecords on the fly with values from server
+    app.myDataTable.doBeforeLoadData = function(oRequest, oResponse, oPayload) {
+        oPayload.totalRecords = oResponse.meta.totalRecords;
+        oPayload.pagination.recordOffset = oResponse.meta.startIndex;
+        return oPayload;
+    };
+    
+    // Subscribe to events for row selection
+    app.myDataTable.subscribe("rowMouseoverEvent", app.myDataTable.onEventHighlightRow);
+    app.myDataTable.subscribe("rowMouseoutEvent", app.myDataTable.onEventUnhighlightRow);
+    app.myDataTable.subscribe("rowClickEvent", app.myDataTable.onEventSelectRow);
+    
+//     var highlightEditableCell = function(oArgs){
+//         var elCell = oArgs.target;
+//         if(YAHOO.util.Dom.hasClass(elCell, "yui-dt-editable")){
+//             this.highlightCell(elCell);
+//         }
+//     };
+    
+//     app.myDataTable.subscribe("cellMouseoverEvent", highlightEditableCell);
+//     app.myDataTable.subscribe("cellMouseoutEvent", app.myDataTable.onEventUnhighlightCell);
+//     app.myDataTable.subscribe("cellClickEvent", app.myDataTable.onEventShowCellEditor);
+    
+	/**  herader bgcolor:#D9D9E2 */
+	app.layout = new YAHOO.widget.Layout({
+// 		数据&gt;&gt;材料模板   header: "查询条件",    , header: "模块信息" 
+        units: [//70
+        	{ position: "top", height: 70,  resize : true, body: "top", header: "查询条件", gutter: "0px", collapse: true, scroll : true },
+            { position: "center", body: "center"}
+//         	{ position: "center", body: "center1", scroll: false, gutter: "0 0 1 0" }
+        ]
+    });
+	
+	app.layout.on('resize', function() {
+        if (app.myDataTable) {
+            app.myDataTable.set('height', (this.getSizes().center.h-62 ) + 'px');//114没有新增按钮,141:有button不在header,144有button在header,
+// 			app.myDataTable.set('height', ( this.getSizes().center.h ) + 'px');//114没有新增按钮,141:有button不在header,144有button在header,
+            app.myDataTable._syncColWidths();
+        }
+    }, app.layout, true);
+           
+    app.layout.on('render', function() {
+//     	app.myDataTable.set('height', ( this.getSizes().center.h ) + 'px');//74 original
+    	app.myDataTable.set('height', (this.getSizes().center.h-62 ) + 'px');//74 original
+    }, app.layout, true);  
+    
+    app.layout.render();
+	
+    return {
+        ds: app.myDataSource,
+        dt: app.myDataTable,
+        oDS: app.oDS,
+        oAC: app.oAC
+    };
+        
+};
+YAHOO.util.Event.addListener(window, "load", app.DynamicData);
+
+
+//新增按钮
+function onButton4Click(p_oEvent) {
+	var zgdwmc = document.getElementById("selectDW").value;
+	app.zgdwbm = zgdwmc.split(":")[0];
+	window.location.href="<%=basePath%>tZgmodAttachmentAction.do?method=initAdd&zgdwbm="+app.zgdwbm;
+};
+
+//编辑按钮
+function onButton5Click(p_oEvent) {
+	var rows = app.myDataTable.getSelectedRows();
+	if(rows.length==0){
+		alert("没有选择记录！");
+		return false;
+	}else{
+		var oRecord = app.myDataTable.getRecord(rows[0]);
+		window.location.href="<%=basePath%>tZgmodAttachmentAction.do?method=initModify&attId="+oRecord.getData("attId");
+	}
+}
+//删除按钮
+function onButton6Click(p_oEvent) {
+	var rows = app.myDataTable.getSelectedRows();
+	if(rows.length==0){
+		alert("没有选择记录！");
+		return false;
+	}else{
+		var oRecord = app.myDataTable.getRecord(rows[0]);
+		deleterow(oRecord.getData("attId"));
+	}
+}
+
+/** --------------       end      删除时用YUI2.9发送异步请求                       --------------------*/
+</script>
+</head>
+<body class="yui-skin-sam">
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+	<div id="top">
+		<div style="padding:0px 0 0px 5px">  
+		<form id="form" name="form" method="post">
+<!-- 			<fieldset id="fieldset"> -->
+<!-- 				<legend>查询条件</legend> -->
+				<!-- style= "font-size:18px; color:#000000" -->
+<!-- 	            <table width="100%">   -->
+				<table>  
+					<tr>
+						<td>
+							<label for="nmlevel">模块级别:</label>
+							<select id="nmlevel" name="nmlevel" style="width:200px;">
+								<option value="" selected="selected">--选择--</option>
+							    <option value="0">零级</option>
+							    <option value="1">一级</option>
+							    <option value="2">二级</option>
+							    <option value="3">三级</option>
+							    <option value="4">四级</option>
+							</select>
+						</td>
+						<td>
+							<label for="cmleaf">模块类型:</label>
+							<select id="cmleaf" name="cmleaf"  style="width:200px;"> 
+								<option value="" selected="selected">--选择--</option>
+							    <option value="true">叶子</option>
+							    <option value="false">非叶子</option>
+							</select>
+						</td>
+						<td>
+							<div id="myAutoComplete">
+								<label for="nmparent">上级模块:</label>&nbsp;<input id="nmparent" type="text">
+								<div id="myContainer" ></div>
+							</div>
+<!-- 							<input type="text" id="nmparent" name="nmparent" value="" id="nmparent" /> -->
+						</td>
+						<td>
+							<label for="cmname">模块名称:</label>
+							<input type="text" id="cmname" name="cmname" value=""  id="cmname" />
+						</td>
+						<td>
+							<div style="padding:0px 0 0px 15px" id="buttons">
+								<button type="button" id="button1" name="button1">查询</button>
+				        		<button type="reset" id="button2" name="button2">清空</button>
+								<button type="button" id="button3" name="button3">导出</button>
+	                        </div>
+						</td>
+					</tr>
+			    </table>
+<!-- 			</fieldset> -->
+		</form>
+		</div>
+	</div>
+	
+	<div id="center">
+		<div id="datatable"></div>
+		<div id="pag"></div>
+	</div>
+
+</body>
+</html>

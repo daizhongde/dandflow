@@ -1,0 +1,87 @@
+1、作业定义管理
+/migration/WebRoot/migcommon/migJobInfo/migJobInfo_main.html
+
+var buttons = ajaxReqRespText("/curd/tAuthorityRmrelationCURDfindUserButton4tb.action?id=10036");
+// console.log("buttons:"+buttons);
+buttons = eval("(" + buttons + ")");
+
+var tb={};
+tb.create_btn = { text : 'New Job',iconCls : 'icon-add', disabled : false,handler : function(){ create_Record(); return false; }};
+tb.update_btn = { text : 'Edit', iconCls : 'icon-edit', handler : function(){ update_Record(); return false; }};
+tb.update_btn1 = { text : 'Edit1', iconCls : 'icon-edit', handler : function(){ update_Record1(); return false; }};
+tb.read_btn = { text : 'View', iconCls : 'icon-search', handler : function(){ read_Record(); return false; } };
+tb.delete_btn = { text : 'Remove', iconCls : 'icon-remove', handler : function(){ delete_Record(); }};
+tb.delete_btn1 = { text : 'Remove1', iconCls : 'icon-remove', handler : function(){ delete_Record1(); }};
+tb.import_btn = { text : 'Import Job', iconCls : 'icon-import',	handler : function(){ importJobExcelFile(); return false;}	};
+tb.btn15 = { text : 'Instance Job', iconCls:'icon-redo', handler: function(){ instanceJob(); return false; } };
+
+var toolbar = [];
+if( buttons.create_btn==1 ){ toolbar.push(tb.create_btn) };
+if( buttons.update_btn==1 ){ toolbar.push(tb.update_btn) };
+if( buttons.update_btn1==1 ){ toolbar.push(tb.update_btn1) };
+if( buttons.read_btn==1 ){ toolbar.push(tb.read_btn) };
+if( buttons.delete_btn==1 ){ toolbar.push(tb.delete_btn) };
+if( buttons.delete_btn1==1 ){ toolbar.push(tb.delete_btn1) };
+if( buttons.import_btn==1 ){ toolbar.push(tb.import_btn) };
+if( buttons.btn15==1 ){ toolbar.push(tb.btn15) };
+
+2、作业实例管理
+/migration/WebRoot/migcommon/migJobProcess/migJobProcess_main.html
+var buttons = ajaxReqRespText("/curd/tAuthorityRmrelationCURDfindUserButton4tb.action?id=10018");
+//console.log("buttons:"+buttons);
+buttons = eval("(" + buttons + ")");
+
+var tb={};
+tb.read_btn = { text : 'Monitor', iconCls : 'icon-search', handler : function(){ monitor(); return false; } };
+tb.btn21 = { text : 'Monitor1', iconCls : 'icon-search', handler : function(){ monitor1(); return false; } };
+tb.delete_btn = { text : 'Remove', iconCls : 'icon-remove', handler : function(){ removeInstance(); }};
+tb.delete_btn1 = { text : 'Remove1', iconCls : 'icon-remove', handler : function(){ removeInstance1(); }};
+tb.btn15 = { text : 'Start', iconCls:'icon-run', handler: function(){ startJob();  } };
+tb.btn16 = { text : 'Start1', iconCls:'icon-run', handler: function(){ startJob1(); } };
+tb.btn17 = { text : 'Pause', iconCls:'icon-pause', handler: function(){ pauseJob(); }};
+tb.btn18 = { text : 'Pause1', iconCls:'icon-pause', handler: function(){ pauseJob1(); } };
+tb.btn19 = { text : 'Reset', iconCls:'icon-back', handler: function(){ resetJob(); } };
+tb.btn20 = { text : 'Reset1', iconCls:'icon-back', handler: function(){ resetJob1(); } };
+
+var toolbar = [];
+if( buttons.read_btn==1 ){ toolbar.push(tb.read_btn) };
+if( buttons.btn21==1 ){ toolbar.push(tb.btn21) };
+if( buttons.delete_btn==1 ){ toolbar.push(tb.delete_btn) };
+if( buttons.delete_btn1==1 ){ toolbar.push(tb.delete_btn1) };
+if( buttons.btn15==1 ){ toolbar.push(tb.btn15) };
+if( buttons.btn16==1 ){ toolbar.push(tb.btn16) };
+if( buttons.btn17==1 ){ toolbar.push(tb.btn17) };
+if( buttons.btn18==1 ){ toolbar.push(tb.btn18) };
+if( buttons.btn19==1 ){ toolbar.push(tb.btn19) };
+if( buttons.btn20==1 ){ toolbar.push(tb.btn20) };
+
+
+
+3、 合法性稽核配管理
+var buttons = ajaxReqRespText("/curd/tAuthorityRmrelationCURDfindUserButton4tb.action?id=10055");
+console.log("buttons:"+buttons);
+buttons = eval("(" + buttons + ")");
+
+var buttons2 = ajaxReqRespText("/curd/tAuthorityRbrelationCURDfindUserButton4tb2.action?id=10055");
+console.log("buttons2:"+buttons2);
+buttons2 = eval("(" + buttons2 + ")");
+
+var tb={};
+tb.create_btn={ text:'New Config', iconCls:'icon-add', handler:function(){ create_Record();  return false; } };
+tb.update_btn={ text:'Edit Config', iconCls:'icon-edit', handler:function(){ update_Record();  return false; } };
+tb.update_btn1={ text:'Edit Config1', iconCls:'icon-edit', handler:function(){ update_Record1();  return false; } };
+tb.read_btn={ text:'View Config', iconCls:'icon-search', handler:function(){ read_Record();  return false; } };
+tb.delete_btn={ text:'Remove Config', iconCls:'icon-remove', handler:function(){ delete_Record(); } };
+tb.delete_btn1={ text:'Remove Config1', iconCls:'icon-remove', handler:function(){ delete_Record1(); } };
+tb.delete_btn2={ text:'Remove All My config', iconCls:'icon-remove', handler:function(){ delete_Record2(); } };
+tb.import_btn={ text:'Import config', iconCls:'icon-import', handler:function(){ import_Record(); return false;} };
+
+var toolbar = [];
+if( buttons.create_btn==1 ){ toolbar.push(tb.create_btn) };
+if( buttons.update_btn==1 ){ toolbar.push(tb.update_btn) };
+if( buttons.update_btn1==1 ){ toolbar.push(tb.update_btn1) };
+if( buttons.read_btn==1 ){ toolbar.push(tb.read_btn) };
+if( buttons.delete_btn==1 ){ toolbar.push(tb.delete_btn) };
+if( buttons.delete_btn1==1 ){ toolbar.push(tb.delete_btn1) };
+if( buttons.delete_btn2==1 ){ toolbar.push(tb.delete_btn2) };
+if( buttons.import_btn==1 ){ toolbar.push(tb.import_btn) };

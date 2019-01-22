@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    status : 这个用于设置log4j2自身内部的信息输出,可以不设置,当设置成trace时,会看到log4j2内部各种详细输出
+    monitorInterval : Log4j能够自动检测修改配置文件和重新配置本身, 设置间隔秒数。
+     ["Appenders", "Loggers", "Properties", "Scripts", "CustomLevels"].
+     
+     优先级从高到低依次为：OFF、FATAL、ERROR、WARN、INFO、DEBUG、TRACE、 ALL。
+     
+-->
+<configuration status="DEBUG" monitorInterval="6000">
+	<properties>  
+        <property name="LOG_HOME">${maven.log4j2.log_home}</property>  
+        <property name="FILE_NAME">log2</property>
+        <property name="ERROR_FILE_NAME">error2</property>  
+    </properties>  
+    <!--先定义所有的appender-->
+    <appenders>
+        <!--这个输出控制台的配置-->
+        <Console name="Console" target="SYSTEM_OUT">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）
+            onMatch="ACCEPT" onMismatch="DENY" -->
+            <ThresholdFilter level="DEBUG" />
+            <!--这个都知道是输出日志的格式-->
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+        </Console>
+        
+        <!--这个会打印出所有的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <RollingFile name="RollingFile" fileName="${LOG_HOME}/${FILE_NAME}.log"
+                     filePattern="${LOG_HOME}/$${date:yyyy-MM}/${FILE_NAME}-%d{MM-dd-yyyy}-%i.{FILE_NAME}.gz">
+            <PatternLayout pattern="%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{36} %L %M - %msg%xEx%n"/>
+            <SizeBasedTriggeringPolicy size="50MB"/>
+        </RollingFile>
+        
+        <!-- 设置日志格式并配置日志压缩格式(service.log.年份.gz) -->
+        <RollingRandomAccessFile name="error_appender"
+                                 immediateFlush="false" fileName="${LOG_HOME}/${ERROR_FILE_NAME}.log"
+                                 filePattern="${LOG_HOME}/$${date:yyyy-MM}/${ERROR_FILE_NAME}-%d{MM-yyyy}-%i.${ERROR_FILE_NAME}.gz">
+            <!--
+                %d{yyyy-MM-dd HH:mm:ss, SSS} : 日志生产时间
+                %p : 日志输出格式
+                %c : logger的名称
+                %m : 日志内容，即 logger.info("message")
+                %n : 换行符
+                %C : Java类名
+                %L : 日志输出所在行数
+                %M : 日志输出所在方法名
+                hostName : 本地机器名
+                hostAddress : 本地ip地址
+             -->
+            <PatternLayout>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %class{36} %L %M -- %msg%xEx%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="10" modulate="true" />
+            </Policies>
+        </RollingRandomAccessFile>
+        
+    </appenders>
+    <!--然后定义logger，只有定义了logger并引入的appender，appender才会生效-->
+    <loggers>
+        <!--建立一个默认的root的logger-->
+        <root level="DEBUG">
+            <appender-ref ref="RollingFile"/>
+            <appender-ref ref="Console"/>
+        </root>
+        <!-- 第三方日志系统 -->
+        <logger name="org.springframework.core" level="debug"/>
+        <logger name="org.springframework.beans" level="debug"/>
+        <logger name="org.springframework.context" level="debug"/>
+        <logger name="org.springframework.web" level="debug"/>
+    </loggers>
+    <!-- 日志实例(info),其中'service-log'继承root,但是root将日志输出控制台,而'service-log'将日志输出到文件,通过属性'additivity="false"'将'service-log'的
+             的日志不再输出到控制台 -->
+    <loggers>
+	    <logger name="error_log" level="error" includeLocation="true" additivity="false">
+	        <appender-ref ref="error_appender"/>
+	    </logger>
+    </loggers>
+</configuration>

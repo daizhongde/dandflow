@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dwr PUBLIC "-//GetAhead Limited//DTD Direct Web Remoting 3.0//EN" "http://getahead.org/dwr/dwr30.dtd">
+
+<dwr>
+  <allow>
+  	<!-- Log 
+    <create creator="new" scope="application">
+      <param name="class" value="person.daizhongde.migration.dwr.reverseajax.Log"/>
+    </create>
+    -->
+    
+<!-- 	<create creator="new" javascript="Remote">  
+        <param name="class" value="com.asc.dps.function.datamanager.sendmes.Remote" />  
+        <include method="noticeNewOrder" />  
+        <include method="getData" />  
+	</create>  -->
+    <!-- 使用spring创建器,创建一个名为securitySession的javascript对象,作用:取spirng security 里面的用户信息 
+    <create javascript="sessionUtil" creator="spring">
+      <param name="beanName">sessionService</param>
+      <include method="getUsername" />
+    </create>-->
+    
+    <!-- chat 
+    <create creator="new" scope="application">
+      <param name="class" value="com.example.dwr.reverseajax.JavascriptChat"/>
+    </create>-->
+    <create javascript="JavascriptChat" creator="spring">
+      <param name="beanName">javascriptChat</param>
+      <include method="addMessage" />
+    </create>
+    <create javascript="MigJobInsComet" creator="spring">
+      <param name="beanName">migJobInsComet</param>
+      <include method="sendInsId" />
+    </create>
+     
+    <convert converter="bean" match="person.daizhongde.migration.dwr.reverseajax.Message"/>
+    
+    
+    <!-- 过程  |  使用spring创建器,创建一个名为migJobProcessService的javascript对象
+    <create javascript="migJobProcessService" creator="spring">
+      <param name="beanName">migJobProcessService</param>
+      <include method="startJob" />
+    </create> -->
+    
+    <!-- chat 
+    <create creator="new" scope="application">
+      <param name="class" value="person.daizhongde.migration.dwr.reverseajax.JavascriptChat"/>
+    </create>
+    <create creator="new" scope="application">
+      <param name="class" value="person.daizhongde.migration.dwr.reverseajax.JavaChat"/>
+    </create>
+    <convert converter="bean" match="person.daizhongde.migration.dwr.reverseajax.Message"/>
+-->
+    <!-- clock 
+    <create creator="new" scope="application">
+      <param name="class" value="person.daizhongde.migration.dwr.reverseajax.Clock"/>
+    </create>
+    
+    <create creator="new" scope="application">
+      <param name="class" value="person.daizhongde.migration.dwr.reverseajax.PeopleTable"/>
+    </create>
+-->
+<!--    <create creator="new" javascript="Logmanager"> -->
+<!--      <param name="class" value="person.daizhongde.migration.dwr.reverseajax.Logmanager"/> -->
+<!--    </create> -->
+   
+<!--     <convert match="person.daizhongde.migration.dwr.reverseajax.Person" converter="bean"/> -->
+
+    <!-- this is a bad idea for live, but can be useful in testing -->
+    <convert converter="exception" match="java.lang.Exception"/>
+    <convert converter="bean" match="java.lang.StackTraceElement"/>
+
+  </allow>
+
+</dwr>

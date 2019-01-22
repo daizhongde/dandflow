@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>数据表格 by jeasyui CURD</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../scripts/jquery-easyui/1.4.1/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../scripts/jquery-easyui/1.4.1/themes/icon.css"/>
+<script type="text/javascript" src="../scripts/jquery-1.4.4.min.js"></script>
+
+<script type="text/javascript" src="../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../scripts/jquery-easyui/1.4.1/locale/easyui-lang-zh_CN.js"></script>
+<!-- <script type="text/javascript" src="../scripts/jquery-easyui/1.4.1/plugins/jquery.edatagrid.js"></script> -->
+<script type="text/javascript" src="../scripts/json/jquery.json-2.2.min.js"></script>
+<script type="text/javascript" src="../scripts/virtue/virtue.js"></script>
+
+<script type="text/javascript">
+var query = VIRTUE.query;
+
+function newRecord(){  //使用一个window
+	$('#win').window('open').window('setTitle', '添加模块');
+	$('#win').window("refresh", "../common/tAuthorityRecord/tAuthorityRecord_add.html");
+}
+
+function editRecord() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		$('#win').window('open').window('setTitle', '编辑模块');
+		$('#win').window("refresh", "../curd/tAuthorityRecordCURDinitModify.action?pojo.NMid="+row.ID);
+	}
+}
+
+var read = {};
+read.jdata = { act: "read",condition: {nmid: ""},operator : {nmid:1} };
+function browseRecord() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		$('#win').window('open').window('setTitle', '浏览模块');
+		read.jdata.condition.nmid = row.ID;
+		$('#win').window("refresh", "../curd/tAuthorityRecordCURDbrowse.action?jdata="+encodeURI($.toJSON( read.jdata )));
+	}
+}
+
+var del = {};
+del.jdata = {act: "del",condition: { nmid: "" },operator : {nmid : 1} };
+function destroyRecord(){
+	var row = $('#grid').datagrid('getSelected');
+	if (row){
+		$.messager.confirm('确认','确认删除吗?',function(r){
+			if (r){
+				del.jdata.condition.nmid = row.ID;
+				$.post("../curd/tAuthorityRecordCURDdelete.action", { jdata: encodeURI($.toJSON( del.jdata )) }, function(result, status){
+					alert(result.msg);
+					if (result.success){
+						$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+					}
+				});
+			}
+		});
+	}
+};
+
+var toolbar = [{
+	text:'添加参数',
+	iconCls:'icon-add',
+	handler:function(){
+		newRecord();
+	}
+},{
+	text:'编辑参数',
+	iconCls:'icon-edit',
+	handler:function(){
+		editRecord();
+	}
+},{
+	text:'删除参数',
+	iconCls:'icon-remove',
+	handler:function(){
+		destroyRecord();
+	}
+}];
+//program component
+$(function(){
+	$('#grid').datagrid({
+		title: '作业参数',
+		//iconCls:'icon-reload',
+		toolbar: toolbar,
+		width: 938,
+		height: 720,
+		nowrap: true,
+		striped: true,
+		fit: true,
+// 		collapsible: true,
+		url: "../query/migJobParaJEasyUIQUERYdfind.action",
+// 		idField: "ID",
+		multiSort: true,
+		remoteSort: true,
+		sortName:"task",
+		sortOrder:"asc",
+		singleSelect: true,
+		columns:[[
+			{title:'节点(任务/作业)ID',field:"task",width:120, sortable: true },
+		    {title:'节点(任务/作业)名称',field:"task_name",width:180 },
+		    {title:'参数',field:"para",width:80, sortable: true },
+		    {title:'参数中文名',field: "para_name",width: 180 },
+		    {title:'参数类型',field:"para_type",width: 60 },
+		    {title:'参数值',field:"para_value",width: 180 }
+		]],
+		rownumbers:true,
+		pageNumber: query.pageNumber,
+		pageSize: query.pageSize,
+		queryParams:{
+			jdata: encodeURI($.toJSON( query.jdata ))
+		},
+        rowContextMenu: [
+           { text: "编辑", iconCls: "icon-edit", handler: function (e, index) { t.datagrid("beginEdit", index); } }
+       	],
+		pagination: true,
+		//enableHeaderClickMenu: false,
+		//enableHeaderContextMenu: false,
+		//enableRowContextMenu: false,
+		autoFocusField: "Name",
+		autoEditing: false,         //该属性启用双击行时自定开启该行的编辑状态
+		extEditing: true,           //该属性启用行编辑状态的 ExtEditing 风格效果，该属性默认为 true。
+		singleEditing: true         //该属性启用datagrid的只允许单行编辑效果，该属性默认为 true。
+	});
+});
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+    <div data-options="region:'center',border:false" title="noheader" style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+</body>
+</html>

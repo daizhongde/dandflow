@@ -1,0 +1,397 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>数据表格 by ext3.4.1</title>
+	
+	<link rel="stylesheet" type="text/css" href="/ext-3.4.1/resources/css/ext-all.css" />
+	<link rel="stylesheet" type="text/css" href="/ext-3.4.1/examples/ux/css/LockingGridView.css" />
+	    
+	<script type="text/javascript" src="/ext-3.4.1/adapter/ext/ext-base.js"></script>
+	<script type="text/javascript" src="/ext-3.4.1/ext-all.js"></script>
+	
+	<script type="text/javascript" src="/ext-3.4.1/examples/ux/LockingGridView.js"></script>
+	<script type="text/javascript" src="/ext-3.4.1/examples/ux/grid/PageBarEx.js"></script>
+	
+	<script type="text/javascript" src="/ext-3.4.1/src/locale/ext-lang-zh_CN.js"></script>
+	
+<style type="text/css">
+.x-panel-body {
+	background-color: #B3DFDA
+}
+
+</style>
+<!-- 	<link rel="stylesheet" type="text/css" href="/ext-3.4.1/examples/grid/grid-examples.css" /> -->
+<!-- 	<link rel="stylesheet" type="text/css" href="/ext-3.4.1/examples/shared/examples.css" /> -->
+<script type="text/javascript" >
+var app = {};
+var query = {};
+query.jdata = { act: "noquery", condition: {}, operator : {} };
+var request = { query: query };
+request.start = 0;
+request.count = 25;
+
+/** validate and assign value **/
+function PackingParameter(){
+	var nmlevel = document.getElementById("nmlevel").value;
+	var cmleaf = document.getElementById("cmleaf").value;
+	var nmparent = document.getElementById("nmparent").value;
+	var cmname = document.getElementById("cmname").value;
+// 	alert("nmlevel:"+nmlevel);
+// 	alert("cmleaf:"+cmleaf);
+// 	alert("nmparent:"+nmparent);
+// 	alert("cmname:"+cmname);
+	
+	query.jdata.condition = {};//解决了IE6下,undefined传到后台的问题
+	query.jdata.operator = {};
+	if(nmlevel !== ""){
+		query.jdata.condition.level = nmlevel;
+		query.jdata.operator.level = 1;
+	}
+	if(cmleaf !== ""){
+		query.jdata.condition.leaf = cmleaf;
+		query.jdata.operator.leaf = 1;
+	}
+	if(nmparent !== ""){
+		query.jdata.condition["t2.name"] = nmparent;
+		query.jdata.operator["t2.name"] = 11;
+	}
+	if(cmname !== ""){
+		query.jdata.condition.name = cmname;
+		query.jdata.operator.name = 11;
+	}
+	return true;
+};
+
+/** search data ,reload data  **/
+function submitForm(){
+	query.jdata.act = "query";
+   	if(!PackingParameter()){
+   		return;
+   	}
+  	//Parameters are encoded as standard HTTP parameters using Ext.urlEncode.
+    app.store.baseParams.jdata = Ext.util.JSON.encode( query.jdata ) ;
+    app.store.reload({
+    	params: {
+	        start: request.start,          // specify params for the first page load if using paging
+	        limit: request.count
+		}
+    });
+};
+/**  清空  **/
+function clearForm(){
+	document.getElementById("form").reset();
+};
+/** export data, don't search   **/
+function exportData(){
+	query.jdata.act = "exp";
+	if(!PackingParameter()){
+   		return;
+   	}
+    var form = document.createElement("form");
+    document.body.appendChild( form );
+    var i = document.createElement("input");
+    i.type = "hidden";
+    i.name = "jdata";
+    i.value = encodeURI( Ext.util.JSON.encode( query.jdata ) );
+    form.appendChild(i);
+    form.action = "../../exp/tAuthorityModuleEXPexpModule.action";
+    form.method = "post";
+    form.submit();
+};
+
+/** format level **/
+function fmtNmlevel(n){
+// 	n = new Number(n);
+	switch(n){
+		case 0: return '零级'; break;
+		case 1: return '一级'; break;
+		case 2: return '二级'; break;
+		case 3: return '三级'; break;
+		case 4: return '四级'; break;
+		default: return n;
+	}
+};
+/** format node type  **/
+function fmtCmleaf(s){
+	s = new String(s);
+	if(s=="true"){
+		return '叶子';
+	}else if(s == "false"){
+		return '非叶子';
+	}else{
+		return value;
+	}
+};
+
+Ext.onReady(function(){
+
+    // create the Data Store
+    app.store = new Ext.data.JsonStore({
+        root: "results",
+        totalProperty: "totalCount",
+        idProperty: "id",
+        remoteSort: true,
+        sortInfo: {
+            field: "level",
+            direction: "DESC" // ASC or 'DESC' (case sensitive for local sorting)
+        },
+        hasMultiSort : true,
+        
+        fields: [ 
+			{name: "id", type: "int"},
+			"name", 
+            {name: "level", type: "int"},
+            "leaf",
+            {name: "order", type: "int"},
+            {name: "super", type: "string"},
+            "target", "iconcls", "expanded", "checked", "path",
+            "note",   "ctime",   "cip",      "cuser",   "mtime",
+            "mip",    "muser"
+        ],
+        autoLoad :{ params : { start : request.start, limit : request.count } },
+//         baseParams: { jdata: encodeURI( Ext.util.JSON.encode( query.jdata ) ) },
+		baseParams: { jdata: Ext.util.JSON.encode( query.jdata ) },
+        // load using script tags for cross domain, if the data in on the same domain as
+        // this page, an HttpProxy would be better
+//         proxy: new Ext.data.ScriptTagProxy({
+//             url: 'http://extjs.com/forum/topics-browse-remote.php'
+//         })
+        proxy: new Ext.data.HttpProxy({
+			url: "../../query/tAuthorityModuleExt3QUERYdfind.action"
+		})
+    });
+// app.store.setDefaultSort('LEVEL_', 'DESC');
+
+    var grid = new Ext.grid.GridPanel({
+//         width:700,
+//         height:500,
+        title:'模块信息',
+        region: 'center',
+        store: app.store,
+        trackMouseOver: true,
+        disableSelection: false,
+        loadMask: true,
+        frame: false,
+        border: true,
+        stripeRows: true,
+        
+        // grid columns
+        colModel: new Ext.ux.grid.LockingColumnModel([{
+            id: 'topic', // id assigned so we can apply custom css (e.g. .x-grid-col-topic b { color:#333 })
+            header: "模块ID",
+            dataIndex: "id",
+            width: 70,
+            sortable: true,
+            locked: true,
+            hidden: true
+        },{
+            header: "模块名称",
+            dataIndex: "name",
+            locked: true,
+            width: 180
+        },{
+            header: "模块级别",
+            dataIndex: "level",
+            width: 70,
+//             align: 'right',
+            renderer: fmtNmlevel,
+            sortable: true
+        },{
+            id: 'LEAF',
+            header: "模块类型",
+            dataIndex: "leaf",
+            width: 70,
+            renderer: fmtCmleaf,
+            sortable: true
+        },{
+            header: "模块次序号",
+            dataIndex: "order",
+            width: 70,
+            sortable: true
+        },{
+            header: "上级模块",
+            dataIndex: "super",
+            width: 180,
+            sortable: true
+        },{
+            header: "链接目标",
+            dataIndex: "target",
+            hidden: true
+        },{
+            header: "模块图标样式",
+            dataIndex: "iconcls",
+            hidden: true
+        },{
+            header: "展开状态",
+            dataIndex: "expanded",
+            hidden: true
+        },{
+            header: "选定状态",
+            dataIndex: "checked",
+            hidden: true
+        },{
+            header: "模块路径",
+            dataIndex: "path",
+            width: 300
+        },{
+            header: "模块备注",
+            dataIndex: "note",
+            width: 300
+        },{
+            header: "创建时间",
+            dataIndex: "ctime",
+            width: 120,
+            hidden: true
+        },{
+            header: "创建者使用的IP",
+            dataIndex: "cip",
+            width: 120,
+            hidden: true
+        },{
+            header: "创建者",
+            dataIndex: "cuser",
+            width: 70,
+            hidden: true
+        },{
+            header: "最后修改时间",
+            dataIndex: "mtime",
+            width: 120,
+            hidden: true
+        },{
+            header: "最后修改者使用的IP",
+            dataIndex: "mip",
+            width: 120,
+            hidden: true
+        },{
+            header: "最后修改者",
+            dataIndex: "muser",
+            width: 70,
+            hidden: true
+        }]),
+
+        // customize view config
+//         viewConfig: {
+//             forceFit: false
+//             enableRowBody: true,
+//             showPreview: true,
+//             getRowClass : function(record, rowIndex, p, store){
+//                 if(this.showPreview){
+//                     p.body = '<p>'+record.data.excerpt+'</p>';
+//                     return 'x-grid3-row-expanded';
+//                 }
+//                 return 'x-grid3-row-collapsed';
+//             }
+//         },
+		view: new Ext.ux.grid.LockingGridView({ forceFit: false }),
+		// paging bar on the bottom
+// 		bbar: new Ext.PagingToolbar({
+//             pageSize: request.count,
+//             store: app.store,
+//             displayInfo: true,
+//             displayMsg: '显示 {0} - {1} 共 {2}条',
+//             emptyMsg: "没有记录!"
+//             items:[
+//                 '-', {
+//                 pressed: true,
+//                 enableToggle:true,
+//                 text: 'Show Preview',
+//                 cls: 'x-btn-text-icon details',
+//                 toggleHandler: function(btn, pressed){
+//                     var view = grid.getView();
+//                     view.showPreview = pressed;
+//                     view.refresh();
+//                 }
+//             }]
+//         })
+		bbar: new Ext.ux.grid.PageBarEx({
+	        store: app.store,
+	        width: 30,
+	        pageSize: request.count
+	    }).pageToolBar
+    });
+    
+    // render it
+//     grid.render('grid');
+
+    // trigger the data store load
+//     app.store.load({params:{ start: request.start, limit: request.count, jdata: encodeURI( Ext.util.JSON.encode( query.jdata ) ) }});
+    
+    var viewport = new Ext.Viewport({
+        layout: 'border',
+        items: [
+        {
+        	title: '查询条件',
+            region: 'north',
+            contentEl: 'searchPanel',
+//             autoHeight: true,
+// 			style: {
+// 				background: '#B3DFDA'
+//             },
+//             ctCls: 'x-box-layout-ct custom-class',
+//             cls:'x-panel-body',
+            border: true,
+            split: true,
+            collapsible: true
+        }, 
+//         {
+//             region: 'center',
+//             contentEl: 'grid'
+//         }
+        grid
+        ]
+	});
+});
+
+</script>
+</head>
+<body>
+<!-- style="height:30px;background:#B3DFDA;"    -->
+	<div id="searchPanel" title="查询条件" >  
+		<div style="padding:0px 0 0px 5px">  
+			<form id="form" method="post">  
+<!-- 	        <table width="100%">   -->
+				<table>  
+                <tr>
+                    <td>
+                    	<label for="nmlevel">模块级别:</label>
+                        <select id="nmlevel" name="nmlevel" style="width:100px;">
+                        	<option value="" selected="selected">--选择--</option>
+                        	<option value="0">零级</option>
+                        	<option value="1">一级</option>
+                        	<option value="2">二级</option>
+                        	<option value="3">三级</option>
+                        	<option value="4">四级</option>
+                        </select>
+                    </td>
+                    <td>
+                    	<label for="cmleaf" style="padding-left:0.5cm;">模块类型:</label>
+                        <select id="cmleaf" name="cmleaf" style="width:100px;">
+                        	<option value="" selected="selected">--选择--</option>
+                        	<option value="true">叶子</option>
+                        	<option value="false">非叶子</option>
+                        </select>
+                    </td>
+                    <td>
+						<label for="nmparent" style="padding-left:0.5cm;">上级模块:</label>
+                        <input id="nmparent" name="nmparent" value="" style="width:100px;">
+                    </td>
+                    <td>
+						<label for="cmname" style="padding-left:0.5cm;">模块名称:</label>
+                        <input id="cmname" name="cmname" value="" style="width:100px;">
+                    </td>
+                    <td>
+                    	<div style="padding:0px 0 0px 15px">
+                    			<button onclick="submitForm()" type="button">查询</button>&nbsp;
+								<button  type="reset">清空</button>&nbsp;
+								<button onclick="exportData()" type="button">导出</button>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </form>
+        </div>
+    </div>
+<!--<div id="grid"></div> -->
+</body>
+</html>

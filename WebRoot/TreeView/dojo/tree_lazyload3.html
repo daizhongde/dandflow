@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--
+ ! Excerpted from "Mastering Dojo",
+ ! published by The Pragmatic Bookshelf.
+ ! Copyrights apply to this code. It may not be used to create training material, 
+ ! courses, books, articles, and the like. Contact us if you are in doubt.
+ ! We make no guarantees that this code is fit for any purpose. 
+ ! Visit http://www.pragmaticprogrammer.com/titles/rgdojo for more book information.
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>菜单树 lazyload - ForestStoreModel</title>
+<style type="text/css">
+@import "/dojo-1.9.1/dijit/themes/tundra/tundra.css";
+</style>
+<!-- 
+	http://ajax.googleapis.com/ajax/libs/dojo/1.9.1/dojo/dojo.js
+	http://dojotoolkit.org/reference-guide/1.9/_static/js/dojo/dojo.js
+	http://demos.dojotoolkit.org/dojo/dojo.js 
+	/dojo-1.9.1/dojo/dojo.js
+	 -->
+<script type="text/javascript" src="/dojo-1.9.1/dojo/dojo.js.uncompressed.js"
+	djConfig="parseOnLoad: true"></script>
+<script type="text/javascript">
+dojo.require("doh.runner");
+dojo.require("dojo.query");
+
+dojo.require("dojox.data.JsonRestStore");
+dojo.require("dijit.tree.dndSource");
+
+dojo.require("dojo.parser");	// scan page for widgets and instantiate them
+dojo.require("dojox.data.demos.stores.LazyLoadJSIStore");
+dojo.require("dijit.Tree");
+/**
+dojo.require("dojox.data.QueryReadStore");
+dojo.require("dijit.tree.ForestStoreModel");
+
+dojo.require("dojo.store.JsonRest");
+dojo.require("dojo.store.Observable");
+dojo.require("dojo._base.Deferred");
+
+dojo.require("dijit.tree.TreeStoreModel");
+dojo.require("dojo.data.ItemFileReadStore");
+dojo.require("dojo/store/JsonRest");
+dojo.require("dojox.data.JsonRestStore");
+dojo.require("dojo/domReady!");
+**/
+var queryOptions = {};
+//if(dojo.byId("ignoreCaseEnabled").checked){
+//	queryOptions.ignoreCase = dojo.query("#fetchForm")[0].ignoreCase[0].checked;
+//}
+//if(dojo.byId("deepEnabled").checked){
+//	queryOptions.deep = dojo.query("#fetchForm")[0].deep[0].checked;
+//}
+var query = {};
+//query.q = dojo.byId("searchText").value;
+//query.jdata = dojo.json.stringify( jdata ) ;
+// 			query : query,
+// 			queryOptions : queryOptions
+query.id = 1;
+
+
+var booksService = function(query, queryOptions) {
+	return dojo.xhrGet({
+		url : "../../tree/tAuthorityModuleTREEquery_Dojo_Tree_Lazy.action",
+		handleAs : 'json',
+		content : {
+			id:1
+		}
+	});
+};
+var store = new dojox.data.JsonRestStore({
+	idAttribute : "id", //Defaults to 'id'.
+	labelAttribute : "text",
+	service : booksService,
+	target : 'booksData'
+});
+
+/**
+var store = new dojox.data.QueryReadStore(
+{
+	requestMethod:"post",
+	target : "../../tree/tAuthorityModuleTREEquery_Dojo_Tree_Lazy.action",
+	labelAttribute : "text",
+	idAttribute : "id", //Defaults to 'id'.
+// 	fetch: function( request ){
+// 		request.serverQuery = {
+// 			id: "1"
+// 		};
+// 		return this.inherited("fetch", arguments);
+// 	}
+});
+doh.t(store, "store created");
+**/	
+var store = new dojox.data.demos.stores.LazyLoadJSIStore({
+	requestMethod:"post",
+	url:"../../tree/tAuthorityModuleTREEquery_Dojo_Tree_Root.action"
+	
+});
+
+var mmModel = new dijit.tree.TreeStoreModel({
+	store : store,
+	deferItemLoadingUntilExpand : true,
+// 	rootLabel : "湖南社保金融卡省内前置系统R",
+// 	rootId : "1",
+// 	query: {id:"1"},
+	childrenAttrs : [ "children" ]
+	
+});
+doh.t(mmModel, "model created");
+	
+</script>
+</head>
+<body class="tundra">
+
+	<!-- data-dojo-props="model: treeModel showRoot: true" -->
+	<div dojoType="dijit.Tree" 
+		model="mmModel" persist="false" id="modulesDataTree" dndController="dijit.tree.dndSource">
+</body>
+</html>

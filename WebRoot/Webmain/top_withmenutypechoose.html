@@ -1,0 +1,185 @@
+<html>
+  <head>
+    <title>顶部窗口</title>
+    <meta name="keywords" content="keyword1,keyword2,keyword3">
+    <meta name="description" content="this is my page">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <link href="../css/top.css" rel="stylesheet" type="text/css">
+
+<style type="text/css">
+<!--
+#sysname{
+	font-family: "微软雅黑", Arial;
+	font-size:24px;
+	color: #FFFFFF;
+	padding:0px 0px 0px 0px;
+}
+#sysdiv{
+	padding:10px 0px 0px 0px;
+	width: 600px;
+	height: 40px
+}
+	-->
+</style>
+<script type="text/javascript">
+	function ShowMenu()
+	{	
+		parent.Frameleft.cols="260,*";
+		hidediv.style.display="block";
+	}
+	
+	function HideMenu()
+	{	
+		parent.Frameleft.cols="0,*";
+		hidediv.style.display="none";
+	}
+	
+	function help(){
+	    var dLeft = (window.screen.AvailWidth-800-10)+"px";	    
+	    var dTop  = (window.screen.availHeight-600)+"px";
+	    var r_url = window.parent.document.getElementById('basefrm').src;
+// 		alert(r_url);
+	    var params = "dialogLeft="+dLeft+";dialogTop="+dTop+";dialogWidth=800px;dialogHeight=600px;center=no;scroll=yes;resizable=yes;help=no;status=no;"
+	    window.showModelessDialog("../help/helpIframe.jsp?r_url="+r_url,window,params);	
+	}
+	
+	/** Refresh left frame, When change menu style  **/
+	function onChangeMenuStyle( value ){
+		if( value.indexOf('../MenuBar/') ==-1 ){
+			window.parent.document.getElementById('menufrm').src=value;
+		}else{
+			//hide left frame
+			parent.Frameleft.cols="0,*";
+			hidediv.style.display="none";
+			//change right frame URL
+			window.parent.document.getElementById('basefrm').src=value;
+		}
+		
+	};
+</script>
+</head>
+<body style="overflow:hidden">
+
+<table width="100%" height="59" border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td valign="top">
+	    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+	      <tr>
+	     	<td background="../images/top/top_bg01.gif"><div id="sysdiv"><span id="sysname">权限管理系统</span></div></td>
+	        <td width="82" align="right"><img src="../images/top/top_img01.gif" width="82" height="50"></td>
+	      </tr>
+	    </table>
+        <table width="100%" height="28" border="0" cellpadding="0" cellspacing="0" background="../images/top/top_bg02.gif">
+          <tr>
+            <td width="122">
+	            <table border="0" cellpadding="0" cellspacing="2">
+	                <tr>
+	                  <td width="84" align="right"><img src="../images/top/top_xtcds.gif" width="80" height="24" onClick="ShowMenu()" style="cursor:pointer" onMouseOver="this.src='../images/top/top_xtcdso.gif'" onMouseDown="this.src='../images/top/top_xtcdsd.gif'" onMouseUp="this.src='../images/top/top_xtcdso.gif'" onMouseOut="this.src='../images/top/top_xtcds.gif'"></td>
+	                  <td id="hidediv" style="display:block">
+	                  	<img src="../images/top/top_xtcds_hid.gif" width="28" height="24" 
+		                  	onClick="HideMenu()" style="cursor:pointer" 
+		                  	onMouseOver="this.src='../images/top/top_xtcds_hido.gif'" 
+		                  	onMouseDown="this.src='../images/top/top_xtcds_hidd.gif'" 
+		                  	onMouseUp="this.src='../images/top/top_xtcds_hido.gif'" 
+		                  	onMouseOut="this.src='../images/top/top_xtcds_hid.gif'">
+		                	
+	                  </td>
+	                  <td>
+
+<select id="selectMenuStyle" name="selectMenuStyle" onchange="onChangeMenuStyle(this.value)">
+	<optgroup label="菜单树">
+		<option value="../TreeView/jeasyui/tree_jeasyui.html">菜单树-JQueryEasyUI</option>
+		<option value="../TreeView/dojo/tree_dojo.html">菜单树-Dojo1.9</option>
+		<option value="../TreeView/yui2/tree_yui2.html">菜单树-YUI2.9.0</option>
+		<option value="../TreeView/yui3/tree_yui3.html">菜单树-YUI3.10.3</option>
+		<option value="../TreeView/ext3/tree_ext3.html">菜单树-EXT3</option>
+		<option value="../TreeView/ext4/tree_ext4.html">菜单树-EXT4</option>
+		<option value="../TreeView/rico21/tree_rico21.html">菜单树-Rico(Prototype)</option>
+		<option value="../TreeView/gubusoft/tree_gubusoft.html" selected="selected">菜单树-GubuSoft</option>
+		<option value="../TreeView/fason/tree_fason.html">菜单树-Fason</option>
+		<option value="../TreeView/webfx/tree_webfx.html">菜单树-WebFxTree(集邮版)</option>
+		<option value="../TreeView/xtree/tree_xtree.html">菜单树-WebFxTree</option>
+	</optgroup>
+
+	<optgroup label="菜单条">
+<!-- 		<option value="../MenuBar/jeasyui/tree_jeasyui.html">菜单条-JQueryEasyUI</option> -->
+<!-- 		<option value="../MenuBar/dojo/tree_dojo.html">菜单条-Dojo1.9</option> -->
+<!-- 		<option value="../MenuBar/yui2/tree_yui2.html">菜单条-YUI2.9.0</option> -->
+<!-- 		<option value="../MenuBar/yui3/tree_yui3.html">菜单条-YUI3.10.3</option> -->
+<!-- 		<option value="../MenuBar/ext3/tree_ext3.html">菜单条-EXT3</option> -->
+<!-- 		<option value="../MenuBar/ext4/tree_ext4.html">菜单条-EXT4</option> -->
+<!-- 		<option value="../MenuBar/rico21/tree_rico21.html">菜单条-Rico(Prototype)</option> -->
+<!-- 		<option value="../MenuBar/gubusoft/tree_gubusoft.html">菜单条-PureCSS</option> -->
+		<option value="main_yui2.html">菜单条-JQueryEasyUI</option>
+		<option value="main_yui2.html">菜单条-Dojo1.9</option>
+		<option value="../MenuBar/yui2/menubar_yui2.html">菜单条-YUI2.9.0</option>
+		<option value="main_rightframe.html">菜单条-YUI3.10.3</option>
+		<option value="main_rightframe.html">菜单条-EXT3</option>
+		<option value="main_rightframe.html">菜单条-EXT4</option>
+		<option value="main_rightframe.html">菜单条-Rico(Prototype)</option>
+		<option value="main_rightframe.html">菜单条-PureCSS</option>
+	</optgroup>
+	
+	<optgroup label="手风琴">
+		<option value="../Accordion/jeasyui/tree_jeasyui.html">手风琴-JQueryEasyUI</option>
+		<option value="../Accordion/dojo/tree_dojo.html">手风琴-Dojo1.9</option>
+		<option value="../Accordion/yui2/tree_yui2.html">手风琴-YUI2.9.0</option>
+		<option value="../Accordion/yui3/tree_yui3.html">手风琴-YUI3.10.3</option>
+		<option value="../Accordion/ext3/tree_ext3.html">手风琴-EXT3</option>
+		<option value="../Accordion/ext4/tree_ext4.html">手风琴-EXT4</option>
+		<option value="../Accordion/rico21/tree_rico21.html">手风琴-Rico(Prototype)</option>
+		<option value="../Accordion/gubusoft/tree_gubusoft.html">手风琴-PureCSS</option>
+	</optgroup>
+
+ 	<optgroup label="企业风">
+		<option value="../EnterpriseMenu/jeasyui/tree_gubusoft.html">企业风-WebFxTree</option>
+		<option value="../EnterpriseMenu/jeasyui/tree_gubusoft.html">企业风-WebFxTree</option>
+		<option value="../EnterpriseMenu/jeasyui/tree_gubusoft.html">企业风-WebFxTree</option>
+		<option value="../EnterpriseMenu/jeasyui/tree_gubusoft.html">企业风-WebFxTree</option>
+		<option value="../EnterpriseMenu/jeasyui/tree_gubusoft.html">企业风-WebFxTree</option>
+		<option value="../EnterpriseMenu/jeasyui/tree_gubusoft.html">企业风-WebFxTree</option>
+		<option value="../EnterpriseMenu/jeasyui/tree_gubusoft.html">企业风-WebFxTree</option>
+		<option value="../EnterpriseMenu/jeasyui/tree_gubusoft.html">企业风-WebFxTree</option>
+	</optgroup>
+</select>
+	                  </td>
+	                </tr>
+	            </table>
+            </td>
+            <td>&nbsp;</td>
+          </tr>
+      	</table>
+      </td>
+    <td width="400"><table width="100%" height="28" border="0" cellpadding="0" cellspacing="0" background="../images/top/top_bg04.gif">
+      <tr>
+        <td align="right">
+	        <table width="400" border="0" cellpadding="0" cellspacing="0">
+	          <tr>
+	            <td width="90"><img src="../images/top/lock.gif" width="24" height="24" align="absmiddle"><a href="javascript:showModalDialog('../admin/tAuthorityUser/tAuthorityUser_PasswordModify.html',[],'dialogHeight:300px;dialogWidth:	500px;center:Yes;help:No;resizable:yes;status:No');" target="basefrm" id="one1">密码维护</a></td>
+	            <td width="90"><img src="../images/top/top_icon02.gif" width="24" height="24" align="absmiddle"><a href="#"  onclick="help()" id="one">使用帮助</a></td>
+	            <td width="90"><img src="../images/top/top_icon03.gif" width="24" height="24" align="absmiddle"><a href="../logoutServlet" target="_parent" id="one">退出系统</a></td>
+	          </tr>
+	        </table>
+        </td>
+      </tr>
+    </table>
+       <table width="100%" height="50" border="0" cellpadding="0" cellspacing="0" background="../images/top/top_bg03.gif">
+          <tr>
+            <td>
+            	<table width="256" border="0" cellpadding="0" cellspacing="4">
+	              <tr>
+<!-- 	              history.go(0) -->
+	                <td width="80"><img src="../images/top/top_menu01.gif" width="74" height="38" onMouseOver="this.src='../images/top/top_menu01o.gif'" onMouseDown="this.src='../images/top/top_menu01d.gif'" onMouseUp="this.src='../images/top/top_menu01u.gif'" onMouseOut="this.src='../images/top/top_menu01.gif'" onClick="javascript:history.go(-1)" style="cursor:pointer"></td>
+	                <td width="80" align="center"><img src="../images/top/top_menu02.gif" width="74" height="38" onMouseOver="this.src='../images/top/top_menu02o.gif'" onMouseDown="this.src='../images/top/top_menu02d.gif'" onMouseUp="this.src='../images/top/top_menu02u.gif'" onMouseOut="this.src='../images/top/top_menu02.gif'" onClick="javascript:history.go(1)" style="cursor:pointer"></td>
+	                <td width="80"><img src="../images/top/top_menu03.gif" width="74" height="38" onMouseOver="this.src='../images/top/top_menu03o.gif'" onMouseDown="this.src='../images/top/top_menu03d.gif'" onMouseUp="this.src='../images/top/top_menu03u.gif'" onMouseOut="this.src='../images/top/top_menu03.gif'" onClick="javascript:parent.basefrm.location.reload()" style="cursor:pointer"></td>
+	                <td width="80"><img src="../images/top/top_menu04.gif" width="74" height="38" onMouseOver="this.src='../images/top/top_menu04o.gif'" onMouseDown="this.src='../images/top/top_menu04d.gif'" onMouseUp="this.src='../images/top/top_menu04u.gif'" onMouseOut="this.src='../images/top/top_menu04.gif'" style="cursor:pointer" onClick="javascript:parent.basefrm.location.href='welcome.html'"></td>
+	              </tr>
+	           	</table>
+            </td>
+          </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

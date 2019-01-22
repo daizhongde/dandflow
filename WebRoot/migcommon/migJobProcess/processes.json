@@ -1,0 +1,121 @@
+[ {
+	"processId" : "101",
+	"migJobIns" : {
+		"jobInsId" : "1001",
+		"migJobInfo" : {},
+		"jobInsName" : "作业100实例1001"
+	},
+	"jobId" : "100",
+	"nodeId" : "DA",
+	"isleaf" : 1,
+	"nodeName" : "任务DA",
+	"nodeRemark" : "任务DA备注",
+	"controlId" : "1",
+	"comId" : "1",
+	"status" : 2,
+	"prepos" : "",
+	"postpos" : "DC",
+	"createdate" : "2014-01-24 09:53",
+	"remark" : "101过程备注",
+	"coords" : "110,70",
+	"zb" : {
+		"x" : 110,
+		"y" : 70
+	}
+}, {
+	"processId" : "102",
+	"migJobIns" : {
+		"jobInsId" : "1001",
+		"migJobInfo" : {},
+		"jobInsName" : "作业100实例1001"
+	},
+	"jobId" : "100",
+	"nodeId" : "DB",
+	"isleaf" : 1,
+	"nodeName" : "任务DB",
+	"nodeRemark" : "任务DB备注",
+	"controlId" : "1",
+	"comId" : "1",
+	"status" : 2,
+	"prepos" : "",
+	"postpos" : "DC|DD",
+	"createdate" : "2014-01-24 09:53",
+	"remark" : "102过程备注",
+	"coords" : "110,270",
+	"zb" : {
+		"x" : 110,
+		"y" : 270
+	}
+}, {
+	"processId" : "103",
+	"migJobIns" : {
+		"jobInsId" : "1001",
+		"migJobInfo" : {},
+		"jobInsName" : "作业100实例1001"
+	},
+	"jobId" : "100",
+	"nodeId" : "DC",
+	"isleaf" : 1,
+	"nodeName" : "任务DC",
+	"nodeRemark" : "任务DC备注",
+	"controlId" : "1",
+	"comId" : "1",
+	"status" : 1,
+	"prepos" : "DA|DB",
+	"postpos" : "DE",
+	"createdate" : "2014-01-24 09:53",
+	"remark" : "103过程备注",
+	"coords" : "270,70",
+	"zb" : {
+		"x" : 270,
+		"y" : 70
+	}
+}, {
+	"processId" : "104",
+	"migJobIns" : {
+		"jobInsId" : "1001",
+		"migJobInfo" : {},
+		"jobInsName" : "作业100实例1001"
+	},
+	"jobId" : "100",
+	"nodeId" : "DD",
+	"isleaf" : 1,
+	"nodeName" : "任务DD",
+	"nodeRemark" : "任务DD备注",
+	"controlId" : "1",
+	"comId" : "1",
+	"status" : 1,
+	"prepos" : "DB",
+	"postpos" : "DE",
+	"createdate" : "2014-01-24 09:53",
+	"remark" : "104过程备注",
+	"coords" : "270,270",
+	"zb" : {
+		"x" : 270,
+		"y" : 270
+	}
+}, {
+	"processId" : "105",
+	"migJobIns" : {
+		"jobInsId" : "1001",
+		"migJobInfo" : {},
+		"jobInsName" : "作业100实例1001"
+	},
+	"jobId" : "100",
+	"nodeId" : "DE",
+	"isleaf" : 1,
+	"nodeName" : "任务DE",
+	"nodeRemark" : "任务DE备注",
+	"controlId" : "1",
+	"comId" : "1",
+	"status" : 0,
+	"prepos" : "DC|DD",
+	"postpos" : "",
+	"createdate" : "2014-01-24 09:53",
+	"remark" : "105过程备注",
+	"coords" : "450,170",
+	"zb" : {
+		"x" : 450,
+		"y" : 170
+	}
+} ]

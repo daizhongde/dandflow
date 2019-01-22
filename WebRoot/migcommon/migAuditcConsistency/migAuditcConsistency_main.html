@@ -1,0 +1,282 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>一致性稽核配置</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/icon.css"/>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+<!-- <script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/locale/easyui-lang-zh_CN.js"></script> -->
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/plugins/easyuiExtends.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+
+<link rel="stylesheet" href="../../scripts/codemirror-5.10/lib/codemirror.css" />
+<script src="../../scripts/codemirror-5.10/lib/codemirror.js"></script>
+<script src="../../scripts/codemirror-5.10/mode/sql/sql.js"></script>
+<link rel="stylesheet" href="../../scripts/codemirror-5.10/addon/hint/show-hint.css" />
+<script src="../../scripts/codemirror-5.10/addon/hint/show-hint.js"></script>
+<script src="../../scripts/codemirror-5.10/addon/hint/sql-hint.js"></script>
+
+<style type="text/css">
+<!--
+.CodeMirror {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+-->
+</style>
+
+<script type="text/javascript">
+var query = VIRTUE.query;
+var OPE = VIRTUE.operator;
+
+var tableName = "mig_auditc_consistency";
+
+/** validate and assign value **/
+function PackingParameter(){
+	var formData = $('#s_form').form( 'getData');
+
+	query.init();
+	for (var field in formData) {
+		if( formData[field] !== "" && field != "ope" ){
+			query.jdata.condition[field] = formData[field];
+			query.jdata.operator[field] = OPE.CONTAIN;
+			if( field=="audit_name" && formData["ope"] != "" ){
+				query.jdata.operator[field] = formData["ope"];
+			}
+		}
+	}
+	return true;
+};
+
+/** search data ,reload data  **/
+function submitForm(){
+   	if(!PackingParameter()){
+   		return;
+   	}
+   	$('#grid').datagrid( 'reload', {
+   		columnNames : "audit_id,audit_name,mig_sql,author,mig_sql_rep,sql_db",
+   		tableName : tableName,
+   		jdata: encodeURI( $.toJSON( query.jdata ) ) 
+   	} );
+};
+/**  清空  **/
+function clearForm(){
+	$('#s_form').form('clear');
+};
+
+function newRecord(){  //使用一个window
+	$('#win').window('open').window('setTitle', 'New Config');
+	$('#win').window("refresh", "migAuditcConsistency_add.html");
+}
+
+var read = {};
+read.jdata = { act: "read",condition: {audit_id: ""}, operator : {audit_id:1} };
+function editRecord() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		read.jdata.condition.audit_id = row.audit_id;
+		$('#win').window('open').window('setTitle', 'Edit Config');
+		$('#win').window("refresh", getContextPath()+"/curd/commonCURDinitModify.action?tableName="+tableName+"&jdata="+encodeURI($.toJSON( read.jdata )));
+	}
+}
+
+function browseRecord() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		$('#win').window('open').window('setTitle', 'View Config');
+		read.jdata.condition.audit_id = row.audit_id;
+		$('#win').window("refresh", getContextPath()+"/curd/commonCURDbrowse.action?tableName="+tableName+"&jdata="+encodeURI($.toJSON( read.jdata ))+"&_="+ (new Date()).getTime());
+	}
+}
+
+var del = {};
+del.jdata = {act: "del",condition: { audit_id: "" },operator : {audit_id : 1} };
+function destroyRecord(){
+	var row = $('#grid').datagrid('getSelected');
+	if (row){
+		$.messager.confirm('Comfirm','Comfirm Remove?',function(r){
+			if (r){
+				del.jdata.condition.audit_id = row.audit_id;
+				$.post( getContextPath()+"/curd/commonCURDdelete.action", {
+					tableName : tableName,
+					jdata: encodeURI($.toJSON( del.jdata )) 
+				}, function(result, status){
+					alert(result.msg);
+					if (result.success){
+						$('#grid').datagrid('reload',{
+							columnNames : "audit_id,audit_name,mig_sql,author,mig_sql_rep",
+							tableName : tableName,
+							jdata: encodeURI( $.toJSON( query.jdata ) )
+						} );	// reload data
+					}
+				});
+			}
+		});
+	}
+};
+
+var toolbar = [{
+	text:'New Config',
+	iconCls:'icon-add',
+	handler:function(){
+		newRecord();
+	}
+},{
+	text:'Edit Config',
+	iconCls:'icon-edit',
+	handler:function(){
+		editRecord();
+	}
+},{
+	text:'Remove Config',
+	iconCls:'icon-remove',
+	handler:function(){
+		destroyRecord();
+	}
+},{
+	text:'View Config',
+	iconCls:'icon-search',
+	handler:function(){ 
+		browseRecord(); 
+	}
+}];
+
+$(function(){
+	$('#grid').datagrid({
+		title : '',
+		toolbar : toolbar,
+		width : 938,
+		height : 720,
+		nowrap : true,
+		striped : true,
+		fit : true,
+		collapsible : true,
+		url: getContextPath()+"/query/commonJEasyUIQUERYdfind.action",
+		idField : "audit_id",
+		remoteSort: true,
+		multiSort : false,
+		singleSelect : true,
+		columns : [ [
+			{ title : 'id', field : 'audit_id',width : 90,hidden: true  }, 
+			{ title : 'Audit Item', field : 'audit_name', width : 240, sortable: true },
+			{ title : 'Audit SQL', field : 'mig_sql',width : 530, formatter: function(value,row, index ){
+				return value==null? "" : (value.length<=120 ? value : value.substring(0,120)+"...");
+			} }, 
+			{ title : 'DB Connection URL', field : 'sql_db', width : 220  },
+			{ title : 'Parameter Template', field : 'mig_sql_rep', width : 120  },
+			{ title : 'Auditor', field : 'author', width : 80, sortable: true }
+		] ],
+		pagination : true,
+		rownumbers : false,
+		queryParams : {
+			columnNames : "audit_id,audit_name,mig_sql,author,mig_sql_rep,sql_db",
+			tableName : tableName,
+			jdata: encodeURI( $.toJSON( query.jdata ) ) 
+		}
+	});
+});
+
+
+
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+    <div data-options="region:'north',border:true,split:true" style="height:66px;background:#B3DFDA;" title="查询条件" >  
+        <div style="padding:0px 0 0px 15px">  
+        <form id="s_form" method="post">  
+            <table>  
+                <tr>
+                    <td>Audit Item:</td>
+                    <td>
+                    	<input class="easyui-combobox" 
+		                        id='ope_C' name="ope"
+		                        data-options="valueField:'value', textField:'label',
+		                        value:VIRTUE.operator.STARTWITH,
+		                        editable:false,
+								data:VIRTUE.OPECBBDATA,width:120,
+		                        required:true"/>
+                        <input id="audit_name" name="audit_name" value="">
+                    </td>
+                    <td>DB Connection URL:</td>
+                    <td>
+                        <input id="src_db_connect" name="sql_db" type="text" value="" width="150px" ></input>
+                    </td>
+                    <td>Author:</td>
+                    <td>
+                        <input id="author" name="author" type="text" value="" width="120px" ></input>
+                    </td>
+                    <td>
+                    	<div style="padding:0px 0 0px 15px">
+                    		<a class="easyui-linkbutton" data-options="iconCls:'icon-search'" href="javascript:void(0)" 
+		               		onclick="submitForm()" style="width:80px">Submit</a>&nbsp;&nbsp;
+		               		<a class="easyui-linkbutton" data-options="iconCls:'icon-clear'" href="javascript:void(0)" 
+		               		onclick="clearForm()" style="width:80px">Clear</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </form>
+        </div>
+    </div>
+    <div data-options="region:'center', border:false" title="" style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+	
+	<div id="win" class="easyui-window" title="添加" style="width:600px;height:400px"  
+        data-options="modal:true,closed:true">
+	</div>
+<script type="text/javascript">
+
+$(function(){
+	$('#src_db_connect').combogrid({
+		url : getContextPath()+"/query/commonCBBQUERYdfind.action",
+		panelWidth : 500,
+		panelHeight : 200,
+		idField : 'url',
+		textField : 'name',
+		editable : false,
+		pagination : false,
+		fitColumns : false,
+		required : true,
+		rownumbers : true,
+		mode : 'remote',
+		delay : 500,
+		sortName : 'url',
+		sortOrder : 'asc',
+		pageSize : 5,
+		pageList : [ 5, 10 ],
+		queryParams : {
+			tableName : "mig_config_connection",
+			columns: "url"
+		},
+		columns : [ [ {
+			field : 'name',
+			title : 'Name',
+			width : 120,
+			sortable : true
+		},{
+			field : 'url',
+			title : 'Connection URL',
+			width : 220,
+			sortable : true
+		}, {
+			field : 'remark',
+			title : 'Description',
+			width : 220,
+			sortable : false
+		}, {
+			field : 'ctime',
+			title : 'Create Time',
+			width : 130,
+			sortable : true
+		} ] ]
+	});
+});
+</script>
+</body>
+</html>

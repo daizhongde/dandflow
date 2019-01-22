@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<title>项目外部对账</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="../../plugins/easyui/themes/default/easyui.css">
+		<link rel="stylesheet" href="../../plugins/easyui/themes/icon.css">
+		<script type="text/javascript" src="../../module/public/js/jquery-1.8.3.min.js"></script>
+<!-- 		<script type="text/javascript" src="../../module/public/js/jquery-1.4.4.min.js"></script> -->
+<!-- 	    <script type="text/javascript" src="../../plugins/loadmask/js/jquery.loadmask.min.js"></script> -->
+	    <script type="text/javascript" src="../../plugins/easyui/jquery.easyui.min.js"></script>
+	    <script type="text/javascript" src="../../plugins/easyui/easyuiExtends.js"></script>
+	    <script type="text/javascript" src="../../plugins/easyui/locale/easyui-lang-zh_CN.js"></script>
+<!-- 	    <script type="text/javascript" src="../../plugins/easyui-ext/jquery.jdirk.min.js"></script> -->
+<!-- 	    <script type="text/javascript" src="../../plugins/easyui-ext/jeasyui.icons.all.min.js"></script> -->
+<!-- 	    <script type="text/javascript" src="../../plugins/easyui-ext/jeasyui.extensions.all.min.js"></script> -->
+<!-- 	    <script type="text/javascript" src="../../plugins/icheck/icheck.min.js"></script> -->
+        <script type="text/javascript" src="../../module/public/js/json/jquery.json-2.2.min.js"></script>
+        <script type="text/javascript" src="../../module/public/js/virtue/virtue-1.0.min.js"></script>
+        <script type="text/javascript" src="../../module/public/js/commonUtil.js"></script>
+        <script type="text/javascript" src="../../module/public/js/dateformator.js"></script>
+		<script type="text/javascript" src="../../module/rm/js/erb_query.js"></script>
+		<!-- 打印必须 -->
+		<script language="javascript" src="../../plugins/Lodop6.192/LodopFuncs.js"></script>
+		<object id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0> 
+		       <embed id="LODOP_EM" type="application/x-print-lodop" width=0 height=0></embed>
+		</object>
+<script language="javascript" type="text/javascript"> 
+    var LODOP; //声明为全局变量      
+	function PrintOneURL(strID){
+		LODOP=getLodop();  
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_按网址打印");
+		LODOP.ADD_PRINT_URL(30,20,746,"100%",document.getElementById(strID).value);
+		LODOP.SET_PRINT_STYLEA(0,"HOrient",3);
+		LODOP.SET_PRINT_STYLEA(0,"VOrient",3);
+//		LODOP.SET_SHOW_MODE("MESSAGE_GETING_URL",""); //该语句隐藏进度条或修改提示信息
+//		LODOP.SET_SHOW_MODE("MESSAGE_PARSING_URL","");//该语句隐藏进度条或修改提示信息
+// 		LODOP.PRINT();//直接打印
+// 		LODOP.PRINTA();//选择打印机
+		LODOP.PREVIEW();//打印预览
+// 		LODOP.PRINT_SETUP();//打印维护
+	};
+	/** 打印  */
+	app.print = function (){
+		var row = $('#grid').datagrid('getSelected');
+		if (row) {
+//		   document.form["erb_id"].value = getContextPath()+"/bms_rm/erb_printErb.action?erbId="+row.erbId;
+		   document.form["erb_id"].value = "../../bms_rm/erb_printErb.action?data={erbId:"+row.erbId+"}";
+//		   alert(document.form["erb_id"].value);
+		   PrintOneURL("erb_id");
+		}
+	};
+</script>
+
+	</head>
+	<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+		<!-- 查询面板  background:#B3DFDA; -->
+        <div data-options="region:'north',border:true,split:true" style="height:112px;" title="查询条件" > 
+<!-- 		<div class="easyui-panel" style="background: #fafafa; " title="查询条件"> -->
+			<form id="form" name="form" method="post" style="margin:0;padding:0;" >
+				<table width="100%" cellpadding="5">
+					<tr>
+						<td>对账单号:</td>
+						<td><input class="easyui-validatebox"  type="text"  name="erbNo" style="width:120px;"/></td>
+						
+						<td>订单编号:</td>
+						<td><input class="easyui-validatebox easyui-searchbox"  type="text"  name="orderNo" style="width:120px;"/></td>
+						
+						<td>应收单号:</td> 
+						<td><input class="easyui-validatebox easyui-searchbox"  type="text"  name="arbNo" style="width:120px;"/></td>
+						
+						<td><input type="text" id="erb_id" name="erb_id" style="display:none" value=""/></td>
+					</tr>
+					<tr>
+						<td>客户名称:</td> 
+						<td><input class="easyui-validatebox easyui-searchbox"  type="text"  name="custId" style="width:120px;"/></td>
+						
+						<td>对账日期:</td>
+						<td><input class="easyui-datebox"  type="text"  name="recoTime" style="width:120px;"/></td>
+						
+						<td>对账单状态:</td>
+						<td>
+<!-- 						对账单状态：'1':差异未调整、'2':差异已调整、'3':已提交，4::已审核' " 
+							<select class="easyui-combobox" id="state" name="state" style="width:120px;">
+	                        	<option value="" selected="selected">--选择--</option>
+	                        	<option value="1">差异未调整</option>
+	                        	<option value="2">差异已调整</option>
+	                        	<option value="4">已审核</option>
+	                        </select>-->
+	                        <input class="easyui-combobox" 
+	                        id="state" name="state" value="NSUBMIT"
+	                        data-options="valueField:'code',textField:'value',url:'../../bms_rm/dic_getDicByType.action?dicType=ERB_STATE',method:'post',required:true" 
+	                        style="width:120px;">
+						</td>
+						
+						<td>
+							<div style="padding:0px 0 0px 15px">
+	                        	<a id="btnSearch" href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="submitForm()">查询</a>
+	                        	<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-no" onclick="clearForm()">清空</a>
+	                        </div>
+<!-- 							<input id="btnSearch" type="button" onclick="submitForm()" value='查 询'/>&nbsp; -->
+<!-- 							<input type='button' onclick="clearForm()" value='清 空'/> -->
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+	
+		<!-- 查询结果界面 -->
+    <div data-options="region:'center',border:false" title="" style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+	<!-- 新增界面 -->
+	<div id="erbill_c"></div>
+	<!-- 差异调整界面 -->
+	<div id="erbill_adjust"></div>
+	<!-- 查看界面 -->
+	<div id="erbill_view"></div>
+	
+	<div id="erbill_c_dlg-buttons">
+	    <table cellpadding="0" cellspacing="0" style="width:100%">
+		    <tr>
+			    <td style="text-align:right">
+			    <a href="#" class="easyui-linkbutton" iconCls="icon-save" onclick="javascript:save_erb()">保存</a>
+			    <a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#erbill_c').dialog('close')">关闭</a>
+			    </td>
+		    </tr>
+	    </table>
+    </div>
+    <div id="erbill_adjust_dlg-buttons">
+	    <table cellpadding="0" cellspacing="0" style="width:100%">
+		    <tr>
+			    <td style="text-align:right">
+			    <a href="#" class="easyui-linkbutton" iconCls="icon-save" onclick="javascript:adjust_erb()">保存</a>
+			    <a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#erbill_adjust').dialog('close')">关闭</a>
+			    </td>
+		    </tr>
+	    </table>
+    </div>
+    <div id="erbill_view_dlg-buttons">
+	    <table cellpadding="0" cellspacing="0" style="width:100%">
+		    <tr>
+			    <td style="text-align:right">
+			    <a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#erbill_view').dialog('close')">关闭</a>
+			    </td>
+		    </tr>
+	    </table>
+    </div>
+	</body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>content audit field compare result</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/icon.css"/>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+<!-- <script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/locale/easyui-lang-zh_CN.js"></script> -->
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/plugins/easyuiExtends.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+
+<script type="text/javascript">
+var app = {};
+	
+var query = VIRTUE.query;
+var exp = VIRTUE.exp;
+var noquery = VIRTUE.noquery;
+var OPE = VIRTUE.operator;
+
+//actually this variable is not used in background. When we use common query interface, we need define this.
+var tableName = "mig_auditf_field_result";
+
+var domains = ajaxReqRespText("/cbb/dicCBBgetDicByType.action?dicType=Busi-Domain");
+	domains = eval("(" + domains + ")");
+
+fmtDomain = function(value,row, index ){
+	for(var i=0, j=domains.length; i<j; i++){
+		if( domains[i].code == value ){
+			return domains[i].value;
+		}
+	}
+	return value;
+};
+
+function enterKeyDown(event)
+{
+    if(event.keyCode==13)
+    {
+    	submitForm();
+	}
+};
+
+/** validate and assign value **/
+function PackingParameter(){
+	var formData = $('#s_form').form( 'getData');
+	query.init();
+	for (var field in formData) {
+		if( formData[field] !== "" ){
+			query.jdata.condition[field] = formData[field];
+			query.jdata.operator[field] = OPE.EQUAL;
+		}
+	}
+	exp.jdata.condition = query.jdata.condition;
+	exp.jdata.operator = query.jdata.operator;
+	return true;
+};
+
+/** search data ,reload data  **/
+function submitForm(){
+   	if(!PackingParameter()){
+   		return;
+   	}
+   	$('#grid').datagrid( 'reload', {
+//    		tableName : tableName,
+   		jdata: encodeURI( $.toJSON( query.jdata ) ) 
+   	} );
+};
+/**  清空  **/
+function clearForm(){
+	$('#s_form').form('clear');
+};
+/** Export file by selected file extension name  */
+function exportSimply()
+{
+	//You must Packing parameter at last
+	if(!PackingParameter()){
+   		return;
+   	}
+	
+	var form = document.createElement("form");
+	form.action = "../../exp/migAuditfFieldResultEXPexportXLS.action?_="+(new Date).getTime();
+	
+    document.body.appendChild(form);
+    var i = document.createElement("input");
+    i.type = "hidden";
+    i.name = "jdata";
+    i.value = encodeURI($.toJSON( exp.jdata ) );
+    form.appendChild(i);
+
+    form.method = "post";
+    
+//  一提交disable和show的效果立马就不见了哦
+    form.submit();
+};
+var read = {};
+read.jdata = { act: "read",
+		condition: {faudit_main_id: "", faudit_sub_index: ""}, 
+		operator : {faudit_main_id : OPE.EQUAL, faudit_sub_index : OPE.EQUAL} 
+	};
+
+function browseRecord() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		$('#win').window('open').window('setTitle', 'View');
+		read.jdata.condition.faudit_main_id = row.faudit_main_id;
+		read.jdata.condition.faudit_sub_index = row.faudit_sub_index;
+		$('#win').window("refresh", getContextPath()+"/curd/migAuditfFieldResultCURDbrowse.action?jdata="+encodeURI($.toJSON( read.jdata )));
+	}
+};
+
+var toolbar = [{
+	text:'查看',
+	iconCls:'icon-search',
+	disabled: true,
+	handler:function(){
+		browseRecord(); 
+	}
+}];
+
+$(function(){
+	$('#grid').datagrid({
+		title : 'Search Result',
+		toolbar : toolbar,
+		width : 938,
+		height : 720,
+		nowrap : true,
+		striped : true,
+		fit : true,
+		collapsible : true,
+		url: getContextPath()+"/query/migAuditfFieldResultJEasyUIQUERYdfind.action",
+		idField : "main_id,dryrun_id,fares_serial,domain",
+		remoteSort: true,
+		multiSort : false,
+		singleSelect : true,
+		frozenColumns: [[
+		  { field : 'main_id', title : 'Main Id', width : 60, hidden : true },
+		  { title : 'Audit Item', field : 'audit_item', width : 90, sortable: true },
+		  { field : 'dryrun_id', title : 'Dry Run', width : 60, hidden : true }, 
+		  { title : 'dryrun', field : 'dryrun_name', width : 80, sortable: true }
+   		]],
+		columns : [ [ //, formatter: fmtIsKey
+		  { field : 'fares_serial', title : 'Serial', width : 110, sortable : true },
+		  { field : 'domain', title : 'Domain', width : 100, sortable : true, formatter: fmtDomain },
+		  { field : 'field_index', title : 'Field Index', width : 70, sortable : true },
+		  { field : 'src_table_name', title : 'Source Table', width : 170, sortable : true },
+		  { field : 'dst_table_name', title : 'Target Table', width : 170, sortable : true },
+		  { field : 'src_field_name', title : 'Source Field', width : 120, sortable : true },
+		  { field : 'dst_field_name', title : 'Target Field', width : 120, sortable : true },
+		  { field : 'unmatch_cnt', title : 'Unmatch Count', width : 100, align: 'right', sortable : true },
+		  { field : 'unmatch_rate', title : 'Unmatch Rate', width : 100, align: 'right', formatter: fmtRate, sortable : true },
+		  { field : 'current_content_rate', title : 'Content CRate', width : 100, align: 'right',formatter: fmtRate, sortable : true },
+		  { field : 'current_result_rate', title : 'Result CRate', width : 100, align: 'right', formatter: fmtRate,sortable : true },
+		  { field : 'effect_content_rate', title : 'Ept Content CRate', width : 100, align: 'right', formatter: fmtRate,sortable : true },
+		  { field : 'effect_result_rate', title : 'Ept Result CRate', width : 100, align: 'right', formatter: fmtRate,sortable : true },
+		  { field : 'create_time', title : 'Create Time', width : 130, sortable : true }
+		] ],
+		pagination : true,
+		rownumbers : false,
+		queryParams : {
+// 			tableName : tableName,
+			jdata: encodeURI( $.toJSON( query.jdata ) ) 
+		}
+	});
+	
+	
+	var fares_main_items = ajaxReqRespText("/query/migAuditfMainCBBQUERYdfind.action");
+	fares_main_items = eval("(" + fares_main_items + ")");
+	fares_main_items = fares_main_items.rows;
+	//console.log(fares_main_items);
+	
+	$('#fares_main_id').combobox({
+		//url : "../../query/migAuditfMainCBBQUERYdfind.action",
+		data : fares_main_items,
+		required : true,
+		valueField : 'faudit_id',
+		textField : 'faudit_name',
+		onChange: function(newValue, oldValue){
+// 			alert("newValue:"+newValue+",oldValue:"+oldValue);
+// 			var g = $('#fares_main_id').combogrid('grid');	// get datagrid object
+// 			app.auditMainRow = g.datagrid('getSelected');	// get the selected row
+			submitForm();
+		}
+	});
+	
+	/*$('#fares_main_id').combogrid({
+		url : "../../query/migAuditfMainCBBQUERYdfind.action",
+		panelWidth : 150,
+		panelHeight : 200,
+		idField : 'faudit_id',
+		textField : 'faudit_name',
+		pagination : true,
+		fitColumns : false,
+		required : true,
+// 		editable : false,
+		rownumbers : true,
+		mode : 'remote',
+		delay : 500,
+		sortName : 'faudit_name',
+		sortOrder : 'asc',
+		pageSize : 5,
+		pageList : [ 5, 10 ],
+		onChange: function(newValue, oldValue){
+// 			alert("newValue:"+newValue+",oldValue:"+oldValue);
+// 			var g = $('#fares_main_id').combogrid('grid');	// get datagrid object
+// 			app.auditMainRow = g.datagrid('getSelected');	// get the selected row
+			submitForm();
+		},
+		frozenColumns: [[
+               {
+       			field : 'faudit_id',
+       			title : 'ID',
+       			width : 100,
+       			hidden : true
+       		}, {
+       			field : 'faudit_name',
+       			title : 'Audit Item',
+       			width : 100,
+       			sortable : true
+       		}
+   		]],
+		columns : [ [ {
+			field : 'faudit_srctable_name',
+			title : 'Source Table',
+			width : 100,
+			sortable : true
+		}, {
+			field : 'faudit_dsttable_name',
+			title : 'Target Table',
+			width : 100,
+			sortable : true
+		}] ],
+        onChange: function(newValue, oldValue){
+        	submitForm();
+        }
+	});*/
+	
+	$('#fares_dryrun_id').combogrid({
+		url : "../../query/commonCBBQUERYdfind.action",
+		queryParams : {
+			tableName : "v_dryrun_config",
+			columns: "mig_dryrun_name"
+		},
+		panelWidth : 500,
+		panelHeight : 200,
+		idField : 'mig_dryrun_id',
+		textField : 'mig_dryrun_name',
+		pagination : true,
+		fitColumns : false,
+		required : true,
+		rownumbers : true,
+		mode : 'remote',
+		delay : 500,
+		sortName : 'mig_dryrun_id',
+		sortOrder : 'desc',
+		pageSize : 5,
+		pageList : [ 5, 10 ],
+		onSelect: function(index,row){
+			submitForm();
+		},
+		columns : [ [
+			{ title : 'ID', field : 'mig_dryrun_id',width : 90, sortable: true }, 
+			{ title : 'Dry Run', field : 'mig_dryrun_name', width : 120, sortable: true }, 
+			{ title : 'Description', field : 'remark',  width : 300 } 
+		] ],
+        onChange: function(newValue, oldValue){
+        	submitForm();
+        }
+	});
+});
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+    <div data-options="region:'north',border:true,split:true" style="height:92px;background:#B3DFDA;" title="Quality Audit>>(FA)Field Compare Report" >  
+        <form id="s_form" method="post" style="margin:0;padding:0;">
+        <div style="padding:0px 0 0px 15px">
+            <table width="100%"> 
+                <tr>
+                    <td>Dryrun:</td>
+                    <td>
+                        <input id="fares_dryrun_id" name="dryrun_id" value="">
+                    </td>
+                    <td>Domain:</td>
+                    <td>
+                    	<input class="easyui-combobox"
+		                        id='domain' name="domain" value="" 
+		                        data-options="valueField:'code', textField:'value',
+		                        editable:false,
+								data: domains,
+                        onChange: function(newValue, oldValue){
+                        	submitForm();
+                        }"/>
+                    </td>
+                    <td>Audit Item:</td>
+                    <td>
+                    	<input id="fares_main_id" name="main_id"value="">
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <table width="100%" border="0" align="center">
+			<tr bgcolor="#E2EEFE" valign="bottom">
+				<td height="23"><div align="center"><!-- default height='21'  -->
+					<a class="easyui-linkbutton" data-options="iconCls:'icon-search'" href="javascript:void(0)" 
+               		onclick="submitForm()" style="width:80px">Submit</a>&nbsp;&nbsp;
+<!--                		<a class="easyui-linkbutton" data-options="iconCls:'icon-print'" href="javascript:void(0)"  -->
+<!--                		onclick="PrintOneURL()" style="width:80px">Print</a>&nbsp;&nbsp; -->
+               		
+               		<a class="easyui-linkbutton" data-options="iconCls:'icon-export'" href="javascript:void(0)" 
+               		onclick="exportSimply()" style="width:80px">Export</a>&nbsp;&nbsp;
+               		<a class="easyui-linkbutton" data-options="iconCls:'icon-clear'" href="javascript:void(0)" 
+               		onclick="clearForm()" style="width:80px">Clear</a>
+				</div></td>
+			</tr>
+		</table>
+		</form>
+    </div>
+    <div data-options="region:'center', border:false" title="" style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+	
+	<div id="win" class="easyui-window" title="添加" style="width:600px;height:400px"  
+        data-options="modal:true,closed:true">
+	</div>
+</body>
+</html>

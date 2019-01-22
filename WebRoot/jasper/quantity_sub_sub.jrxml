@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="quantity_sub_sub" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="9260ff26-223a-4a7a-bc6a-beeef0b4a58d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DRYRUNID" class="java.lang.String"/>
+	<parameter name="ENTITY" class="java.lang.String"/>
+	<parameter name="AUDIT_ITEM" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT  enum_desc,src_count,dst_count,src_count-dst_count min_cnt, CONCAT(FORMAT((src_count - dst_count) / src_count * 100,2),'%') ratio FROM tool.`mig_auditc_report_detail_result` WHERE entity=$P{ENTITY} AND fares_dryrun_id=$P{DRYRUNID} and audit_item=$P{AUDIT_ITEM};]]>
+	</queryString>
+	<field name="enum_desc" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="src_count" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="dst_count" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="min_cnt" class="java.lang.Long"/>
+	<field name="ratio" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="1" y="0" width="71" height="20" uuid="3f24ca39-6403-4660-9c6c-a25386ac7c71"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{enum_desc}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="72" y="0" width="100" height="20" uuid="e4cf4c9b-dfae-4ca2-8160-ae4d04123976"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{src_count}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="172" y="0" width="100" height="20" uuid="194e61bf-96c3-49e3-92ec-0ac350f5c897"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{dst_count}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="272" y="0" width="100" height="20" uuid="2bc781dc-6e0f-405b-8ef7-0b214edfae9d"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{min_cnt}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="372" y="0" width="100" height="20" uuid="e0b7efca-55c2-47af-9f84-c49107e4b0d3"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ratio}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

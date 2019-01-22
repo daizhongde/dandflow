@@ -1,0 +1,28 @@
+{
+    "taskStatus":"0",
+    "coords":"110,70",
+    "zb":{
+        "x":110,
+        "y":70
+    },
+    "jobProcess":{
+        "processId":"P00700",
+        "jobId":"com00700",
+        "task":null,
+        "subtask":"DA",
+        "status":"任务DA",
+        "prepos":"F",
+        "postpos":null,
+        "createdate":null,
+        "remark":null
+    },
+    "taskInfo":{
+        "comId":"com00700",
+        "taskAuthor":null,
+        "taskId":"DA",
+        "taskName":"任务DA",
+        "taskNode":"F",
+        "taskRemark":null,
+        "taskUpdate":null
+    }
+}

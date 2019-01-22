@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<title>修改控件实例参数</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+	</head>
+	<body>
+	<div class="easyui-layout" fit="true">
+        <div data-options="region:'center',border:false" title="" 
+        	style="overflow:hidden" noheader="true"> 
+				<fieldset title="任务属性">
+				<legend>任务属性</legend>
+				<form id="modifyTask_form" method="post" style="margin:0;padding:0;" >	
+				<table id="taskTable" width="100%" cellpadding="2">
+					<tr>
+						<td style='width:120px'></td>
+						<td><input id="utaskId" class="easyui-validatebox" data-options="required:true" type="hidden" name="taskId" style='width:90%;' value="" /></td>
+					</tr>
+					<tr>
+						<td style='width:120px'>任务名称:</td>
+						<td><input id="utaskName" class="easyui-validatebox" data-options="required:true" type="text" name="taskName" style='width:90%;' value="" /></td>
+					</tr>
+					<tr>
+						<td style='width:120px'>任务备注:</td>
+						<td><textarea rows="2" cols="50" id="utaskRemark" name="taskRemark" style='width:90%;'></textarea></td>
+					</tr>
+				</table>
+				</form>
+				</fieldset>
+				
+			<form id="modifyPara_form" method="post" style="margin:0;padding:0;" >	
+				<fieldset title="控件参数">
+				<legend>控件参数</legend>
+				<table id="paraTable" width="100%" cellpadding="2">
+				<!-- 
+					<tr>
+						<td>参数一:</td>
+						<td><input class="easyui-validatebox"  type="text" name="para" style="width:120px;" value="" /></td>
+					</tr> -->
+<script type="text/javascript">
+// alert(nodes[app.zindex].task.taskName);
+$("#taskTable #utaskId").val(nodes[app.zindex].task.taskId);
+$("#taskTable #utaskName").val(nodes[app.zindex].task.taskName);
+// alert("1 copy.task.taskRemark:"+copy.task.taskRemark);
+// alert("2 nodes[app.zindex].task.taskRemark:"+nodes[app.zindex].task.taskRemark);
+$("#taskTable #utaskRemark").val(nodes[app.zindex].task.taskRemark);
+
+for( var i=0,j=nodes[app.zindex].paras.length; i<j; i++ ){
+	var para = nodes[app.zindex].paras[i];
+	var row = "<tr>"
+		+"<td style='width:120px'>"+para.paraName+":</td>"
+		+"<td><input class='easyui-validatebox' type='text' name='"+para.id.paraId+"' style='width:90%;' value='"+para.paraValue+"'/></td>"
+		+"</tr>";
+	
+	$("#paraTable").append(row);
+}
+</script>
+				</table>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+	</body>
+</html>

@@ -1,0 +1,152 @@
+[{
+	"id" : {
+		"jobId" : "J100",
+		"nodeId" : "DA"
+	},
+	"isLeaf" : 1,
+	"nodeStatus" : "0",
+	"prepos" : "",
+	"postpos" : "DC",
+	"coords" : "110,70", "zb" : {"x" : 110,"y" : 70 },
+	"task" : {
+		"taskId" : "DA",
+		"taskName" : "任务DA",
+		"controlId" : "con007",
+		"comId" : "com00700",
+		"taskAuthor" : null,
+		"taskRemark" : null,
+		"taskUpdate" : null
+	},
+	"paras" : [{
+		"id" : {
+			"comId" : "com00700",
+			"paraId" : 1
+		},
+		"paraName" : "Audit_database",
+		"paraValue" : "10.1.249.100:root:easeaseas:tool"
+	} ]
+},{
+	"id" : {
+		"jobId" : "J100",
+		"nodeId" : "DB"
+	},
+	"isLeaf" : 1,
+	"nodeStatus" : "0",
+	"prepos" : "",
+	"postpos" : "DC|DD",
+	"coords" : "110,270",
+	"zb" : {
+		"x" : 110,
+		"y" : 270
+	},
+	"task" : {
+		"taskId" : "DB",
+		"taskName" : "任务DB",
+		"controlId" : "con007",
+		"comId" : "com00700",
+		"taskAuthor" : null,
+		"taskRemark" : null,
+		"taskUpdate" : null
+	},
+	"paras" : [{
+		"id" : {
+			"comId" : "com00700",
+			"paraId" : 1
+		},
+		"paraName" : "Audit_database",
+		"paraValue" : "10.1.249.100:root:easeaseas:tool"
+	} ]
+},{
+	"id" : {
+		"jobId" : "J100",
+		"nodeId" : "DC"
+	},
+	"isLeaf" : 1,
+	"nodeStatus" : "0",
+	"prepos" : "DA|DB",
+	"postpos" : "DE",
+	"coords" : "270,70",
+	"zb" : {
+		"x" : 270,
+		"y" : 70
+	},
+	"task" : {
+		"taskId" : "DC",
+		"taskName" : "任务DC",
+		"controlId" : "con007",
+		"comId" : "com00700",
+		"taskAuthor" : null,
+		"taskRemark" : null,
+		"taskUpdate" : null
+	},
+	"paras" : [{
+		"id" : {
+			"comId" : "com00700",
+			"paraId" : 1
+		},
+		"paraName" : "Audit_database",
+		"paraValue" : "10.1.249.100:root:easeaseas:tool"
+	} ]
+},{
+	"id" : {
+		"jobId" : "J100",
+		"nodeId" : "DD"
+	},
+	"isLeaf" : 1,
+	"nodeStatus" : "0",
+	"prepos" : "DB",
+	"postpos" : "DE",
+	"coords" : "270,270",
+	"zb" : {
+		"x" : 270,
+		"y" : 270
+	},
+	"task" : {
+		"taskId" : "DD",
+		"taskName" : "任务DD",
+		"controlId" : "con007",
+		"comId" : "com00700",
+		"taskAuthor" : null,
+		"taskRemark" : null,
+		"taskUpdate" : null
+	},
+	"paras" : [{
+		"id" : {
+			"comId" : "com00700",
+			"paraId" : 1
+		},
+		"paraName" : "Audit_database",
+		"paraValue" : "10.1.249.100:root:easeaseas:tool"
+	} ]
+},{
+	"id" : {
+		"jobId" : "J100",
+		"nodeId" : "DE"
+	},
+	"isLeaf" : 1,
+	"nodeStatus" : "0",
+	"prepos" : "DC|DD",
+	"postpos" : "",
+	"coords" : "450,170",
+	"zb" : {
+		"x" : 450,
+		"y" : 170
+	},
+	"task" : {
+		"taskId" : "DE",
+		"taskName" : "任务DE",
+		"controlId" : "con007",
+		"comId" : "com00700",
+		"taskAuthor" : null,
+		"taskRemark" : null,
+		"taskUpdate" : null
+	},
+	"paras" : [{
+		"id" : {
+			"comId" : "com00700",
+			"paraId" : 1
+		},
+		"paraName" : "Audit_database",
+		"paraValue" : "10.1.249.100:root:easeaseas:tool"
+	} ]
+}]

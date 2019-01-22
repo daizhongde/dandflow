@@ -1,0 +1,575 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>作业实例管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/icon.css"/>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+<!-- <script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/locale/easyui-lang-zh_CN.js"></script> -->
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../../scripts/const/const.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+
+<script type="text/javascript">
+var noquery = VIRTUE.noquery;
+var query = VIRTUE.query;
+var OPE = VIRTUE.operator;
+var del = VIRTUE.del;
+
+var app={};
+app.selectedRow = {};//记录数据表格中选择中的行
+
+var jobType = ajaxReqRespText("/cbb/dicCBBgetDicByType.action?dicType=job_type" );
+jobType = eval ("(" + jobType + ")");
+
+var author = ajaxReqRespText("/common/commonCommoncurrentUserLogname.action");
+
+var buttons = ajaxReqRespText("/curd/tAuthorityRmrelationCURDfindUserButton4tb.action?id=10018");
+//console.log("buttons:"+buttons);
+buttons = eval("(" + buttons + ")");
+
+function enterKeyDown(event)
+{
+    if(event.keyCode==13)
+    {
+    	submitForm();
+	}
+};
+
+/** validate and assign value **/
+function PackingParameter(){
+	var dryrun_id = $("#dryrunId").combogrid('getValue');
+	var job_ins_name = $('#jinsname').val();
+	var type = $('#jtype').combobox("getValue");
+	var author = $('#jauthor').val();
+	var status = $('#jstatus').combobox('getValue');
+	
+	query.init();
+	if(dryrun_id != ""){
+		query.jdata.condition.dryrun_id = dryrun_id;
+		query.jdata.operator.dryrun_id = OPE.EQUAL;
+	}
+	if(job_ins_name != ""){
+		query.jdata.condition.job_ins_name = job_ins_name;
+		query.jdata.operator.job_ins_name = OPE.CONTAIN;
+	}
+	if(type != "" && type != null){
+		query.jdata.condition.type = type;
+		query.jdata.operator.type = OPE.EQUAL;
+	}
+	if(author != ""){
+		query.jdata.condition.author = author;
+		query.jdata.operator.author = OPE.CONTAIN;
+	}
+	if(status != ""){
+		query.jdata.condition["status"] = status;
+		query.jdata.operator["status"] = OPE.EQUAL;
+	}
+	return true;
+};
+
+/** search data ,reload data  **/
+function submitForm(){
+   	if(!PackingParameter()){
+   		return;
+   	}
+   	$('#grid').datagrid( 'reload', { jdata: encodeURI( $.toJSON( query.jdata ) ) } );
+};
+/**  清空  **/
+function clearForm(){
+	$('#form').form('clear');
+};
+
+/** format level **/
+function fmtStatus(n,row,index){
+	n = new String(n);
+	if(n=='0'){
+		return JSTATENAME[n]==undefined ? n : JSTATENAME[n];
+	}else{
+		return "<img src='../../images/job/"+PSTATEICON[n]+"'  alt='alt' />"+(JSTATENAME[n]==undefined ? n : JSTATENAME[n]);
+	}
+};
+
+/** 启动作业  **/
+function startJob(){
+	var rows = $('#grid').datagrid('getSelections');
+	if(rows.length!=1){
+		alert("Please select one row!");
+		return false;
+	};
+	var row = $('#grid').datagrid('getSelected');
+
+	if (row && ( row.status == JSTATE.UNEXECUTE || row.status == JSTATE.PAUSE ) ) {
+		app.selectedRow = row;
+		
+		var jdata = { jobId: row.job_id, job_ins_id: row.job_ins_id };
+		$.ajax({
+		   type: "POST",
+		   url: "../../busi/migJobProcessBUSIstartJob.action",
+		   async: false,
+		   data: {
+			   jdata: encodeURI( $.toJSON( jdata ) )
+		   },
+		   success: function(oResponse){
+			   oResponse = eval("("+oResponse+")");
+				alert( oResponse.msg );
+				if (oResponse.success){
+					$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+				}
+		   }
+		});
+	}
+};
+/** 启动作业(只能启动自己的)  **/
+function startJob1(){
+	var rows = $('#grid').datagrid('getSelections');
+	if(rows.length!=1){
+		alert("Please select one row!");
+		return false;
+	};
+	var row = $('#grid').datagrid('getSelected');
+	if (row.author != author) {
+		alert("You can't start other's instance!");
+		return;
+	};
+	
+	if (row && ( row.status == JSTATE.UNEXECUTE || row.status == JSTATE.PAUSE ) ) {
+		app.selectedRow = row;
+		
+		var jdata = { jobId: row.job_id, job_ins_id: row.job_ins_id };
+		$.ajax({
+		   type: "POST",
+		   url: "../../busi/migJobProcessBUSIstartJob.action",
+		   async: false,
+		   data: {
+			   jdata: encodeURI( $.toJSON( jdata ) )
+		   },
+		   success: function(oResponse){
+			   oResponse = eval("("+oResponse+")");
+				alert( oResponse.msg );
+				if (oResponse.success){
+					$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+				}
+		   }
+		});
+	}
+};
+/** 暂停作业  **/
+function pauseJob(){
+	var rows = $('#grid').datagrid('getSelections');
+	if(rows.length!=1){
+		alert("Please select one row!");
+		return false;
+	};
+	var row = $('#grid').datagrid('getSelected');
+	if (row && (row.status == JSTATE.EXECUTING || row.status == JSTATE.ERROR ) ) {
+		app.selectedRow = row;
+		
+		var jdata = { jobId: row.job_id, job_ins_id: row.job_ins_id };
+		$.ajax({
+		   type: "POST",
+		   url: "../../busi/migJobProcessBUSIpauseJob.action",
+		   async: false,
+		   data: {
+			   jdata: encodeURI( $.toJSON( jdata ) )
+		   },
+		   success: function(oResponse){
+			   oResponse = eval("("+oResponse+")");
+				alert( oResponse.msg );
+				if (oResponse.success){
+					$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+				}
+		   }
+		});
+	}
+};
+/** 暂停作业 （只能暂停自己的） **/
+function pauseJob1(){
+	var rows = $('#grid').datagrid('getSelections');
+	if(rows.length!=1){
+		alert("Please select one row!");
+		return false;
+	};
+	var row = $('#grid').datagrid('getSelected');
+	if (row.author != author) {
+		alert("You can't pause other's instance!");
+		return;
+	};
+	
+	if (row && (row.status == JSTATE.EXECUTING || row.status == JSTATE.ERROR ) ) {
+		app.selectedRow = row;
+		
+		var jdata = { jobId: row.job_id, job_ins_id: row.job_ins_id };
+		$.ajax({
+		   type: "POST",
+		   url: "../../busi/migJobProcessBUSIpauseJob.action",
+		   async: false,
+		   data: {
+			   jdata: encodeURI( $.toJSON( jdata ) )
+		   },
+		   success: function(oResponse){
+			   oResponse = eval("("+oResponse+")");
+				alert( oResponse.msg );
+				if (oResponse.success){
+					$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+				}
+		   }
+		});
+	}
+};
+
+/** 重置作业  **/
+function resetJob(){
+	var rows = $('#grid').datagrid('getSelections');
+	if(rows.length!=1){
+		alert("Please select one row!");
+		return false;
+	};
+	var row = $('#grid').datagrid('getSelected');
+	if (row ) {
+		app.selectedRow = row;
+		
+		var jdata = { jobId: row.job_id, job_ins_id: row.job_ins_id };
+		$.ajax({
+		   type: "POST",
+		   url: "../../busi/migJobInsBUSImodifyJobStatus2init.action",
+		   async: false,
+		   data: {
+			   jdata: encodeURI( $.toJSON( jdata ) )
+		   },
+		   success: function(oResponse){
+			   oResponse = eval("("+oResponse+")");
+				alert( oResponse.msg );
+				if (oResponse.success){
+					$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+				}
+		   }
+		});
+	}
+};
+/** 重置作业（只能重置自己的）  **/
+function resetJob1(){
+	var rows = $('#grid').datagrid('getSelections');
+	if(rows.length!=1){
+		alert("Please select one row!");
+		return false;
+	};
+	var row = $('#grid').datagrid('getSelected');
+	if (row.author != author) {
+		alert("You can't reset other's instance!");
+		return;
+	};
+	if (row ) {
+		app.selectedRow = row;
+		
+		var jdata = { jobId: row.job_id, job_ins_id: row.job_ins_id };
+		$.ajax({
+		   type: "POST",
+		   url: "../../busi/migJobInsBUSImodifyJobStatus2init.action",
+		   async: false,
+		   data: {
+			   jdata: encodeURI( $.toJSON( jdata ) )
+		   },
+		   success: function(oResponse){
+			   oResponse = eval("("+oResponse+")");
+				alert( oResponse.msg );
+				if (oResponse.success){
+					$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+				}
+		   }
+		});
+	}
+};
+/** 监控（表格双击行用） */
+function dbmonitor(index, row){
+	app.selectedRow = row;
+	window.location.href="../../busi/migJobProcessBUSImonitor.action?id="+row.job_ins_id+"&jid="+row.job_id;
+	return false;//to support IE6
+};
+/** 监控*/
+function monitor(){
+	var rows = $('#grid').datagrid('getSelections');
+	if(rows.length!=1){
+		alert("Please select one row!");
+		return false;
+	};
+	var row = $('#grid').datagrid('getSelected');
+	
+	app.selectedRow = row;
+	window.location.href="../../busi/migJobProcessBUSImonitor.action?id="+row.job_ins_id+"&jid="+row.job_id;
+	return false;//to support IE6
+};
+/** domainer's ins view,  open monitor to author himself， otherwise view it */
+function monitor1(index, row){
+	var rows = $('#grid').datagrid('getSelections');
+	if(rows.length!=1){
+		alert("Please select one row!");
+		return false;
+	};
+	var row = $('#grid').datagrid('getSelected');
+	if (row.author == author) {
+		window.location.href="../../busi/migJobProcessBUSImonitor.action?id="+row.job_ins_id+"&jid="+row.job_id;
+	}else{
+		window.location.href="../../busi/migJobProcessBUSImonitor1.action?id="+row.job_ins_id+"&jid="+row.job_id;
+	}				
+	return false;//to support IE6
+	
+};
+function removeInstance(){
+// 	var row = $('#grid').datagrid('getSelected');
+	var rows = $('#grid').datagrid('getSelections');
+	
+	if (rows.length != 0 ) {
+		$.messager.confirm('Confirm', 'Confirm Remove?', function(r) {
+			if (r) {
+				var job_ins_id = new Array();
+				for(var i=0; i<rows.length; i++ ){
+					job_ins_id.push(rows[i].job_ins_id);
+				}
+				
+				var jdata = { job_ins_id: job_ins_id };
+				$.ajax({
+				   type: "POST",
+				   url: "../../busi/migJobInsBUSIremoveInstance.action",
+				   async: false,
+				   data: {
+					   jdata: encodeURI( $.toJSON( jdata ) )
+				   },
+				   success: function(oResponse){
+					   oResponse = eval("("+oResponse+")");
+						alert( oResponse.msg );
+						if (oResponse.success){
+							$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+						}
+				   }
+				});
+			}
+		});
+	}
+};
+/** 只能删除自己的实例  */
+function removeInstance1(){
+// 	var row = $('#grid').datagrid('getSelected');
+	var rows = $('#grid').datagrid('getSelections');
+	
+	if (rows.length != 0 ) {
+		for(var i=0; i<rows.length; i++ ){
+			if( rows[i].author != author ){
+				alert("You can't remove other's instance!");
+				return;
+			}
+		}
+		
+		$.messager.confirm('Confirm', 'Confirm Remove?', function(r) {
+			if (r) {
+				var job_ins_id = new Array();
+				for(var i=0; i<rows.length; i++ ){
+					job_ins_id.push(rows[i].job_ins_id);
+				}
+				
+				var jdata = { job_ins_id: job_ins_id };
+				$.ajax({
+				   type: "POST",
+				   url: "../../busi/migJobInsBUSIremoveInstance.action",
+				   async: false,
+				   data: {
+					   jdata: encodeURI( $.toJSON( jdata ) )
+				   },
+				   success: function(oResponse){
+					   oResponse = eval("("+oResponse+")");
+						alert( oResponse.msg );
+						if (oResponse.success){
+							$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+						}
+				   }
+				});
+			}
+		});
+	}
+};
+/*  四层权限，方式一 
+ * 使用了四 层权限的三个菜单：
+ 作业、实例、合法性稽核
+ */
+var tb={};
+tb.read_btn = { text : 'Monitor', iconCls : 'icon-search', handler : function(){ monitor(); return false; } };
+tb.btn21 = { text : 'Monitor1', iconCls : 'icon-search', handler : function(){ monitor1(); return false; } };
+tb.delete_btn = { text : 'Remove', iconCls : 'icon-remove', handler : function(){ removeInstance(); }};
+tb.delete_btn1 = { text : 'Remove1', iconCls : 'icon-remove', handler : function(){ removeInstance1(); }};
+tb.btn15 = { text : 'Start', iconCls:'icon-run', handler: function(){ startJob();  } };
+tb.btn16 = { text : 'Start1', iconCls:'icon-run', handler: function(){ startJob1(); } };
+tb.btn17 = { text : 'Pause', iconCls:'icon-pause', handler: function(){ pauseJob(); }};
+tb.btn18 = { text : 'Pause1', iconCls:'icon-pause', handler: function(){ pauseJob1(); } };
+tb.btn19 = { text : 'Reset', iconCls:'icon-back', handler: function(){ resetJob(); } };
+tb.btn20 = { text : 'Reset1', iconCls:'icon-back', handler: function(){ resetJob1(); } };
+
+var toolbar = [];
+if( buttons.read_btn==1 ){ toolbar.push(tb.read_btn) };
+if( buttons.btn21==1 ){ toolbar.push(tb.btn21) };
+if( buttons.delete_btn==1 ){ toolbar.push(tb.delete_btn) };
+if( buttons.delete_btn1==1 ){ toolbar.push(tb.delete_btn1) };
+if( buttons.btn15==1 ){ toolbar.push(tb.btn15) };
+if( buttons.btn16==1 ){ toolbar.push(tb.btn16) };
+if( buttons.btn17==1 ){ toolbar.push(tb.btn17) };
+if( buttons.btn18==1 ){ toolbar.push(tb.btn18) };
+if( buttons.btn19==1 ){ toolbar.push(tb.btn19) };
+if( buttons.btn20==1 ){ toolbar.push(tb.btn20) };
+
+// var toolbar = [{ text:'Monitor', iconCls:'icon-monitor', handler: function(){ monitor(); return false;}},
+//                { text:'Monitor1', iconCls:'icon-monitor', handler: function(){ monitor1(); return false;}},
+//                { text:'Start', iconCls:'icon-run', handler: function(){ startJob(); }},
+//                { text:'Start1', iconCls:'icon-run', handler: function(){ startJob1(); }},
+//                { text:'Pause', iconCls:'icon-pause', handler: function(){ pauseJob(); }},
+//                { text:'Pause1', iconCls:'icon-pause', handler: function(){ pauseJob1(); }},
+//                { text:'Reset', iconCls:'icon-back',	handler: function(){ resetJob(); }},
+//                { text:'Reset1', iconCls:'icon-back',	handler: function(){ resetJob1(); }},
+//                { text:'Remove', iconCls:'icon-remove', handler: function(){ removeInstance(); }},
+//                { text:'Remove1', iconCls:'icon-remove', handler: function(){ removeInstance1(); }}
+//               ];
+              
+//program component
+$(function(){
+	$('#grid').datagrid({
+		title: 'Search Result',
+		//iconCls:'icon-reload',
+		toolbar: toolbar,
+		width: 938,
+		height: 720,
+		nowrap: true,
+		striped: true,
+		fit: true,
+// 		collapsible: true,
+		url: "../../query/migJobInsJEasyUIQUERYdfind.action",
+		idField: "job_ins_id",
+		remoteSort: true,
+		sortName:"job_ins_id",
+		sortOrder:"desc",
+		singleSelect: false,
+		columns: [[
+            {title:'Instance ID',field:"job_ins_id", hidden: true},
+            {title:'Job ID',field:"job_id", hidden: true},
+            { title : 'Dryrun', field : "dryrun", width : 120 },
+		    {title:'Instance Name',field:"job_ins_name", width:280, sortable: true},
+		    {title:'Instance Type',field:"type", width:120, sortable: true, formatter: function(value,row, index ){
+				for(var i=0, j=jobType.length; i<j; i++){
+					if( jobType[i].code == value ){
+						return jobType[i].value
+					}
+				}
+			} },
+			{title:'Author',field:"author",width:80, sortable: true  },
+		    {title:'Description',field:"remark",width:280 },
+		    {title:'Status',field:"status",width:80, formatter: fmtStatus,sortable: true },
+		    {title:'Last Update Time',field:"mtime",width:130, sortable: true }
+		]],
+		rownumbers:true,
+		pagination:true,
+		pageSize: 20,
+		queryParams:{
+			jdata: encodeURI($.toJSON( noquery.jdata )) 
+		},
+		onDblClickRow: dbmonitor,
+		onLoadSuccess: function(pageNumber, pageSize){
+			$('#grid').datagrid('clearSelections');
+		}
+	});
+
+	$('#dryrunId').combogrid({
+		url : getContextPath()+"/query/commonCBBQUERYdfind.action",
+		queryParams : {
+			tableName : "v_dryrun_config",
+			columns: "mig_dryrun_name"
+		},
+		editable: true,
+		panelWidth : 500,
+		panelHeight : 200,
+		idField : 'mig_dryrun_id',
+		textField : 'mig_dryrun_name',
+		pagination : true,
+		fitColumns : false,
+		required : true,
+		rownumbers : true,
+		mode : 'remote',
+		delay : 500,
+		sortName : 'mig_dryrun_id',
+		sortOrder : 'desc',
+		pageSize : 5,
+		pageList : [ 5, 10 ],
+		columns : [ [
+			{ title : 'ID', field : 'mig_dryrun_id',width : 90, sortable: true }, 
+			{ title : 'Dry Run名称', field : 'mig_dryrun_name', width : 120, sortable: true }, 
+			{ title : '备注', field : 'remark',  width : 300 } 
+		] ],
+        onChange: function(newValue, oldValue){
+        	submitForm();
+        }
+	});
+});
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+    <div data-options="region:'north',border:true,split:true" style="height:95px;background:#B3DFDA;" title="Instance console--Search Condition" >
+        <div style="padding:0px 0 0px 15px">  
+        <form id="form" method="post">  
+            <table>  
+                <tr>
+                	<td>Dryrun:</td>
+					<td>
+						<input id='dryrunId' name='dryrunId' />
+					</td>
+                    <td>Instance Name:</td>
+                    <td>
+                        <input id="jinsname" name="ins_name" value="" 
+                        onkeydown="enterKeyDown(event)" style="width:100px;">
+                    </td>
+                    <td>Author:</td>
+                    <td>
+                        <input id="jauthor" name="author" value="" onkeydown="enterKeyDown(event)" style="width:100px;">
+                    </td>
+                	<td></td>
+				</tr>
+				<tr>
+                    <td>Instance Status:</td>
+                    <td>
+                        <input class="easyui-combobox" 
+		                        id='jstatus' name="status" value="" editable="false"
+		                        data-options="valueField:'code', textField:'value',url:'../../cbb/dicCBBgetDicByType.action?dicType=job_status',
+		                        method:'post',
+        onChange: function(newValue, oldValue){
+        	submitForm();
+        }" 
+		                        style="width:100px;">
+                    </td>
+                    <td>Instance Type:</td>
+                    <td>
+                    	<input class="easyui-combobox" 
+	                        id='jtype' name="type" value="" editable="false"
+	                        data-options="valueField:'code', textField:'value',
+	                        data: jobType,
+        onChange: function(newValue, oldValue){
+        	submitForm();
+        }"/>
+                    </td>
+                    <td></td>
+                	<td></td>
+                    <td>
+                    	<div style="padding:0px 0 0px 15px">
+                        	<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="submitForm()">Search</a>
+                        	<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-clear" onclick="clearForm()">Clear</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </form>
+        </div>
+    </div>
+    
+    <div data-options="region:'center',border:false" title="" style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+</body>
+</html>

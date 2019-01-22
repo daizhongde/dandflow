@@ -1,0 +1,397 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>作业控件台</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../scripts/jquery-easyui/1.4.1/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../scripts/jquery-easyui/1.4.1/themes/icon.css"/>
+<script type="text/javascript" src="../scripts/jquery-1.4.4.min.js"></script>
+
+<script type="text/javascript" src="../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../scripts/jquery-easyui/1.4.1/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../scripts/json/jquery.json-2.2.min.js"></script>
+<script type="text/javascript" src="../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../scripts/const/const.js"></script>
+<script type="text/javascript" src="../scripts/utils/commonUtil.js"></script>
+
+<script type="text/javascript">
+var noquery = VIRTUE.noquery;
+var query = VIRTUE.query;
+var OPE = VIRTUE.operator;
+var del = VIRTUE.del;
+
+var app={};
+app.selectedRow = {};//记录数据表格中选择中的行
+
+/** validate and assign value **/
+function PackingParameter(){
+	var name = $('#jname').val();
+	var author = $('#jauthor').val();
+	var status = $('#jstatus').combobox('getValue');
+	var compiled = $('#jcompiled').combobox('getValue');
+	
+// 	alert("status:"+status);
+	query.init();
+	if(name !== ""){
+		query.jdata.condition.name = name;
+		query.jdata.operator.name = OPE.CONTAIN;
+	}
+	if(author !== ""){
+		query.jdata.condition.author = author;
+		query.jdata.operator.author = OPE.CONTAIN;
+	}
+	if(status !== ""){
+		query.jdata.condition["status"] = status;
+		query.jdata.operator["status"] = OPE.EQUAL;
+	}
+	if(compiled !== ""){
+		query.jdata.condition["compiled"] = compiled;
+		query.jdata.operator["compiled"] = OPE.EQUAL;
+	}
+	return true;
+};
+
+/** search data ,reload data  **/
+function submitForm(){
+   	if(!PackingParameter()){
+   		return;
+   	}
+//  jdata = { act: 'query',condition: {'t1.nmlevel': [0,1,2,3]},operator : {'t1.nmlevel' : 13} };
+   	$('#grid').datagrid( 'reload', { jdata: encodeURI( $.toJSON( query.jdata ) ) } );
+};
+/**  清空  **/
+function clearForm(){
+	$('#form').form('clear');
+};
+
+/** format level **/
+function fmtStatus( n ){
+// 	n = new String(n);
+	return JSTATENAME[n]==undefined ? n : JSTATENAME[n];
+};
+
+/** format compiled **/
+function fmtCompiled( n ){
+// 	n = new String(n);
+	return n=='1' ? '已编译' : '未编译';
+};
+
+/** 删除作业   **/
+function destroyJob(){
+	var row = $('#grid').datagrid('getSelected');
+	if ( row && row.status != JSTATE.EXECUTING  ) {
+		app.selectedRow = row;
+		$.messager.confirm('确认','确认删除吗?',function(r){
+			if (r){
+				del.init();
+				del.jdata.condition.id = row.id;
+				del.jdata.operator.id = OPE.EQUAL;
+
+				$.ajax({
+				   type: "POST",
+				   url: "../curd/migJobInfoCURDdelete.action",
+				   async: false,
+				   data: {
+					   jdata: encodeURI($.toJSON( del.jdata ))
+				   },
+				   success: function(oResponse){
+// 						alert( oResponse.msg );
+	 					if (oResponse.success){
+	 						$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+	 					}
+				   }
+				});
+			}
+		});
+	}
+};
+/** 编译作业   **/
+function compileJob(){
+	var row = $('#grid').datagrid('getSelected');
+	if (row && row.status != JSTATE.EXECUTING && row.status != JSTATE.PAUSING_MANUAL ) {
+		app.selectedRow = row;
+		
+		var jdata = { jobId: row.id };
+		$.ajax({
+		   type: "POST",
+		   url: "../busi/migJobInfoBUSIcompile.action",
+		   async: false,
+		   data: {
+			   jdata: encodeURI( $.toJSON( jdata ) )
+		   },
+		   success: function(oResponse){
+			   oResponse = eval("("+oResponse+")");
+				alert( oResponse.msg );
+				if (oResponse.success){
+					$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+				}
+		   }
+		});
+	}
+};
+
+/** 启动作业  **/
+function startJob(){
+	var row = $('#grid').datagrid('getSelected');
+	if (row && row.compiled == COMPILESTATE.COMPILED && ( row.status == JSTATE.UNEXECUTE || row.status == JSTATE.PAUSE ) ) {
+		app.selectedRow = row;
+		
+		var jdata = { jobId: row.id };
+		$.ajax({
+		   type: "POST",
+		   url: "../busi/migJobProcessBUSIstartJob.action",
+		   async: false,
+		   data: {
+			   jdata: encodeURI( $.toJSON( jdata ) )
+		   },
+		   success: function(oResponse){
+			   oResponse = eval("("+oResponse+")");
+				alert( oResponse.msg );
+				if (oResponse.success){
+					$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+				}
+		   }
+		});
+	}
+};
+/** 暂停作业  **/
+function pauseJob(){
+	var row = $('#grid').datagrid('getSelected');
+	if (row && row.compiled == COMPILESTATE.COMPILED && row.status == JSTATE.EXECUTING ) {
+		app.selectedRow = row;
+		
+		var jdata = { jobId: row.id };
+		$.ajax({
+		   type: "POST",
+		   url: "../busi/migJobProcessBUSIpauseJob.action",
+		   async: false,
+		   data: {
+			   jdata: encodeURI( $.toJSON( jdata ) )
+		   },
+		   success: function(oResponse){
+			   oResponse = eval("("+oResponse+")");
+				alert( oResponse.msg );
+				if (oResponse.success){
+					$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+				}
+		   }
+		});
+	}
+};
+
+/** 重置作业  **/
+function resetJob(){
+	var row = $('#grid').datagrid('getSelected');
+	if (row && row.compiled == COMPILESTATE.COMPILED ) {
+		app.selectedRow = row;
+		
+		var jdata = { jobId: row.id };
+		$.ajax({
+		   type: "POST",
+		   url: "../busi/migJobInfoBUSImodifyJobStatus2init.action",
+		   async: false,
+		   data: {
+			   jdata: encodeURI( $.toJSON( jdata ) )
+		   },
+		   success: function(oResponse){
+			   oResponse = eval("("+oResponse+")");
+				alert( oResponse.msg );
+				if (oResponse.success){
+					$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+				}
+		   }
+		});
+	}
+};
+/** 监控*/
+function monitor(index, row){
+	if (row && row.compiled == COMPILESTATE.COMPILED  ) {
+		app.selectedRow = row;
+		window.location.href="../busi/migJobProcessBUSImonitor.action?id="+row.id;
+		return false;//to support IE6
+	}
+};
+var toolbar = [{
+	text:'作业新增',
+	iconCls:'icon-add',
+	disabled: true,
+	handler:function(){
+//		alert('add');
+// 		newModule();
+	}
+},{
+	text:'作业修改',
+	iconCls:'icon-edit',
+	handler:function(){
+		var row = $('#grid').datagrid('getSelected');
+		if (row  && row.status != JSTATE.EXECUTING ) {
+// 			alert("row.compiled:"+row.compiled+",COMPILESTATE.COMPILED: "+COMPILESTATE.COMPILED);
+			if( row.compiled == COMPILESTATE.COMPILED ){
+				$.messager.confirm('确认','修改已编译的作业将清除编译后数据，并重置作业状态，确认修改吗？',function(r){
+					if (r){
+						var jdata = { jobId: row.id };
+						$.ajax({
+						   type: "POST",
+						   url: "../busi/migJobInfoBUSIclearProcesses.action",
+						   async: false,
+						   data: {
+							   jdata: encodeURI( $.toJSON( jdata ) )
+						   },
+						   success: function(oResponse){
+							   oResponse = eval("("+oResponse+")");
+// 								alert( oResponse.msg );
+								if (oResponse.success){
+									app.selectedRow = row;
+									window.location.href="../curd/migJobInfoCURDinitModify.action?id="+row.id;
+									return false;//to support IE6
+								}
+						   }
+						});
+					}
+				});
+			}else{
+				app.selectedRow = row;
+				window.location.href="../curd/migJobInfoCURDinitModify.action?id="+row.id;
+				return false;//to support IE6
+			}
+			
+		}
+	}
+},{
+	text:'作业删除',
+	iconCls:'icon-remove',
+	handler:function(){
+		destroyJob();
+	}
+},{
+	text:'作业查看',
+	iconCls:'icon-search',
+	handler:function(){
+		var row = $('#grid').datagrid('getSelected');
+		if (row) {
+			app.selectedRow = row;
+			window.location.href="../curd/migJobInfoCURDbrowse.action?id="+row.id;
+			return false;//to support IE6
+		}
+	}
+},{
+	text:'作业编译',
+	iconCls:'icon-redo',
+	handler: function(){ 
+		compileJob(); 
+	}
+},{
+	text:'作业监控',
+	iconCls:'icon-monitor',
+	handler: function(){
+		var row = $('#grid').datagrid('getSelected');
+		var index = $('#grid').datagrid('getRowIndex', row);
+		monitor(index, row );
+		return false;//to support IE6
+	}
+},{
+	text:'作业启动',
+	iconCls:'icon-run',
+	handler: function(){ 
+		startJob(); 
+	}
+},{
+	text:'作业暂停',
+	iconCls:'icon-pause',
+	handler: function(){
+		pauseJob(); 
+	}
+},{
+	text:'作业重置',
+	iconCls:'icon-back',
+	handler: function(){
+		resetJob();
+	}
+}];
+//program component
+$(function(){
+	$('#grid').datagrid({
+		title: '作业信息',
+		//iconCls:'icon-reload',
+		toolbar: toolbar,
+		width: 938,
+		height: 720,
+		nowrap: true,
+		striped: true,
+		fit: true,
+// 		collapsible: true,
+		url: "../query/migJobInfoJEasyUIQUERYdfind.action",
+		idField: "ID",
+		remoteSort: true,
+		sortName:"status",
+		sortOrder:"desc",
+		singleSelect: true,
+		columns: [[
+            {title:'作业ID',field:"id", hidden: true},
+		    {title:'作业名称',field:"name", width:180, sortable: true},
+			{title:'作业创建者',field:"author",width:80, sortable: true  },
+		    {title:'作业备注',field:"remark",width:280  },
+		    {title:'作业状态',field:"status",width:80, formatter: fmtStatus,sortable: true },
+		    {title:'编译状态',field:"compiled",width:80, sortable: true, formatter: fmtCompiled }
+		]],
+		rownumbers:true,
+		pagination:true,
+		pageSize: 20,
+		queryParams:{
+			jdata: encodeURI($.toJSON( query.jdata )) 
+		},
+		onDblClickRow: monitor
+	});
+
+});
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+    <div data-options="region:'north',border:true,split:true" style="height:70px;background:#B3DFDA;" title="查询条件" >  
+        <div style="padding:0px 0 0px 15px">  
+        <form id="form" method="post">  
+            <table>  
+                <tr>
+                    <td>作业名称:</td>
+                    <td>
+                        <input id="jname" name="name" value="" style="width:100px;">
+                    </td>
+                    <td>创建者:</td>
+                    <td>
+                        <input id="jauthor" name="author" value="" style="width:100px;">
+                    </td>
+                    <td>作业状态:</td>
+                    <td>
+                        <input class="easyui-combobox" 
+		                        id='jstatus' name="status" value="" editable="false"
+		                        data-options="valueField:'code', textField:'value',url:'../cbb/dicCBBgetDicByType.action?dicType=job_status',
+		                        method:'post'" 
+		                        style="width:100px;">
+                    </td>
+                    <td>编译状态:</td>
+                    <td>
+                        <select class="easyui-combobox" id="jcompiled" name="compiled" style="width:100px;"
+                        editable="false" >
+                        	<option value="" selected="selected">--选择--</option>
+                        	<option value="0">未编译</option>
+                        	<option value="1">已编译</option>
+                        </select>
+                    </td>
+                    
+                    <td>
+                    	<div style="padding:0px 0 0px 15px">
+                        	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()"> 查  询 </a>
+                        	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="clearForm()"> 清  空 </a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </form>
+        </div>
+    </div>
+    
+    <div data-options="region:'center',border:false" title="" style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+</body>
+</html>

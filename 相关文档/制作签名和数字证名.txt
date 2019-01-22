@@ -1,0 +1,10 @@
+对Applet进行数字签名和证书制作，因为Applet需要访问本地资源，需要可信任的权限，只有提供证书，添加到信任列表方可运行，
+其他的一些方法比如修改jre的policy策略，不是根本的方法， 也有安全隐患
+  简单步骤：
+  a)打包程序：jar cvf test.jar test.class
+  b)生成密钥库和使用别名： keytool -genkey -keystore test.store -alias test     //默认有效期半年
+keytool -genkey -alias hibaoApplet -validity 18250 -keystore hibaoApplet.store
+//自己设置时间， 1000 代表有效期1000天  18250 50年
+  c)导出证书： keytool -export -keystore hibaoApplet.store -alias hibaoApplet -file hibaoApplet.cer
+  d)对jar进行签名： jarsigner -keystore hibaoApplet.store  hibaoApplet.jar hibaoApplet 
+上述步骤完成后，需要将证书放到和applet相同路径下，一边能够访问和下载到，系统jre会自动寻找下载证书，确认对话框放行Applet后即可正常使

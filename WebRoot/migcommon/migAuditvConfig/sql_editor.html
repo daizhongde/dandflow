@@ -1,0 +1,26 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>sql编辑</title>
+</head>
+<body>
+<div style="border-top: 1px solid black; border-bottom: 1px solid black;">
+<textarea id="code" cols="120" rows="40"></textarea>
+</div>
+<script type="text/javascript">
+if( isNotNvl(app.SQLValue) ){
+	$("#code").val( app.SQLValue );
+};
+
+app.editor = CodeMirror.fromTextArea('code', {
+//     height: "400px",
+    parserfile: "parsesql.js",
+    stylesheet: getContextPath()+"/scripts/codemirror-5.10/sqlcolors.css",
+    path: getContextPath()+"/scripts/codemirror-5.10/",
+    lineNumbers: true,
+    textWrapping: false
+});
+
+</script>
+</body>
+</html>

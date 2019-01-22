@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>auditvconfig配置</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+<script type="text/javascript">
+
+/** check nodes  */
+app.checkNodes = function ()
+{
+	if( isNotNvl(app.idstr) ){
+		var treev = $('#tree-auditvconfig');
+		var idarr = app.idstr.split(",");
+// 		console.log("app.idstr:"+app.idstr+",idarr.length: "+idarr.length);
+		for(var i=0, j = idarr.length; i<j; i++ ){
+			treev.tree( 'check',  treev.tree('find', idarr[i]).target );
+		}
+	}
+};
+/** only select all wholesale  */
+app.selectWholesale = function ()
+{
+	var treev = $('#tree-auditvconfig');
+	var roots = treev.tree('getRoots');
+	for(var m=0, n = roots.length; m<n; m++ ){
+		var nodes = treev.tree('getChildren',roots[m].target);
+// 		console.log(nodes.length);
+		for(var i=0, j = nodes.length; i<j; i++){
+			if( nodes[i].text.indexOf("_0_") != -1 ){
+				treev.tree( 'check',  nodes[i].target );
+			}else{
+				treev.tree( 'uncheck',  nodes[i].target );
+			}
+		}
+	}
+};
+/** only select all Retail  */
+app.selectRetail = function ()
+{
+	var treev = $('#tree-auditvconfig');
+	var roots = treev.tree('getRoots');
+	for(var m=0, n = roots.length; m<n; m++ ){
+		var nodes = treev.tree('getChildren',roots[m].target);
+// 		console.log(nodes.length);
+		for(var i=0, j = nodes.length; i<j; i++){
+			if( nodes[i].text.indexOf("_1_") != -1 ){
+				treev.tree( 'check',  nodes[i].target );
+			}else{
+				treev.tree( 'uncheck',  nodes[i].target );
+			}
+		}
+	}
+};
+</script>
+<div class="easyui-layout" fit="true">
+    <div data-options="region:'center', border:false" title="" style="overflow:auto;" noheader="true">
+		<div style="margin:20px 0;">
+			<a href="#" class="easyui-linkbutton" onclick="app.selectWholesale()">Only Select All Wholesale</a>
+			<a href="#" class="easyui-linkbutton" onclick="app.selectRetail()">Only Select All Retail</a>
+		</div>
+		<ul id="tree-auditvconfig" class="easyui-tree" data-options="
+			url:getContextPath()+'/tree/migAuditvConfigTREEquery_JEasyUI_Tree.action',
+				method:'post', 
+				checkbox: true,
+				animate:true,
+				lines:true, 
+				mode: 'remote',
+				onLoadSuccess: app.checkNodes"
+		></ul>
+	</div>
+</div>
+</body>
+</html>

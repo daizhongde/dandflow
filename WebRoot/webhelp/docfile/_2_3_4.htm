@@ -1,0 +1,141 @@
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name=Generator content="younghua.com">
+<link href="doc.css" type="text/css" rel="stylesheet" rev="stylesheet" />
+
+	
+<script language="JavaScript" src="../js/commonjs.js" type="text/javascript"></script>
+<link href="../css/navigation.css" type="text/css" rel="stylesheet" rev="stylesheet" />
+	<script>
+setCurTitleIndex( 14 );
+localFrame( 14);
+
+</script>
+
+<title>SplitFile业务参数配置</title>	
+</head>
+<body onKeyDown="return contextkey(); " ><div id='helpdiv'>
+<h3><span lang=X-NONE>2.3.4 </span><span lang=X-NONE>SplitFile</span><span
+lang=X-NONE style='font-family:宋体'>业务参数配置</span></h3>
+
+<p class=MsoNormal style='text-indent:36.0pt'><span lang=X-NONE>SplitFile</span><span
+style='font-family:宋体'>控件定义了原始数据文件的三种业务动作：生成</span><span lang=X-NONE>I</span><span
+style='font-family:宋体'>表规则（即新老</span><span lang=X-NONE>ID</span><span
+style='font-family:宋体'>的对应关系）、</span><span lang=X-NONE>ID</span><span
+style='font-family:宋体'>替换规则（即老</span><span lang=X-NONE>ID</span><span
+style='font-family:宋体'>依据何种</span><span lang=X-NONE>I</span><span
+style='font-family:宋体'>表规则替换为新</span><span lang=X-NONE>ID</span><span
+style='font-family:宋体'>）、文件拆分规则。</span><span lang=X-NONE>SplitFile</span><span
+style='font-family:宋体'>的目的是将一个大地原始文件均匀地分割为多个较小的子文件，以适应</span><span lang=X-NONE>MYSQL</span><span
+style='font-family:宋体'>数据库单表大小要求。</span></p>
+
+<p class=MsoListParagraph style='margin-left:42.0pt;text-indent:-18.0pt'><span
+lang=X-NONE>1、</span><span lang=X-NONE>I</span><span style='font-family:宋体'>表生成规则</span></p>
+
+<p class=MsoNormal align=center style='text-align:center;text-indent:24.0pt'><span
+lang=EN-US><img width=567 height=278 id="图片 47" src="index.files/image014.jpg"></span></p>
+
+<p class=MsoNormal align=center style='text-align:center;text-indent:18.0pt'><span
+lang=X-NONE style='font-size:9.0pt;line-height:150%;font-family:宋体'>SplitFile</span><span
+style='font-size:9.0pt;line-height:150%;font-family:宋体'>控件<span lang=X-NONE>I</span>表生成规则配置页面</span></p>
+
+<p class=MsoNormal style='text-indent:24.0pt'><span style='font-family:宋体'>功能描述：</span></p>
+
+<p class=MsoNormal style='text-indent:24.0pt'><span lang=X-NONE>  </span><span
+style='font-family:宋体'>一条完整的</span><span lang=X-NONE>SplitFile</span><span
+style='font-family:宋体'>控件</span><span lang=X-NONE>I</span><span
+style='font-family:宋体'>表生成规则包括带拆分文件（</span><span lang=X-NONE>Pending Split File</span><span
+style='font-family:宋体'>）、生成</span><span lang=X-NONE>I</span><span
+style='font-family:宋体'>表规则（</span><span lang=X-NONE>Generate Table I Rule</span><span
+style='font-family:宋体'>）两个关键部分，具体如下：</span></p>
+
+<p class=MsoNormal style='text-indent:24.0pt'><span lang=X-NONE>  </span><b><span
+style='font-family:宋体'>待拆分的文件</span></b><span style='font-family:宋体'>，支持正则表达式的书写格式，如：<span
+lang=EN-US>.*_CM_PARTY_.*.DAT</span></span></p>
+
+<p class=MsoNormal style='text-indent:24.0pt'><span lang=EN-US
+style='font-family:宋体'>  </span><b><span style='font-family:宋体'>生成<span
+lang=EN-US>I</span>表规则</span></b><span style='font-family:宋体'>，由生成的<span
+lang=EN-US>I</span>文件名称和规则描述构成。其中，规则描述包括两个部分：第一部分为原始<span lang=EN-US>ID</span>，即在待拆分文件中的<span
+lang=EN-US>ID</span>，一般为待拆分文件的某个域，用“<b><span lang=EN-US>$</span>域</b>”的格式表达，如<span
+lang=EN-US>$2</span>；第二部分为映射新<span lang=EN-US>ID</span>，一般为一组计算公式，目前除了支持加减乘除、括号外，还支持<span
+lang=EN-US>seq</span>表达式，用来描述一个以<span lang=EN-US>I</span>文件名称为粒度的自增长序列，如<span
+lang=EN-US>1000000+seq</span>。</span></p>
+
+<p class=MsoNormal style='text-indent:24.0pt'><span lang=EN-US
+style='font-family:宋体'>&nbsp;</span></p>
+
+<p class=MsoListParagraph style='margin-left:42.0pt;text-indent:-18.0pt'><span
+lang=X-NONE>2、</span><span lang=X-NONE>ID</span><span style='font-family:宋体'>替换规则</span></p>
+
+<p class=MsoNormal align=center style='margin-left:24.0pt;text-align:center;
+text-indent:0cm'><span lang=EN-US><img width=566 height=278 id="图片 48"
+src="index.files/image015.jpg"></span></p>
+
+<p class=MsoNormal align=center style='margin-left:24.0pt;text-align:center;
+text-indent:0cm'><span style='font-size:9.0pt;line-height:150%;font-family:
+宋体'>新建<span lang=X-NONE>ID</span>替换规则页面</span></p>
+
+<p class=MsoNormal style='margin-left:24.0pt;text-indent:0cm'><span
+style='font-family:宋体'>功能描述：</span></p>
+
+<p class=MsoNormal style='margin-left:24.0pt;text-indent:0cm'><span
+lang=X-NONE>  </span><span style='font-family:宋体'>一条完整的</span><span
+lang=X-NONE>SplitFile</span><span style='font-family:宋体'>控件</span><span
+lang=X-NONE>ID</span><span style='font-family:宋体'>替换规则包括待拆分文件中需做</span><span
+lang=X-NONE>ID</span><span style='font-family:宋体'>替换的<b>域</b>和对应做</span><b><span
+lang=X-NONE>ID</span></b><b><span style='font-family:宋体'>替换的</span></b><b><span
+lang=X-NONE>I</span></b><b><span style='font-family:宋体'>表文件名称</span></b><span
+style='font-family:宋体'>，表示待拆分文件中的某个域遵循该</span><span lang=X-NONE>I</span><span
+style='font-family:宋体'>表文件映射关系替换成新的</span><span lang=X-NONE>ID</span><span
+style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='margin-left:24.0pt;text-indent:12.0pt'><span
+style='font-family:宋体'>一个待拆分文件若有多个域需要做</span><span lang=X-NONE>ID</span><span
+style='font-family:宋体'>替换，则配置多条</span><span lang=X-NONE>ID</span><span
+style='font-family:宋体'>替换规则即可。</span></p>
+
+<p class=MsoNormal style='margin-left:24.0pt;text-indent:0cm'><span
+lang=X-NONE>&nbsp;</span></p>
+
+<p class=MsoListParagraph style='margin-left:42.0pt;text-indent:-18.0pt'><span
+lang=X-NONE>3、</span><span style='font-family:宋体'>文件拆分规则</span></p>
+
+<p class=MsoNormal align=center style='margin-left:24.0pt;text-align:center;
+text-indent:0cm'><span lang=EN-US><img width=567 height=278 id="图片 46"
+src="index.files/image016.jpg"></span></p>
+
+<p class=MsoNormal align=center style='margin-left:24.0pt;text-align:center;
+text-indent:0cm'><span style='font-size:9.0pt;line-height:150%;font-family:
+宋体'>新建文件拆分规则页面</span></p>
+
+<p class=MsoListParagraph style='text-indent:24.0pt'><span style='font-family:
+宋体'>功能描述：</span></p>
+
+<p class=MsoListParagraph style='text-indent:24.0pt'><span lang=X-NONE>  </span><span
+style='font-family:宋体'>一条完整的</span><span lang=X-NONE>SplitFile</span><span
+style='font-family:宋体'>控件文件拆分规则包括待拆分文件中拆分依赖的<b>域</b>和<b>文件拆分表达式</b>。</span></p>
+
+<p class=MsoListParagraph style='text-indent:24.1pt'><b><span style='font-family:
+宋体'>文件拆分表达式</span></b><span style='font-family:宋体'>，通过使用</span><span
+lang=X-NONE>* ? $</span><span style='font-family:宋体'>三种特殊符号来表达拆分的方式，</span><span
+lang=X-NONE>*</span><span style='font-family:宋体'>表示任意个任意字符，</span><span
+lang=X-NONE>?</span><span style='font-family:宋体'>表示一个任意字符，</span><span
+lang=X-NONE>$</span><span style='font-family:宋体'>表示匹配的一个字符。</span></p>
+
+<p class=MsoListParagraph style='text-indent:24.0pt'><span style='font-family:
+宋体'>如果对应于某个域的拆分表达式为一个固定字符串，则将域编号配置为</span><span lang=X-NONE>0</span><span
+style='font-family:宋体'>，然后在拆分表达式区域直接书写该固定字符串即可。</span></p>
+
+<p class=MsoNormal style='text-indent:24.0pt'><span lang=X-NONE>&nbsp;</span></p>
+
+</div>
+</body >
+<script>
+forceTreeShow( 'rootNode_node_2_3_4' );
+highlight();
+
+</script>
+</html>

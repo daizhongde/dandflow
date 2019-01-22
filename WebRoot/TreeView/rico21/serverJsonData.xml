@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajax-response>
+<rows>
+	<tr>
+		<td>null</td>
+		<td>1</td>
+		<td>湖南社保金融卡省内前置系统</td>
+		<td>C</td>
+		<td>0</td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>2</td>
+		<td>系统管理</td>
+		<td>C</td>
+		<td>0</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>3</td>
+		<td>用户管理</td>
+		<td>L</td>
+		<td>0</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>4</td>
+		<td>模块管理</td>
+		<td>L</td>
+		<td>0</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>5</td>
+		<td>角色管理</td>
+		<td>L</td>
+		<td>0</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>6</td>
+		<td>部门管理</td>
+		<td>L</td>
+		<td>0</td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>7</td>
+		<td>开户机构维护</td>
+		<td>C</td>
+		<td>0</td>
+	</tr>
+	<tr>
+		<td>7</td>
+		<td>8</td>
+		<td>社保机构对应开户机构维护</td>
+		<td>L</td>
+		<td>0</td>
+	</tr>
+</rows>
+</ajax-response>

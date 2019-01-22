@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>菜单树 YUI2.9.1 customicons</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="/yui_2.9.0/build/fonts/fonts-min.css" />
+<link rel="stylesheet" type="text/css" href="/yui_2.9.0/build/treeview/assets/skins/sam/treeview.css" />
+<script type="text/javascript" src="/yui_2.9.0/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/connection/connection-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/treeview/treeview-min.js"></script>
+
+<!--begin custom header content for this example-->
+<!--bring in the folder-style CSS for the TreeView Control-->
+<link rel="stylesheet" type="text/css" href="/yui_2.9.0/examples/treeview/assets/css/folders/tree.css">
+
+<!-- Some custom style for the expand/contract section-->
+<style>
+#expandcontractdiv {border:1px dotted #dedede; background-color:#EBE4F2; margin:0 0 .5em 0; padding:0.4em;}
+#treeDiv1 { background: #fff; padding:1em;}
+.icon-doc { display:block; height: 22px; padding-left: 20px; background: transparent url(/yui_2.9.0/examples/treeview/assets/img/icons.png) 0 -144px no-repeat; }
+.htmlnodelabel { margin-left: 20px; }
+</style>
+
+</head>
+
+<body class="yui-skin-sam">
+<div id="treeDiv1"></div>
+<script type="text/javascript">
+var tree;
+(function() {
+    function treeInit() {
+//      var sUrl = "serverJsonArray.json";
+		var sUrl = "../../tree/tAuthorityModuleTREEquery_GubuSoft_Tree.action";
+        var callback = {
+            success: function(oResponse) {
+				var menuJsonData = eval("(" + oResponse.responseText + ")"),tempNode;
+
+            	//instantiate the tree:
+                tree = new YAHOO.widget.TreeView("treeDiv1");
+                //get root node for tree:
+                var root = tree.getRoot();
+
+            	/**  recursive create node. author: daizhongde dep.IT**/
+            	function gNode( o, pNode )
+            	{
+            	   if(o.children===undefined){//create leaf node
+                       tempNode = new YAHOO.widget.HTMLNode("<span class=\"htmlnodelabel\">"+o.text+"</span>", pNode, false);
+                       tempNode.data = o;
+                       tempNode.isLeaf = true;
+                       tempNode.href = o.url;
+                       tempNode.contentStyle = "icon-doc";
+            	   }else{//create noleaf node
+            		   var tempNode = new YAHOO.widget.TextNode(o.text, pNode, false);
+            		   tempNode.data = o;
+            	       for (var i in o.children){//recursive call itself
+            			   gNode( o.children[i], tempNode );
+            		   }
+            	   }
+            	}
+            	var childData = menuJsonData[0].children;
+            	for (var k in childData){
+            		gNode( childData[k], root );
+            	}
+                tree.draw();
+            },
+            timeout: 7000
+        };
+        YAHOO.util.Connect.asyncRequest('POST', sUrl, callback);
+    }
+    YAHOO.util.Event.onDOMReady(treeInit);
+})();
+</script>
+</body>
+</html>

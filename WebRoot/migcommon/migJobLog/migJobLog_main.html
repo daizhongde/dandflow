@@ -1,0 +1,355 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>日志多维度查询</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css"
+	href="../../scripts/jquery-easyui/1.4.1/themes/default/easyui.css" />
+<link rel="stylesheet" type="text/css"
+	href="../../scripts/jquery-easyui/1.4.1/themes/icon.css" />
+<script type="text/javascript"
+	src="../../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+
+<script type="text/javascript"
+	src="../../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+<!-- 
+JEasyUI1.4.1要配jQuery v1.11.1(自己的jquery.js)
+JEasyUI1.3.5要配jquery-1.4.4.min.js
+ -->
+<script type="text/javascript"
+	src="../../scripts/json/jquery.json-2.2.min.js"></script>
+	
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+<script type="text/javascript" src="../../scripts/utils/dateformator.js"></script>
+
+<script type="text/javascript">
+	var noquery = VIRTUE.noquery;
+	var query = VIRTUE.query;
+
+	var miglogLevel = ajaxReqRespText("/cbb/dicCBBgetDic2ByType.action?dicType=LOG-LEVEL");
+	miglogLevel = eval("(" + miglogLevel + ")");
+
+	var datetime1 = getDateTimeS1();
+	var datetime2 = getDateTimeS2();
+		
+	/** validate and assign value **/
+	function PackingParameter() {
+		var job_ins_id = $('#job_ins_id').combogrid('getValue');
+		var task_id = $('#task_id').combogrid('getValue');
+		var level = $('#level').combobox('getValue');
+
+		var ctime1 = $('#ctime1').datetimebox('getValue');
+		var ctime2 = $('#ctime2').datetimebox('getValue');
+
+		query.init();
+// 		if (job_ins_id == "") {
+// 			alert("Instance is required！");
+// 			return false;
+// 		}
+		if (job_ins_id !== "") {
+			query.jdata.condition.job_ins_id = job_ins_id;
+			query.jdata.operator.job_ins_id = 1;
+		}
+		if (task_id !== "") {
+			query.jdata.condition.task_id = task_id;
+			query.jdata.operator.task_id = 1;
+		}
+		if (level !== "") {
+			query.jdata.condition["level"] = level;
+			query.jdata.operator["level"] = 1;
+		}
+
+		if (ctime1 == "") {
+			alert("Begin Time is required！");
+			return false;
+		}
+		if (ctime2 == "") {
+			alert("End Time is required！");
+			return false;
+		}
+// 		if (ctime1 != "" && ctime2 != "" && ctime1 > ctime2) {
+// 			alert("Begin must earlier than End Time！");
+// 			return false;
+// 		}
+		query.jdata.condition["ctime"] = [ ctime1, ctime2 ];
+		query.jdata.operator["ctime"] = VIRTUE.operator.BETWEEN;
+		return true;
+	};
+
+	/** search data ,reload data  **/
+	function submitForm() {
+		if (!PackingParameter()) {
+			return;
+		}
+		//  jdata = { act: 'query',condition: {'t1.nmlevel': [0,1,2,3]},operator : {'t1.nmlevel' : 13} };
+		$('#grid').datagrid('reload', {
+			jdata : encodeURI($.toJSON(query.jdata))
+		});
+	};
+	/**  清空  **/
+	function clearForm() {
+		$('#form').form('clear');
+	};
+
+	/** format level **/
+	function fmtloglevel(value, row, index) {
+		for (var i = 0, j = miglogLevel.length; i < j; i++) {
+			if (miglogLevel[i].code == value) {
+				return miglogLevel[i].value
+			}
+		}
+	};
+
+	//program component
+	$(function() {
+		$('#grid')
+				.datagrid(
+						{
+							title : 'Search Result',
+							//iconCls:'icon-reload',
+							width : 938,
+							height : 720,
+							nowrap : true,
+							striped : true,
+							fit : true,
+							// 		collapsible: true,
+							url : "../../query/migJobLogJEasyUIQUERYdfind.action",
+							idField : "log_id",
+							remoteSort : true,
+							// 		sortName:"id",
+							// 		sortOrder:"asc",
+							singleSelect : true,
+							columns : [ [
+									{
+										title : 'ID',
+										field : "log_id",
+										hidden : true
+									},
+									{
+										title : 'Instance ID',
+										field : "job_ins_id",
+										width : 120,
+										hidden : true
+									},
+									{
+										title : 'Dryrun',
+										field : "dryrun",
+										width : 120
+									},
+									{
+										title : 'Instance Name',
+										field : "job_ins_name",
+										width : 130,
+										hidden : false
+									},
+									{
+										title : 'Task ID',
+										field : "task_id",
+										width : 120,
+										hidden : true
+									},
+									{
+										title : 'Task Name',
+										field : "node_name",
+										width : 130,
+										sortable : true
+									},
+									{
+										title : 'Log Level',
+										field : "level",
+										width : 90,
+										formatter : fmtloglevel
+									},
+									{
+										title : 'Log Detail',
+										field : "log_msg",
+										width : 500,
+										formatter : function(value, row, index) {
+											return "<a href='#' title='"+ value +"' class='easyui-tooltip'>"
+													+ value + "</a>";
+										}
+									}, {
+										title : 'Time',
+										field : "ctime",
+										width : 130,
+										sortable : true
+									}, {
+										title : 'Decription',
+										field : "remark",
+										hidden : true
+									} ] ],
+							rownumbers : true,
+							pagination : true,
+							pageSize : 20,
+							queryParams : {
+								jdata : encodeURI($.toJSON(noquery.jdata))
+							}
+						});
+
+		$('#job_ins_id').combogrid({
+			url : "../../query/migJobInsCBBQUERYdfind.action",
+			panelWidth : 500,
+			panelHeight : 200,
+			idField : 'job_ins_id',
+			textField : 'job_ins_name',
+			pagination : true,
+			fitColumns : true,
+			required : true,
+			rownumbers : true,
+			mode : 'remote',
+			delay : 500,
+			sortName : 'job_ins_name',
+			sortOrder : 'asc',
+			pageSize : 5,
+			pageList : [ 5, 10 ],
+			onChange : function(newValue, oldValue) {
+				// 			alert("newValue:"+newValue+",oldValue:"+oldValue);
+				$('#task_id').combogrid({
+					queryParams : {
+						job_ins_id : newValue
+					}
+				});
+			},
+			columns : [ [ {
+				field : 'job_ins_name',
+				title : 'Instance Name',
+				width : 100,
+				sortable : true
+			}, {
+				field : 'remark',
+				title : 'Description',
+				width : 100,
+				sortable : false
+			}, {
+				field : 'mtime',
+				title : 'Update Time',
+				width : 150,
+				sortable : true
+			} ] ]
+		});
+
+		$('#task_id').combogrid({
+			url : "../../query/migJobProcessCBBQUERYdfind.action",
+			panelWidth : 500,
+			panelHeight : 200,
+			idField : 'node_id',
+			textField : 'node_name',
+			pagination : true,
+			fitColumns : true,
+			required : false,
+			rownumbers : true,
+			mode : 'remote',
+			delay : 500,
+			sortName : 'node_name',
+			sortOrder : 'asc',
+			pageSize : 5,
+			pageList : [ 5, 10 ],
+			columns : [ [ {
+				field : 'node_name',
+				title : 'Task Name',
+				width : 100,
+				sortable : true
+			}, {
+				field : 'node_remark',
+				title : 'Description',
+				width : 100,
+				sortable : false
+			}, {
+				field : 'createdate',
+				title : 'Time',
+				width : 150,
+				sortable : true
+			} ] ]
+		});
+		
+		$('#dryrunId').combogrid({
+			url : getContextPath()+"/query/commonCBBQUERYdfind.action",
+			queryParams : {
+				tableName : "v_dryrun_config",
+				columns: "mig_dryrun_name"
+			},
+			editable:false,
+			panelWidth : 500,
+			panelHeight : 200,
+			idField : 'mig_dryrun_id',
+			textField : 'mig_dryrun_name',
+			pagination : true,
+			fitColumns : false,
+			required : true,
+			rownumbers : true,
+			mode : 'remote',
+			delay : 500,
+			sortName : 'mig_dryrun_name',
+			sortOrder : 'asc',
+			pageSize : 5,
+			pageList : [ 5, 10 ],
+			columns : [ [
+				{ title : 'ID', field : 'mig_dryrun_id',width : 90, sortable: true }, 
+				{ title : 'Dry Run名称', field : 'mig_dryrun_name', width : 120, sortable: true }, 
+				{ title : '备注', field : 'remark',  width : 300 } 
+			] ]
+		});
+
+	});
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0"
+	class="easyui-layout">
+	<div data-options="region:'north',border:true,split:true"
+		style="height:95px;background:#B3DFDA;" title="Search Condition">
+		<div style="padding:0px 0 0px 15px">
+			<form id="form" method="post">
+				<table>
+					<tr>
+						<td>Dryrun:</td>
+						<td>
+							<input id='dryrunId' name='dryrunId' />
+						</td>
+						<td>Instance:</td>
+						<td>
+							<input id=job_ins_id name="job_ins_id" type="text" value="">
+						</td>
+						<td>Task:</td>
+						<td>
+							<input id="task_id" name="task_id" type="text" value="">
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Begin Time:</td>
+						<td><input id="ctime1" class="easyui-datetimebox"
+							data-options="formatter:dateToString1,parser:formatString2Date" type="text" name="ctime1" /></td>
+						<td>End Time:</td>
+						<td><input id="ctime2" class="easyui-datetimebox"
+							data-options="formatter:dateToString1,parser:formatString2Date" type="text" name="ctime2" /></td>
+						<td>Log Level:</td>
+						<td><input class="easyui-combobox" id='level' name="level"
+							value="" editable="false"
+							data-options="valueField:'code', textField:'value',
+                        data: miglogLevel" /></td>
+                        
+						<td>
+							<div style="padding: 0px 0 0px 15px">
+								<a class="easyui-linkbutton" data-options="iconCls:'icon-search'" href="javascript:void(0)" 
+			               		onclick="submitForm()" style="width:80px">Submit</a>&nbsp;&nbsp;
+			               		<a class="easyui-linkbutton" data-options="iconCls:'icon-clear'" href="javascript:void(0)" 
+			               		onclick="clearForm()" style="width:80px">Clear</a>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+	</div>
+	<div data-options="region:'center',border:false" title=""
+		style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+	<script type="text/javascript">
+		jQuery(document).ready(function() {
+
+		});
+	</script>
+</body>
+</html>

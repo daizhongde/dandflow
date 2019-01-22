@@ -1,0 +1,301 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>一致性稽核结果报告-子域分组报表</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/icon.css"/>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+<!-- <script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/locale/easyui-lang-zh_CN.js"></script> -->
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/plugins/easyuiExtends.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+
+<script language="javascript" src="../../control/lodop/LodopFuncs.js"></script>
+<script type="text/javascript">
+var app = {};
+app.dryrunRow = {};
+
+var query = VIRTUE.query;
+var exp = VIRTUE.exp;
+var OPE = VIRTUE.operator;
+
+var tableName = "mig_auditc_report_detail_result";
+
+var domains = ajaxReqRespText("/cbb/dicCBBgetDicByType.action?dicType=Busi-Domain");
+	domains = eval("(" + domains + ")");
+
+fmtDomain = function(value,row, index ){
+	for(var i=0, j=domains.length; i<j; i++){
+		if( domains[i].code == value ){
+			return domains[i].value;
+		}
+	}
+	return value;
+};
+
+fmtDiffPrecent  = function(value,row, index){
+	if( row.diff_count == 0){
+		return "0.00%";
+	}else if( 0 < row.diff_count / row.src_count
+			&& row.diff_count / row.src_count < 0.0001 ){
+		return "<0.01%";
+	}else if( 0.9999 < row.diff_count / row.src_count
+			&& row.diff_count / row.src_count < 1 ){
+		return ">99.99%";
+	}else{
+		return new Number( row.diff_count / row.src_count ).toFixed(4)*100+"%";
+	}
+};
+
+/** validate and assign value **/
+function PackingParameter(){
+	var formData = $('#s_form').form( 'getData');
+
+	query.init();
+	for (var field in formData) {
+		if( formData[field] !== "" ){
+			query.jdata.condition[field] = formData[field];
+			if(field=="entity" || field=="fares_dryrun_id"){
+				query.jdata.operator[field] = OPE.EQUAL;
+			}else{
+				query.jdata.operator[field] = OPE.CONTAIN;
+			}
+		}
+	}
+	exp.jdata.condition = query.jdata.condition;
+	exp.jdata.operator = query.jdata.operator;
+	return true;
+};
+
+/** search data ,reload data  **/
+function submitForm(){
+   	if(!PackingParameter()){
+   		return;
+   	}
+   	$('#grid').datagrid( 'reload', {
+//    		columnNames : "id,audit_name,mig_sql,author,mig_sql_rep",
+   		tableName : tableName,
+   		jdata: encodeURI( $.toJSON( query.jdata ) ) 
+   	} );
+};
+/**  清空  **/
+function clearForm(){
+	$('#s_form').form('clear');
+};
+/** Export file by selected file extension name  */
+function exportSimply()
+{
+	//You must Packing parameter at last
+	if(!PackingParameter()){
+   		return;
+   	}
+	
+	var customColumns= new Array("dryrun_name","DOMAIN2","AUDIT_ITEM","src_count","dst_count","diff_count","Diff_Rate2");
+	
+	var form = document.createElement("form");
+	form.action = "../../exp/migAuditcReportDetailResultEXPexportXLS_gbsubdomain.action?_="+(new Date).getTime();
+	
+    document.body.appendChild(form);
+    var i = document.createElement("input");
+    i.type = "hidden";
+    i.name = "jdata";
+    i.value = encodeURI($.toJSON( exp.jdata ) );
+    form.appendChild(i);
+    var j = document.createElement("input");
+    j.type = "hidden";
+    j.name = "customColumns";
+    j.value = encodeURI($.toJSON( customColumns ) );
+    form.appendChild(j);
+    
+    var k = document.createElement("input");
+    k.type = "hidden";
+    k.name = "fileName";
+    k.value = "一致性稽核子域分组报表";
+    form.appendChild(k);
+    form.method = "post";
+    
+//  一提交disable和show的效果立马就不见了哦
+    form.submit();
+};
+var read = {};
+read.jdata = { act: "read",condition: {id: ""}, operator : {id:1} };
+
+function browseRecord() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		$('#win').window('open').window('setTitle', 'View');
+		read.jdata.condition.id = row.id;
+		$('#win').window("refresh", getContextPath()+"/curd/migAuditcReportDetailResultCURDbrowse.action?tableName="+tableName+"&jdata="+encodeURI($.toJSON( read.jdata )));
+	}
+};
+
+var toolbar = [{
+	text:'View',
+	iconCls:'icon-search',
+	disabled : true,
+	handler:function(){ 
+		browseRecord(); 
+	}
+}];
+
+$(function(){
+	$('#grid').datagrid({
+		title : 'Search Result',
+		toolbar : toolbar,
+		width : 938,
+		height : 720,
+		nowrap : true,
+		striped : true,
+		fit : true,
+		collapsible : true,
+		url: getContextPath()+"/query/migAuditcReportDetailResultJEasyUIQUERYdfindGroupbysudomain.action",
+// 		idField : "",
+		remoteSort: true,
+		multiSort : false,
+		singleSelect : true,
+		columns : [ [
+// 			{ title : 'id', field : 'id',width : 90, hidden: true  },
+			{ title : 'DryRunId', field : 'fares_dryrun_id', width : 80, sortable: true, hidden: true },
+			{ title : 'DryRun', field : 'dryrun_name', width : 120, sortable: true },
+			{ title : 'Domain', field : 'entity', width : 120, sortable: true, formatter: fmtDomain  },
+			{ title : 'Sub Domain', field : 'audit_item', width : 120, sortable: true  },
+// 			{ title : 'Enum Description', field : 'enum_desc', width : 140  },
+			{ title : 'Source Data Count', field : 'src_count', width : 120  },
+			{ title : 'Target Data Count', field : 'dst_count', width : 120  },
+			{ title : 'Different Count', field : 'diff_count', width : 120  },
+			{ title : 'Difference Rate', field : 'split_flag', width : 120,formatter: fmtDiffPrecent }
+		] ],
+		pagination : true,
+		rownumbers : false,
+		queryParams : {
+// 			columnNames : "id,audit_name,mig_sql,author,mig_sql_rep",
+			tableName : tableName,
+			jdata: encodeURI( $.toJSON( query.jdata ) ) 
+		},
+		onSelect: function(index,row){
+			var temp = $('#grid').datagrid('getSelected');	// get the selected row
+			app.dryrunRow = {
+				mig_dryrun_id: temp.fares_dryrun_id, 
+				mig_dryrun_name: temp.dryrun_name, 
+				remark: ""
+			};
+		}
+	});
+	
+	$('#fares_dryrun_id').combogrid({
+		url : "../../query/commonCBBQUERYdfind.action",
+		queryParams : {
+			tableName : "v_dryrun_config",
+			columns: "mig_dryrun_name"
+		},
+		panelWidth : 500,
+		panelHeight : 200,
+		idField : 'mig_dryrun_id',
+		textField : 'mig_dryrun_name',
+		pagination : true,
+		fitColumns : false,
+		required : false,
+		rownumbers : true,
+		mode : 'remote',
+		delay : 500,
+		sortName : 'mig_dryrun_name',
+		sortOrder : 'asc',
+		pageSize : 5,
+		pageList : [ 5, 10 ],
+		onSelect: function(index,row){
+			submitForm();
+		},
+		columns : [ [
+			{ title : 'ID', field : 'mig_dryrun_id',width : 90, sortable: true }, 
+			{ title : 'Dry Run', field : 'mig_dryrun_name', width : 120, sortable: true }, 
+			{ title : 'Description', field : 'remark',  width : 300 } 
+		] ]
+	});
+});
+
+
+var LODOP; //声明为全局变量
+/** 打印查询结果 **/
+function PrintOneURL(strID){
+   	if(!PackingParameter()){
+   		return;
+   	}
+//    	$('#grid').datagrid( 'reload', {
+//    		tableName : tableName,
+//    		jdata: encodeURI( $.toJSON( query.jdata ) ) 
+//    	} );
+   	   	
+	LODOP=getLodop();
+	LODOP.PRINT_INIT("一致性稽核子域分组报告_按网址打印");
+
+	LODOP.ADD_PRINT_URL(30,20,746,"95%","../../print/migAuditcReportDetailResultPRINTprintGbsubdomainReport.action?printName=gbsubdomain&jdata="+encodeURI( $.toJSON( query.jdata ) )  );
+	LODOP.SET_PRINT_STYLEA(0,"HOrient",3);
+	LODOP.SET_PRINT_STYLEA(0,"VOrient",3);
+// 	LODOP.SET_SHOW_MODE("MESSAGE_GETING_URL",""); //该语句隐藏进度条或修改提示信息
+// 	LODOP.SET_SHOW_MODE("MESSAGE_PARSING_URL","");//该语句隐藏进度条或修改提示信息
+	LODOP.ADD_PRINT_HTM(1,600,300,100,"总页号：<font color='#0000ff' format='ChineseNum'><span tdata='pageNO'>第##页</span>/<span tdata='pageCount'>共##页</span></font>");
+
+	LODOP.SET_PRINT_STYLEA(0,"ItemType",1);
+
+	LODOP.SET_PRINT_STYLEA(0,"Horient",1);	
+	LODOP.ADD_PRINT_TEXT(3,34,196,20,"总页眉：");
+	LODOP.SET_PRINT_STYLEA(0,"ItemType",1);		
+	LODOP.PREVIEW();			
+};	
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+    <div data-options="region:'north',border:true,split:true" style="height:92px;background:#B3DFDA;" title="Search Condition" >  
+        <form id="s_form" method="post" style="margin:0;padding:0;">
+        <div style="padding:0px 0 0px 15px">
+            <table width="100%"> 
+                <tr>
+                    <td>Doamin:</td>
+                    <td>
+                    	<input class="easyui-combobox"
+		                        id='entity' name="entity" value="" 
+		                        data-options="valueField:'code', textField:'value',
+		                        editable:false,
+								data: domains"/>
+                    </td>
+                    <td>Sub Domain:</td>
+                    <td>
+                        <input id="audit_item" name="audit_item" value="">
+                    </td>
+                    <td>DryRun:</td>
+                    <td>
+                        <input id="fares_dryrun_id" name="fares_dryrun_id" value="">
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <table width="100%" border="0" align="center">
+			<tr bgcolor="#E2EEFE" valign="bottom">
+				<td height="23"><div align="center"><!-- default height='21'  -->
+					<a class="easyui-linkbutton" data-options="iconCls:'icon-search'" href="javascript:void(0)" 
+               		onclick="submitForm()" style="width:80px">Submit</a>&nbsp;&nbsp;
+               		<a class="easyui-linkbutton" data-options="iconCls:'icon-print'" href="javascript:void(0)" 
+               		onclick="PrintOneURL()" style="width:80px">Print</a>&nbsp;&nbsp;
+               		
+               		<a class="easyui-linkbutton" data-options="iconCls:'icon-export'" href="javascript:void(0)" 
+               		onclick="exportSimply()" style="width:80px">Export</a>&nbsp;&nbsp;
+               		<a class="easyui-linkbutton" data-options="iconCls:'icon-clear'" href="javascript:void(0)" 
+               		onclick="clearForm()" style="width:80px">Clear</a>
+				</div></td>
+			</tr>
+		</table>
+		</form>
+    </div>
+    <div data-options="region:'center', border:false" title="" style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+	
+	<div id="win" class="easyui-window" title="添加" style="width:600px;height:400px"  
+        data-options="modal:true,closed:true">
+	</div>
+</body>
+</html>

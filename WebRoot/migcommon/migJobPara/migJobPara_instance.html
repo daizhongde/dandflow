@@ -1,0 +1,249 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>实例化作业参数</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+</head>
+<body>
+	<div class="easyui-layout" fit="true">
+	<form id="instanceJob_form" method="post" style="margin:0;padding:0;">
+		<div data-options="region:'north'" style="height:75px">
+			<table id="jobTable0_4ins" width="100%" cellpadding="2">
+				<tr>
+					<td style='width:130px'></td>
+					<td><input id="jobId_4ins" class="easyui-validatebox"
+						data-options="required: true" type="hidden" name="jobId"
+						style='width:90%;' value="" /></td>
+				</tr>
+				<tr>
+					<td style='width:130px'>Instance Name</td>
+					<td><input id="insName_4ins" class="easyui-validatebox"
+						data-options="required: true" type="text" name="jobInsName"
+						style='width:90%;' value="" /></td>
+				</tr>
+				<tr>
+					<td style='width:130px'>Dryrun</td>
+					<td>
+						<input id='udryrunId_4ins' style='width:90%;' name='dryrunId' />
+					</td>
+				</tr>
+				
+			</table>
+		</div>
+		<div data-options="region:'center',border:false" title=""
+			style="overflow:hidden" noheader="true">
+			<table id="jobparam_grid"></table>
+		</div>
+	</form>
+	</div>
+<script type="text/javascript">
+var insPojo = {
+		jobId : app.selectedRow.id,
+		jobInsName : app.selectedRow.name+"-实例"+new Date().getTime()
+	};
+jQuery(document).ready(function() {
+	$("#instanceJob_form").form("load", 
+		insPojo);
+});
+
+var env = ajaxReqRespText("/query/constantJEasyUIQUERYdfindENV.action" );
+env = eval ("(" + env + ")");
+
+// console.log(env);
+
+$('#udryrunId_4ins').combogrid({
+	url : getContextPath()+"/query/commonCBBQUERYdfind.action",
+	queryParams : {
+		tableName : "v_dryrun_config",
+		columns: "mig_dryrun_name"
+	},
+	editable:true,
+	panelWidth : 500,
+	panelHeight : 200,
+	idField : 'mig_dryrun_id',
+	textField : 'mig_dryrun_name',
+	pagination : true,
+	fitColumns : false,
+	required : true,
+	rownumbers : true,
+	mode : 'remote',
+	delay : 500,
+	sortName : 'mig_dryrun_id',
+	sortOrder : 'desc',
+	pageSize : 5,
+	pageList : [ 5, 10 ],
+	columns : [ [
+		{ title : 'ID', field : 'mig_dryrun_id',width : 90, sortable: true }, 
+		{ title : 'Dry Run名称', field : 'mig_dryrun_name', width : 120, sortable: true }, 
+		{ title : '备注', field : 'remark',  width : 300 } 
+	] ]
+});
+
+/** 作业参数信息工具栏信息 */
+app.jobparam_toolbar = [ {
+	text : 'New',
+	disabled: false,
+	iconCls : 'icon-add',
+	handler : function() {
+		jobparam_append();
+		return false;
+	}
+}, '-', {
+	text : 'Remove',
+	disabled: false,
+	iconCls : 'icon-remove',
+	handler : function() {
+		jobparam_removeit();
+		return false;
+	}
+} , '-', {
+	text : 'Save',
+	disabled: false,
+	iconCls : 'icon-save',
+	handler : function() {
+		jobparam_accept();
+		return false;
+	}
+}, '-', {
+	text : 'Cancel',
+	disabled: false,
+	iconCls : 'icon-undo',
+	handler : function() {
+		jobparam_reject();
+		return false;
+	}
+}, '-', {
+	text : 'Add C Params',
+	disabled: false,
+	iconCls : 'icon-add',
+	handler : function() {
+		jobparam_addCP();
+		return false;
+	}
+}, '-', {
+	text : 'Add R Params',
+	disabled: false,
+	iconCls : 'icon-add',
+	handler : function() {
+		jobparam_addRP();
+		return false;
+	}
+}];
+app.jobparaloaded=false;
+// 作业参数-表格
+$('#jobparam_grid').datagrid({
+	title : '',
+	toolbar : app.jobparam_toolbar,
+	width : 938,
+	height : 720,
+	nowrap : true,
+	striped : true,
+	fit : true,
+	collapsible : true,
+	url: getContextPath()+"/query/migJobParaJEasyUIQUERYdfind.action",
+	idField : "nodeId,para",
+	multiSort : true,
+	singleSelect : true,
+	onClickCell : jobparam_onClickRow,
+	onLoadSuccess: function(){
+		app.jobparaloaded=true;
+	},
+	columns : [ [
+		{ title : 'ID', field : 'nodeId', hidden: true }, 
+		{ title : 'Variable', field : 'para', editor : { type : 'text'}, width : 90 }, 
+		{ title : 'Value', field : 'paraValue', editor : { type : 'text'}, width : 90 }, 
+		{ title : 'Type', field : 'paraType', editor : { type : 'text'}, width : 90, hidden: true }, 
+		{ title : 'Name', field : 'paraName', editor : { type : 'text'}, width : 90 }
+	] ],
+	pagination : false,
+	rownumbers : false,
+	queryParams : {
+		jdata : encodeURI($.toJSON({ act: VIRTUE.act.QUERY, condition: {nodeId: insPojo.jobId }, operator : {} })),
+	}
+});
+
+/** 作业参数表格编辑 */
+var jobparam_editIndex = undefined;
+function jobparam_endEditing() {
+	if (jobparam_editIndex == undefined) 
+	{
+		return true
+	}
+	if ($('#jobparam_grid').datagrid('validateRow', jobparam_editIndex)) 
+	{
+		$('#jobparam_grid').datagrid('endEdit', jobparam_editIndex);
+		jobparam_editIndex = undefined;
+		return true;
+	}
+	else 
+	{
+		return false;
+	}
+};
+function jobparam_onClickRow(index) {
+	if (jobparam_editIndex != index) {
+		if (jobparam_endEditing()) {
+			$('#jobparam_grid').datagrid('selectRow', index).datagrid('beginEdit', index);
+			jobparam_editIndex = index;
+		} else {
+			$('#jobparam_grid').datagrid('selectRow', jobparam_editIndex);
+		}
+	}
+};
+
+function jobparam_append() {
+	if (jobparam_endEditing()) {
+		$('#jobparam_grid').datagrid('appendRow', { nodeId: insPojo.jobId,paraType:"1" });
+		jobparam_editIndex = $('#jobparam_grid').datagrid('getRows').length - 1;
+		$('#jobparam_grid').datagrid('selectRow', jobparam_editIndex).datagrid('beginEdit',
+				jobparam_editIndex);
+	}
+};
+function jobparam_removeit() {
+	if (jobparam_editIndex == undefined) {return}
+	$('#jobparam_grid').datagrid('cancelEdit', jobparam_editIndex).datagrid('deleteRow', jobparam_editIndex)
+	jobparam_editIndex = undefined;
+};
+function jobparam_accept() {
+	if (jobparam_endEditing()) {
+		var rows = $('#jobparam_grid').datagrid('getRows');
+		for(var i=0,j=rows.length; i<j; i++){
+			var row = rows[i];
+			if( isNvl(row.paraName) ){
+				row.paraName = row.para;
+				$('#jobparam_grid').datagrid('updateRow',{
+					index: i,
+					row: row
+				});
+			}
+		}
+		
+		$('#jobparam_grid').datagrid('acceptChanges');
+	}
+};
+function jobparam_reject() {
+	$('#jobparam_grid').datagrid('rejectChanges');
+	jobparam_editIndex = undefined;
+};
+function jobparam_addCP() {
+	if (jobparam_endEditing()) {
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"DIP",paraValue:env.C.DIP,paraType:"1",paraName:"DIP" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"PORT",paraValue:env.C.PORT,paraType:"1",paraName:"PORT" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"HIP",paraValue:"1",paraType:"1",paraName:"HIP" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"USERPASS",paraValue:"1",paraType:"1",paraName:"USERPASS" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"ENV",paraValue:"C",paraType:"1",paraName:"ENV" });
+	}
+};
+function jobparam_addRP() {
+	if (jobparam_endEditing()) {
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"DIP",paraValue:env.R.DIP,paraType:"1",paraName:"DIP" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"PORT",paraValue:env.R.PORT,paraType:"1",paraName:"PORT" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"HIP",paraValue:"1",paraType:"1",paraName:"HIP" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"USERPASS",paraValue:"1",paraType:"1",paraName:"USERPASS" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"ENV",paraValue:"R",paraType:"1",paraName:"ENV" });
+	}
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="quantity_sub" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="e5b256cd-2133-4f7e-891c-243dd19fffca">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="DRYRUNID" class="java.lang.String"/>
+	<parameter name="ENTITY" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Users\\ps\\Desktop\\report\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT DISTINCT audit_item FROM tool.`mig_auditc_report_detail_result` WHERE entity=$P{ENTITY} AND fares_dryrun_id=$P{DRYRUNID};]]>
+	</queryString>
+	<field name="audit_item" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="25" splitType="Stretch">
+			<textField>
+				<reportElement stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" x="0" y="-2" width="116" height="26" uuid="0645cacf-0f18-4edc-8fdc-2230ba72aad8"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{audit_item}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="116" y="1" width="200" height="24" uuid="e29a2d5b-9cca-402e-a241-e505e7186928"/>
+				<subreportParameter name="DRYRUNID">
+					<subreportParameterExpression><![CDATA[$P{DRYRUNID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ENTITY">
+					<subreportParameterExpression><![CDATA[$P{ENTITY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="AUDIT_ITEM">
+					<subreportParameterExpression><![CDATA[$F{audit_item}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "quantity_sub_sub.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

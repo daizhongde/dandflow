@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd" >
+	
+	<!-- spring bean 默认是单例的，是线程安全的 -->
+	<bean id="tPubSeqtableDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.TPubSeqtableDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<!-- 数据字典DAO -->
+	<bean id="tPubDictionaryDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.TPubDictionaryDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="migCodedetailDefineDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigCodedetailDefineDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<bean id="migBusiDomainDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigBusiDomainDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<bean id="migConfigConnectionDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigConfigConnectionDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<!-- 作业导入DAO -->
+	<bean id="jdbcDAO"
+		class="person.daizhongde.migration.hibernate.jdbc.JdbcDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<bean id="migJobProcessDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigJobProcessDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+		<bean id="migJobContentDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigJobContentDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<bean id="migJobInfoDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigJobInfoDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="migJobLogDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigJobLogDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="migComInsDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigComInsDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="migTaskInfoDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigTaskInfoDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<bean id="migControlInfoDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigControlInfoDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="migJobStatDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigJobStatDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="migJobParaDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigJobParaDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="migControlTemplateDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigControlTemplateDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<bean id="migComInfoDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigComInfoDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="migInsParaDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigInsParaDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<bean id="migJobInsDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigJobInsDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<bean id="migTaskConfigDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigTaskConfigDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="migInsConfigDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigInsConfigDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<!-- #####################    content audit #################################-->
+	<bean id="migAuditfSubDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigAuditfSubDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="migAuditfMainDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigAuditfMainDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<!-- 稽核结果明细表 -->
+	<bean id="migAuditfDetailResultDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigAuditfDetailResultDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<!-- 字段级稽核结果总表 -->
+	<bean id="migAuditfMainResultDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigAuditfMainResultDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<bean id="migAuditfFieldResultDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigAuditfFieldResultDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<!-- #####################    consistency audit #################################-->
+	<bean id="migAuditcConsistencyDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigAuditcConsistencyDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="migAuditcReportDetailResultDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigAuditcReportDetailResultDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="migAuditcEnumMappingDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigAuditcEnumMappingDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<!-- #####################    legality audit #################################-->
+	<bean id="migAuditvConfigDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigAuditvConfigDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="migAuditvConfigtreeDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigAuditvConfigtreeDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<bean id="migAuditvResultDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigAuditvResultDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="migAuditvErrreasonDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigAuditvErrreasonDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<!-- data count audit for  file\middle table\target table -->
+	<bean id="migAuditPrecheckDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigAuditPrecheckDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="migDataPrecheckDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigDataPrecheckDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<bean id="tChatMsgDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.TChatMsgDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<!-- 亚信员工 -->
+	<bean id="tAsiainfoEmployeeDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.TAsiainfoEmployeeDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<!-- 迁移配置表 -->
+	<bean id="MigSyncConfigDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigSyncConfigDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+</beans>

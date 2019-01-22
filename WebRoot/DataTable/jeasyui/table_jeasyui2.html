@@ -1,0 +1,357 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>数据表格 by jeasyui</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.3.4/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.3.4/themes/icon.css"/>
+<script type="text/javascript" src="../../scripts/jquery-1.4.4.min.js" ></script>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.3.4/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.3.4/locale/easyui-lang-zh_CN-GBK.js"></script>
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+<!-- <script type="text/javascript" src="../../scripts/json/json-minified.js"></script>  -->
+<!-- <script type="text/javascript" src="../../scripts/json/json_parse.js"></script> -->
+<!-- <script type="text/javascript" src="../../scripts/json/json2.js"></script> -->
+<!-- <script type="text/javascript" src="../../scripts/json/json.js"></script> -->
+<script type="text/javascript">
+//0      1=   2!=    3>    4>=     5<     6<=   7like s% 8     9like %s  10  11like %s%  12    13
+//{" - 选择 - ","等于","不等于","大于","大于或等于","小于","小于或等于","开头是","开头不是","结尾是","结尾不是","包含","不包含"};    in (1,2,3)
+//{" - 选择 - ","等于","不等于","在以下日期之后","在以下日期之后或与之相同","在以下日期之前","在以下日期之前或与之相同","开头是","开头不是","结尾是","结尾不是","包含","不包含"};
+//{" - 选择 - ","等于","不等于","大于","大于或等于","小于","小于或等于"};
+var app = {};
+app.pageNumber=1;
+app.pageSize=20;
+var jdata = {
+	act: "noquery",
+	condition: {
+// 		nmid:2,
+// 		"t2.cmname":"统",
+// 		nmlevel: [0,1,2,3],
+// 		cmmtime: '2013/07/17',
+// 		cmtarget:['R','B']
+	},
+	operator : {//operator 运算符
+// 		nmid : 1,  //=1
+// 		"t2.cmname" : 11,//like '%模块名称%'//key must the same with comdition
+// 		nmlevel : 13, //in (1, 2, 3)
+// 		cmmtime : 4, 
+// 		cmtarget : 13//in ('R', 'B')
+	}
+};
+
+
+//{ act: "noquery",condition: {},operator : {} };
+
+/**
+ * 
+ *jquery.json-2.2.js
+ *  alert($.toJSON(jdata));
+ *json-minified.js
+ *  jsonParse(jdata)
+ *json_parse.js
+ *  json_parse(jdata)
+ *json2.js, json.js
+ *  JSON.parse(jdata),JSON.stringify(jdata)
+ *json.js
+ *  JSON.toJSONString(jdata)
+ */
+// alert(jdata);
+// alert($.toJSON(jdata));
+
+//search event , reload data 
+function submitForm(){
+	var nmlevel = $('#nmlevel').combobox('getValue');
+	var cmleaf = $('#cmleaf').combobox('getValue');
+	var nmparent = $('#nmparent').val();
+	var cmname = $('#cmname').val();
+// 	alert("nmlevel:"+nmlevel);
+// 	alert("cmleaf:"+cmleaf);
+// 	alert("nmparent:"+nmparent);
+// 	alert("cmname:"+cmname);
+	jdata.act = "query";
+	jdata.condition = {};//解决了IE6下,undefined传到后台的问题
+	jdata.operator = {};
+	if(nmlevel !== ""){
+		jdata.condition.nmlevel = nmlevel;
+		jdata.operator.nmlevel = 1;
+	}
+// 	else{//在IE6和世界之窗的普通渲染模式下undefined会传到后台
+// 		jdata.condition.nmlevel = undefined;	
+// 		jdata.operator.nmlevel = undefined;
+// 	}
+	if(cmleaf !== ""){
+		jdata.condition.cmleaf = cmleaf;
+		jdata.operator.cmleaf = 1;
+	}
+	if(nmparent !== ""){
+		jdata.condition["t2.cmname"] = nmparent;
+		jdata.operator["t2.cmname"] = 11;
+	}
+	if(cmname !== ""){
+		jdata.condition.cmname = cmname;
+		jdata.operator.cmname = 11;
+	}
+	$('#agrid').datagrid('reload',{jdata: encodeURI($.toJSON(jdata))});
+};
+function clearForm(){
+	$('#ff').form('clear');
+};
+/** format level **/
+function getNmlevel(n){
+// 	n = new Number(n);
+	switch(n){
+	case 0: return '零级'; break;
+	case 1: return '一级'; break;
+	case 2: return '二级'; break;
+	case 3: return '三级'; break;
+	case 4: return '四级'; break;
+	default: return n;
+	}
+};
+
+function getCmleaf(s){
+	s = new String(s);
+	if(s=="true"){
+		return '叶子';
+	}else if(s == "false"){
+		return '非叶子';
+	}else{
+		return value;
+	}
+};
+
+// var url;
+// url = 'save_user.php';
+// url = 'update_user.php?id=' + row.id;
+
+function newModule(){  //使用一个window
+// 	$('#win').window('options').href='../../test/curd/tAuthorityModule_add_jdata.html';
+// 	$('#win').window('open');
+	$('#win').window('open').window('setTitle', '添加模块');
+	$('#win').window("refresh", "../../common/tAuthorityModule/tAuthorityModule_add.html");
+}
+function editModule() {
+	var row = $('#agrid').datagrid('getSelected');
+	if (row) {
+		$('#win').window('open').window('setTitle', '编辑模块');
+// 		$('#win').window('options').href='../../common/initModifyCommontAuthorityModule.action?pojo.NMid='+row[0];
+// 		$('#win').window('refresh', '../../test/curd/tAuthorityModule_modify_jdata.html?pojo.NMid='+row[0]);
+		$('#win').window("refresh", "../../jsonCURD/tAuthorityModuleJsonCURDinitModify.action?pojo.NMid="+row[0]);
+// 		http://localhost:8080/myapp/common/initModifyCommontAuthorityModule.action?pojo.NMid=8
+// 		alert("1");//只有用这个先暂停一下等refresh的内容完全load,下面的语句才会启效
+// 		$('#ff_U').form('load',{
+// 			"cmname_U": 'name2',
+// 			"pojo.CMpath": 'mymail@gmail.com',
+// 			"pojo.CMleaf": 'false',
+// 			"pojo.NMparent": 2,
+// 			"pojo.NMorder": 5,
+// 			"pojo.NMlevel": 2,
+// 			"pojo.CMnote": 'werwerffs'
+// 		});
+	}
+}
+
+var jdata_R={ act: "read",condition: {nmid: ""},operator : {nmid:1} };
+function viewModule() {
+	var row = $('#agrid').datagrid('getSelected');
+	if (row) {
+		$('#win').window('open').window('setTitle', '浏览模块');
+// 		"../../common/viewCommontAuthorityModule.action?pojo.NMid="+row[0]
+		jdata_R.condition.nmid = row[0];
+// 		$('#win').window("refresh", "../../common/viewCommontAuthorityModule.action?jdata="+encodeURI($.toJSON(jdata_R)));
+		$('#win').window("refresh", "../../jsonCURD/tAuthorityModuleJsonCURDview.action?jdata="+encodeURI($.toJSON(jdata_R)));
+	}
+}
+
+var jdata_D = {act: "del",condition: { nmid: "" },operator : {nmid : 1} };
+function destroyUser(){
+	var row = $('#agrid').datagrid('getSelected');
+	if (row){
+		$.messager.confirm('确认','确认删除吗?',function(r){
+			if (r){
+				jdata_D.condition.nmid = row[0];
+				$.post("../../jsonCURD/tAuthorityModuleJsonCURDdelete.action", { jdata: encodeURI($.toJSON(jdata_D)) }, function(result, status){
+					alert(result.msg);
+					if (result.success){
+						$('#agrid').datagrid('reload',{jdata: encodeURI($.toJSON(jdata))});	// reload data
+					}
+// 					else {
+// 						$.messager.show({	// show error message
+// 							title: '出错',
+// 							msg: result.msg
+// 						});
+// 					}
+				});
+			}
+		});
+	}
+};
+/* function newModule() {//使用两个window组件
+	$('#ff_C').form('clear');
+	$('#win_C').window('open');
+
+}
+function editModule() {
+	var row = $('#agrid').datagrid('getSelected');
+	if (row) {
+		$('#ff_U').form('load', row);
+		$('#win_U').window('open');
+	}
+} */
+
+
+var toolbar = [{
+	text:'添加模块',
+	iconCls:'icon-add',
+	handler:function(){
+//			alert('add');
+// 		window.location.assign("../../test/curd/tAuthorityModule_add_jdata.html");
+// 		$('#winC').window('open');  // open a window  
+// 		$('#winC').window('refresh', '../../test/curd/tAuthorityModule_add_jdata.html');
+// 		$('#winC').window('open');
+		newModule();
+	}
+},{
+	text:'编辑模块',
+	iconCls:'icon-edit',
+	handler:function(){
+// 		$('#winU').window('open');
+		editModule();
+	}
+},{
+	text:'删除模块',
+	iconCls:'icon-remove',
+	handler:function(){
+// 		alert('remove')
+		destroyUser();
+	}
+},{
+	text:'查看模块',
+	iconCls:'icon-search',
+	handler:function(){viewModule();}
+}];
+//program component
+$(function(){
+	$('#agrid').datagrid({
+		title: '模块信息',
+		//iconCls:'icon-reload',
+		toolbar: toolbar,
+		width: 938,
+		height: 720,
+		nowrap: true,
+		striped: true,
+		fit: true,
+		collapsible: true,
+		idField: 0,
+		url: "../../query/tAuthorityModuleJEasyUIQuerydfind2.action",
+// 		sortName: 'nmlevel',
+		remoteSort: true,
+		singleSelect: true,
+		frozenColumns: [[
+            {title:'模块ID',field:'0',hidden: true},
+		    {title:'模块名称',field:'1',width:160}
+		]],
+		columns:[[
+			{title:'模块级别',field:'2',width:60, sortable: true, formatter: getNmlevel},
+		    {title:'模块类型',field:'3',width:60, sortable: true, formatter: getCmleaf},
+		    {title:'模块次序号',field:'4',width:65, sortable: true },
+		    {title:'上级模块',field:'5',width:160},
+		    {title:'链接目标',field:'6',hidden: true},
+		    {title:'模块图标样式',field:'7',hidden: true},
+		    {title:'展开状态',field:'8',hidden: true},
+		    {title:'选定状态',field:'9',hidden: true},
+		    {title:'模块路径',field:'10',width:300},
+		    {title:'模块备注',field:'11',width:100},
+		    {title:'创建时间',field:'12',hidden: true},//,formatter: getCMctime},
+		    {title:'创建者使用的IP',field:'13',hidden: true},
+		    {title:'创建者',field:'14',hidden: true},
+		    {title:'最后修改时间',field:'15',hidden: true},
+		    {title:'最后修改者使用的IP',field:'16',hidden: true},
+		    {title:'最后修改者',field:'17',hidden: true}
+		]],
+		pagination:true,
+		rownumbers:true,
+		pageNumber:app.pageNumber,
+		pageSize:app.pageSize,
+		queryParams:{
+// 			"param.act": jdata.act,
+// 					"param.condition": jdata.condition,
+// 					"param.operator": jdata.operator,
+					jdata: encodeURI($.toJSON(jdata)) }
+	});
+	var p = $('#agrid').datagrid('getPager');
+	if (p){
+		$(p).pagination({
+			//total:50,
+			pageSize:app.pageSize,
+			pageNumber:1,
+			onBeforeRefresh:function(){
+				//alert('before refresh');
+			},
+			onSelectPage:function(pageNumber, pageSize){
+				$('#agrid').datagrid("options").pageNumber=pageNumber;
+				$('#agrid').datagrid("options").pageSize=pageSize;
+				$('#agrid').datagrid('reload',{ jdata: encodeURI($.toJSON(jdata))});
+			}
+		});
+	}
+});
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+    <div data-options="region:'north',border:true,split:true" style="height:90px;background:#B3DFDA;" title="查询条件" >  
+        <div style="padding:0px 0 0px 15px">  
+        <form id="ff" method="post">  
+            <table>  
+                <tr>
+                    <td>模块级别:</td>
+                    <td>
+                        <select class="easyui-combobox" id="nmlevel" name="nmlevel" style="width:200px;">
+                        	<option value="" selected="selected">--选择--</option>
+                        	<option value="0">零级</option>
+                        	<option value="1">一级</option>
+                        	<option value="2">二级</option>
+                        	<option value="3">三级</option>
+                        	<option value="4">四级</option>
+                        </select>
+                    </td>
+                    <td>模块类型:</td>
+                    <td>
+                        <select class="easyui-combobox" id="cmleaf" name="cmleaf" style="width:200px;">
+                        	<option value="" selected="selected">--选择--</option>
+                        	<option value="true">叶子</option>
+                        	<option value="false">非叶子</option>
+                        </select>
+                    </td>
+                    <td>上级模块:</td>
+                    <td>
+                        <input id="nmparent" name="nmparent" value="">
+                    </td>
+                    <td>模块名称:</td>
+                    <td>
+                        <input id="cmname" name="cmname" value="">
+                    </td>
+                    <td>
+                    	<div style="padding:0px 0 0px 15px">
+                        	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()">查询</a>
+                        	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="clearForm()">清空</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </form>
+        </div>
+    </div>
+    <div data-options="region:'center',border:false" title="模块main" style="overflow:hidden;" noheader="true">
+		<table id="agrid"></table>
+	</div>
+<!-- data-options="iconCls:'icon-add',modal:true,closed:true,href:'../../test/curd/tAuthorityModule_add_jdata.html'"> -->
+<!-- data-options="iconCls:'icon-save',modal:true,closed:true"> -->
+	<div id="win" class="easyui-window" title="添加模块" style="width:600px;height:400px"  
+        data-options="modal:true,closed:true">
+	</div>
+<!-- 	<div id="win_U" class="easyui-window" title="编辑模块" style="width:600px;height:400px"   -->
+<!--         data-options="iconCls:'icon-add',modal:true,closed:true,href:'../../test/curd/tAuthorityModule_modify_jdata.html'"> -->
+<!-- 	</div> -->
+</body>
+</html>

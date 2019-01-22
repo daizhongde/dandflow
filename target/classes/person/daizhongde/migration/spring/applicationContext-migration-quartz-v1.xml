@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd">
+
+<!-- 没有注入service,仿paper 定时调度，如果定时任务类中不需要引入spring 中的service，这里就只要定义一个SchedulerFactoryBean而且不需要配置任何属性 -->
+	<bean id="schedulerFactoryBean"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean"  autowire="byType"></bean>
+	 
+	<bean id="migInsQuartzDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.MigInsQuartzDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="migInsQuartzService" class="person.daizhongde.migration.spring.service.quartz.MigInsQuartzServiceImpl" 
+		autowire="byType" init-method="initMigInsQuartz"></bean>
+	
+</beans>

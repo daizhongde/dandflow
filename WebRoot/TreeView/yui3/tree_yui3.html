@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>菜单树 by YUI 3.10.3</title>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="/yui3-gallery/build/gallery-sm-treeview/assets/gallery-sm-treeview-core.css">
+    <link rel="stylesheet" href="/yui3-gallery/build/gallery-sm-treeview/assets/skins/sam/gallery-sm-treeview-skin.css">
+
+    <style>
+    body {
+        color: #333;
+        font: 13px 'Lucida Grande', 'Lucida Sans Unicode', sans-serif;
+        /*background-color: #C3E3FF;*/
+    }
+
+    .yui3-treeview {
+/*         border: 1px solid #efefef; */
+/*         border-radius: 2px; */
+/*         margin: 0 5px; */
+/*         width: 295px; */
+    }
+
+    #options {
+        border: 1px solid #efefef;
+        border-radius: 2px;
+        box-sizing: border-box;
+        margin: 5px;
+        padding: 5px 8px;
+        width: 295px;
+    }
+
+    #options h2 {
+        font-size: 13px;
+        margin-top: -3px;
+    }
+    </style>
+<!-- 
+<script src="http://localhost:80/lib/3.10.3/build/yui/yui-min.js"></script>
+<script src="http://yui.yahooapis.com/3.10.3/build/yui/yui-min.js"></script>
+-->
+<script src="http://localhost:80/lib/3.10.3/build/yui/yui-min.js"></script>
+<script>
+// alert(YUI.meta);
+var Y = YUI({
+    filter: 'min',
+    fetchCSS: false,
+// 	comboBase: 'http://localhost:80/combo?',
+// 	comboBase: "http://localhost:80/lib/",
+// 	root: '3.10.3/build/',
+    combine:false
+}).use('io-base', 'json-parse','gallery-sm-treeview', function (Y) {
+
+var treeview;
+
+// var src="http://yuilibrary.com/api/v1/modules/*/name;submodules?expand=submodules&sort=name";
+// var src="serverJsonData2.json",
+//     var dataSource = new Y.DataSource.Get({source:src});
+
+	function displayIssues(rsp){
+// 		alert(rsp);
+	    var nodes = [];
+	
+	    function addModule(module, parent) {
+	        var node = {
+	            label   : module.text,
+	            state   : {open: true},
+	            children: []
+	        };
+	
+	        if (module.children) {
+	            Y.Object.each(module.children, function (submodule) {
+	                addModule(submodule, node.children);
+	            });
+	        }
+	
+	        parent.push(node);
+	    }
+	
+	    Y.Array.each(rsp, function (module) {
+	        addModule(module, nodes);
+	    });
+	
+	    treeview = window.treeview = new Y.TreeView({
+	        container: '#treeview',
+	        nodes    : nodes
+	    });
+	
+	    treeview.render();
+	};
+	Y.io("../../tree/tAuthorityModuleTREEquery_GubuSoft_Tree.action", {
+//     Y.io('serverJsonArray.json', {
+//         data: 'suspect=butler',
+        on: {
+            complete: function (id, response) {
+                if (response.status >= 200 && response.status < 300) {
+//                 	alert("complete");
+                	displayIssues(Y.JSON.parse(response.responseText));
+                } else {
+                	alert("else");
+                	displayIssues({
+                        guilty: 'NO',
+                        comment: 'Something terrible has happened.'
+                    });
+                }
+            }
+        }
+    });
+});
+</script>
+</head>
+<body class="yui3-skin-sam">
+	<div id="treeview"></div>
+</body>
+</html>

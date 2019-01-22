@@ -1,0 +1,23 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+	<soap:Header>
+<!-- 		<AuthHeader> -->
+<!-- 			<userId>asiainfo</userId> -->
+<!-- 			<userPass>migration</userPass> -->
+<!-- 		</AuthHeader> -->
+	</soap:Header>
+	<soap:Body>
+		<ns2:ExecuteSql xmlns:ns2="urn:ComInterFace">
+			<szMsg>
+				<task-id>TK00000420</task-id>
+				<job-id>JB00000171</job-id>
+				<job-ins-id>IS00000049</job-ins-id>
+				<dryrun-id>21</dryrun-id>
+				<dst-conn>1|10.1.249.100|root|easeaseas|tool</dst-conn>
+				<exec-sql></exec-sql>
+				<com-para></com-para>
+				<parallel-num>5</parallel-num>
+				<isCheck>0</isCheck>
+			</szMsg>
+		</ns2:ExecuteSql>
+	</soap:Body>
+</soap:Envelope>

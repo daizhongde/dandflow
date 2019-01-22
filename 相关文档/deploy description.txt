@@ -1,0 +1,31 @@
+/classes/init.properties 
+jndi datasource config
+
+init.properties
+smart xml path
+upload download file store path
+
+web.xml+servlet+listener delete comment
+
+log4j.properties log directory
+
+weblogic.xml directory
+
+jar num is 44,not include:
+commons-dbcp-1.4.jar;
+commons-pool-1.6;
+sslext-1.2-0.jar;
+javax.servlet.jsp.jstl.jar;
+jstl-impl.jar
+
+Servlet 3.0, JSP 2.2, tomcat7, java6+,need add 
+javax.persistence.jar
+javax.transaction.jar
+You can find in this directory:
+MyEclipsePro2013\plugins\com.genuitec.eclipse.j2eedt.core_11.0.0.me201303222027\data\libraryset\EE_6
+
+Servlet 3.1, JSP 2.3, tomcat8, java7+
+
+
+
+mysql -h 10.226.4.234 -umig123 -pmig123 -D tool< migration/sql/v2.0.160301.sql 

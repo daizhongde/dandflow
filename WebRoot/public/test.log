@@ -1,0 +1,47 @@
+ava.lang.NullPointerException
+        at person.daizhongde.migration.util.VariableUtils.varStatistics(VariableUtils.java:9)
+        at person.daizhongde.migration.spring.service.impl.MigJobProcessServiceImpl.executeLeafTask(MigJobProcessServiceImpl.java:244)
+        at person.daizhongde.migration.spring.service.impl.MigJobProcessServiceImpl.access$8(MigJobProcessServiceImpl.java:195)
+        at person.daizhongde.migration.spring.service.impl.MigJobProcessServiceImpl$MigTaskThread.run(MigJobProcessServiceImpl.java:1030)
+        at java.lang.Thread.run(Thread.java:745)
+Exception in thread "Thread-7" java.lang.NullPointerException
+        at person.daizhongde.virtue.dao.SpringHibernateDaoSupport$21.doInHibernate(SpringHibernateDaoSupport.java:1012)
+        at org.springframework.orm.hibernate3.HibernateTemplate.doExecute(HibernateTemplate.java:411)
+        at org.springframework.orm.hibernate3.HibernateTemplate.execute(HibernateTemplate.java:341)
+        at person.daizhongde.virtue.dao.SpringHibernateDaoSupport.sqlQueryExeUByMap(SpringHibernateDaoSupport.java:997)
+        at person.daizhongde.migration.hibernate.dao.impl.MigJobProcessDAOImpl.sqlQueryUpdateProcessStateandRemark(MigJobProcessDAOImpl.java:85)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:497)
+        at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:317)
+        at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:190)
+        at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:157)
+        at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:99)
+        at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:267)
+        at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:96)
+        at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+        at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:92)
+        at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+        at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:207)
+        at com.sun.proxy.$Proxy62.sqlQueryUpdateProcessStateandRemark(Unknown Source)
+        at person.daizhongde.migration.spring.service.impl.MigJobProcessServiceImpl$MigTaskThread.run(MigJobProcessServiceImpl.java:1036)
+        at java.lang.Thread.run(Thread.java:745)
+DEBUG 2015-08-12 15:50:38 [日志信息] Entering nullPropertyValue [target=[com.opensymphony.xwork2.DefaultTextProvider@4ccfdd94], property=struts]
+DEBUG 2015-08-12 15:50:38 [日志信息] Entering nullPropertyValue [target=[com.opensymphony.xwork2.DefaultTextProvider@4ccfdd94], property=struts]
+DEBUG 2015-08-12 15:50:38 [日志信息] Creating an DefaultActionProxy for namespace [/query] and action name [migJobInsJEasyUIQUERYdfind]
+DEBUG 2015-08-12 15:50:38 [日志信息] Attempting to match 'migJobInsJEasyUIQUERYdfind' to a wildcard pattern, 2 available
+DEBUG 2015-08-12 15:50:38 [日志信息] Value matches pattern '*QUERY*'
+DEBUG 2015-08-12 15:50:38 [日志信息] intercept '/query/migJobInsJEasyUIQUERYdfind' {
+DEBUG 2015-08-12 15:50:38 [日志信息] applied invocation context locale=zh_CN
+DEBUG 2015-08-12 15:50:38 [日志信息] before Locale=zh_CN
+DEBUG 2015-08-12 15:50:38 [日志信息] Entering nullPropertyValue [target=[person.daizhongde.migration.struts2.action.query.MigJobInsJEasyUIQUERYAction@3f700ba4, com.opensymphony.xwork2.DefaultTextProvider@4ccfdd94], property=struts]
+DEBUG 2015-08-12 15:50:38 [日志信息] Bypassing /query/migJobInsJEasyUIQUERYdfind
+DEBUG 2015-08-12 15:50:38 [日志信息] Setting static parameters {}
+DEBUG 2015-08-12 15:50:38 [日志信息] Setting params NONE
+DEBUG 2015-08-12 15:50:38 [日志信息] Setting params jdata => [ %7B%22act%22:%22query%22,%22condition%22:%7B%7D,%22operator%22:%7B%7D%7D ] order => [ desc ] page => [ 1 ] rows => [ 20 ] sort => [ job_ins_id ] 
+DEBUG 2015-08-12 15:50:38 [日志信息] Parameter [jdata] was accepted and will be appended to action!
+DEBUG 2015-08-12 15:50:38 [日志信息] Parameter [order] was accepted and will be appended to action!
+DEBUG 2015-08-12 15:50:38 [日志信息] Parameter [page] was accepted and will be appended to action!
+DEBUG 2015-08-12 15:50:38 [日志信息] Parameter [rows] was accepted and will be appended to action!
+DEBUG 2015-08-12 15:50:38 [日志信息] Parameter [sort] was accepted and will be appended to action!

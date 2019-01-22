@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>任务日志</title>
+	
+    <meta name="keywords" content="keyword1,keyword2,keyword3">
+    <meta name="description" content="this is my page">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    
+    <!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+
+  </head>
+  
+  <body>
+    <script type="text/javascript">
+    
+  //获取指定请求参数的值
+  function getParameter(name){ 
+      var paramStr=location.search; 
+      if(paramStr.length==0)return null; 
+      if(paramStr.charAt(0)!='?')return null; 
+      paramStr=unescape(paramStr); 
+      paramStr=paramStr.substring(1); 
+      if(paramStr.length==0)return null; 
+      var params=paramStr.split('&'); 
+      //alert(params);
+      var p = null;
+      for(var i=0;i<params.length;i++){
+          if(params[i].indexOf(name) >= 0){           
+              p = params[i].split('=');
+              p = p[1];         
+          }
+      }
+      return p;
+  }
+  
+	var jobId =  "";
+	var jobInsId =  "";
+	var nodeId =  "";
+	
+	var jobId =  getParameter("jobId");
+	var jobInsId =  getParameter("jobInsId");
+	var nodeId =  getParameter("nodeId");
+	
+ 	var log = ajaxReqRespText("../busi/migJobLogBUSIfetchLog.action?jobId="+jobId+"&jobInsId="+jobInsId+"&taskId="+nodeId );
+ 
+    document.write(log);
+    </script>
+  </body>
+</html>

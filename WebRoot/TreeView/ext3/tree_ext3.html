@@ -1,0 +1,62 @@
+<html>
+<head>
+<title>菜单树 ext-3.4.1</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="/ext-3.4.1/resources/css/ext-all.css" />
+<style type="text/css">
+.x-tree-node {
+font-size:13px;
+}
+.x-tree-node-el{
+line-height:20px;
+}
+</style>
+<script type="text/javascript" src="/ext-3.4.1/adapter/ext/ext-base.js"></script>
+<script type="text/javascript" src="/ext-3.4.1/ext-all.js"></script>
+<script type="text/javascript" >
+Ext.onReady(function(){
+    // shorthand
+    var Tree = Ext.tree;
+
+    var tree = new Tree.TreePanel({
+        useArrows: true,
+        autoScroll: true,
+        animate: true,
+        enableDD: true,
+        containerScroll: true,
+        border: false,
+        // auto create TreeLoader
+     	dataUrl: '../../tree/tAuthorityModuleTREEquery_Ext3_Tree.action',
+// 		loader: new Ext.tree.TreeLoader({
+// 			nodeParameter : "node",
+// 			dataUrl: '../../tree/tAuthorityModuleTREEquery_Ext3_Tree.action'
+// 		}),
+		
+        root: {
+        	id: '33',
+            nodeType: 'async',
+//             hidden : true,
+            text: '湖南社保金融卡省内前置系统',
+            draggable: false            
+        },
+        listeners: {
+            click: function(n) {
+                //Ext.Msg.alert('Navigation Tree Click', 'You clicked: "' + n.attributes.text + '"');
+            	window.parent.document.getElementById('basefrm').src='../'+n.attributes.url;
+            }
+        }
+    });
+
+    // render the tree
+    tree.render('tree-div');
+    tree.getRootNode().expand();
+});
+</script><!--
+<link rel="stylesheet" type="text/css" href="/ext-3.4.1/examples/shared/examples.css" /> -->
+</head>
+<body>
+<!--  height:300px;width:250px;overflow:auto;
+<script type="text/javascript" src="/ext-3.4.1/examples/shared/examples.js"></script> -->
+<div id="tree-div" style="border:1px solid #c3daf9; height:100%;"></div>
+</body>
+</html>

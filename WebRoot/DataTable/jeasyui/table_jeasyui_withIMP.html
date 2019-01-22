@@ -1,0 +1,527 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>数据表格 jeasyui(带导入)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.3.5/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.3.5/themes/icon.css"/>
+<style type="text/css">
+
+</style>
+<script type="text/javascript" src="../../scripts/jquery-1.4.4.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.3.5/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.3.5/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+<script type="text/javascript">
+var noquery = VIRTUE.noquery;
+var query = VIRTUE.query;
+var exp = VIRTUE.exp;
+
+var del = VIRTUE.del;
+var read = VIRTUE.read;
+
+var OPE = VIRTUE.operator;
+
+/** validate and assign value **/
+function PackingParameter(){
+	var level = $('#level').combobox('getValue');
+	var leaf = $('#leaf').combobox('getValue');
+	var parent = $('#parent').combotree('getValue');
+	var name = $('#name').val();
+
+	query.init();
+	if(level !== ""){
+		query.jdata.condition.level = level;
+		query.jdata.operator.level = OPE.EQUAL;
+	}
+	if(leaf !== ""){
+		query.jdata.condition.leaf = leaf;
+		query.jdata.operator.leaf = OPE.EQUAL;
+	}
+	if(parent !== ""){
+		query.jdata.condition["parent"] = parent;
+		query.jdata.operator["parent"] = OPE.EQUAL;
+	}
+	if(name !== ""){
+		query.jdata.condition.name = name;
+		query.jdata.operator.name = OPE.CONTAIN;
+	}
+	exp.jdata.condition = query.jdata.condition;
+	exp.jdata.operator = query.jdata.operator;
+	return true;
+};
+
+/** search data ,reload data  **/
+function submitForm(){
+   	if(!PackingParameter()){
+   		return;
+   	}
+   	$('#grid').datagrid( 'reload', { jdata: encodeURI( $.toJSON( query.jdata ) ) } );
+};
+
+/**  清空  **/
+function clearForm(){
+	$('#form').form('clear');
+};
+
+/** wizard import function */
+var WIF = {};
+
+/** Get import file extension name */
+WIF.getIMPFileType4Wizard = function()
+{
+ 	return getRadioValue("IMPFileType4Wizard");
+};
+
+
+/** Wizard import data, don't search   **/
+WIF.importByWizard = function()
+{
+	var fileType = WIF.getIMPFileType4Wizard();
+	var form = document.getElementById("IMPdlgForm");
+	
+	if(fileType == "xls")
+	{
+		form.action = "../../imp/tbPayerCommiInfoImpimportXLS.action?_="+(new Date).getTime();
+	}
+	else if(fileType == "txt")
+	{
+		form.action = "../../imp/tbPayerCommiInfoImpimportTXT.action?_="+(new Date).getTime();
+	}
+
+  	var customColumns = getCustomIMPColumns();
+  	PackingIMPOptions();
+  	
+  	var j = document.createElement("input");
+    j.type = "hidden";
+    j.name = "customColumns";
+    j.value = encodeURI($.toJSON( customColumns ) );
+    form.appendChild(j);
+      
+  	var k = document.createElement("input");
+    k.type = "hidden";
+    k.name = "options";
+    k.value = encodeURI($.toJSON( imp.Options ) );
+    form.appendChild(k);
+    
+//  一提交disable和show的效果立马就不见了哦
+    form.submit();
+};
+
+
+/** Get simplely import file extension name */
+function getIMPFileType4Simplely()
+{
+	//EXPFileType4Simplely
+	return getRadioValue("IMPFileType4Simplely");
+};
+
+
+/** Import file by selected file extension name  */
+function importSimply()
+{
+	var upload = document.getElementById("upload4Simplely");
+	if(upload.value=="")
+	{
+		alert("请选择文件 !");
+		return;
+	}
+	$('#IMPdlg').dialog('close');
+	alert("Path:"+upload.value);
+	
+	var fileType = getIMPFileType4Simplely();
+	var form = document.getElementById("IMPdlgForm");
+
+	
+	if(fileType == "xls")
+	{
+		form.action = "../../imp/tbPayerCommiInfoImpimportXLS.action?_="+(new Date).getTime();
+	}
+	else if(fileType == "txt")
+	{
+		form.action = "../../imp/tbPayerCommiInfoImpimportTXT.action?_="+(new Date).getTime();
+	}
+//  一提交disable和show的效果立马就不见了哦
+//	form.submit();
+};
+
+/** format level **/
+function fmtNmlevel(n){
+// 	n = new Number(n);
+	switch(n){
+		case 0: return '零级'; break;
+		case 1: return '一级'; break;
+		case 2: return '二级'; break;
+		case 3: return '三级'; break;
+		case 4: return '四级'; break;
+		default: return n;
+	}
+};
+/** format node type  **/
+function fmtCmleaf(s){
+	s = new String(s);
+	if(s=="true"){
+		return '叶子';
+	}else if(s == "false"){
+		return '非叶子';
+	}else{
+		return value;
+	}
+};
+
+function newModule(){  //使用一个window
+	$('#win').window('open').window('setTitle', '添加模块');
+	$('#win').window("refresh", "tAuthorityModule_add.html");
+};
+
+function editModule() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		$('#win').window('open').window('setTitle', '编辑模块');
+		$('#win').window("refresh", "../../curd/tAuthorityModuleCURDinitModify.action?pojo.NMid="+row.id);
+	}
+};
+
+function browseModule() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		$('#win').window('open').window('setTitle', '浏览模块');
+		read.init();
+		read.jdata.condition.id = row.id;
+		read.jdata.operator.id = OPE.EQUAL;
+		$('#win').window("refresh", "../../curd/tAuthorityModuleCURDbrowse.action?jdata="+encodeURI($.toJSON( read.jdata )));
+	}
+};
+
+//del.jdata = {act: "del",condition: { id: "" },operator : {nmid : 1} };
+function destroyModule(){
+	var row = $('#grid').datagrid('getSelected');
+	if (row){
+		$.messager.confirm('确认','确认删除吗?',function(r){
+			if (r){
+				del.init();
+				del.jdata.condition.id = row.id;
+				del.jdata.operator.id = OPE.EQUAL;
+				$.post("../../curd/tAuthorityModuleCURDdelete.action", { jdata: encodeURI($.toJSON( del.jdata )) }, function(result, status){
+					alert(result.msg);
+					if (result.success){
+						$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+					}
+				});
+			}
+		});
+	}
+};
+
+var toolbar = [{
+	text:'添加模块',
+	iconCls:'icon-add',
+	handler:function(){
+//		alert('add');
+		newModule();
+	}
+},{
+	text:'编辑模块',
+	iconCls:'icon-edit',
+	handler:function(){
+// 		$('#winU').window('open');
+		editModule();
+	}
+},{
+	text:'删除模块',
+	iconCls:'icon-remove',
+	handler:function(){
+// 		alert('remove')
+		destroyModule();
+	}
+},{
+	text:'查看模块',
+	iconCls:'icon-search',
+	handler:function(){ browseModule(); }
+},{
+	text:'导入',
+	iconCls:'icon-import',
+	handler:function(){ $("#IMPdlg").dialog("open"); }
+},{
+	text:'导入向导',
+	iconCls:'icon-import',
+	handler:function(){ $("#IMPdlg1").dialog("open"); }
+}];
+//program component
+$(function(){
+	$('#grid').datagrid({
+		title: '模块信息',
+		//iconCls:'icon-reload',
+		toolbar: toolbar,
+		width: 938,
+		height: 720,
+		nowrap: true,
+		striped: true,
+		fit: true,
+		collapsible: true,
+		url: "../../query/tAuthorityModuleJEasyUIQUERYdfind.action",
+		idField: "id",
+		remoteSort: true,
+		sortName:"level",
+		sortOrder:"desc",
+		multiSort:true,
+		singleSelect: true,
+		frozenColumns: [[
+            {title:'模块ID',field:"id", hidden: true},
+		    {title:'模块名称',field:"name", width:180}
+		]],
+		columns:[[
+			{title:'模块级别',field:"level",width:70, sortable: true, formatter: fmtNmlevel },
+		    {title:'模块类型',field:"leaf",width:70, sortable: true, formatter: fmtCmleaf },
+		    {title:'模块次序号',field:"order",width:75, sortable: true },
+		    {title:'上级模块',field: "super",width: 180, sortable: true },
+		    {title:'链接目标',field:"target",hidden: true},
+		    {title:'模块图标样式',field:"iconcls",hidden: true},
+		    {title:'展开状态',field:"expanded",hidden: true},
+		    {title:'选定状态',field:"checked",hidden: true},
+		    {title:'模块路径',field:"path",width:350},
+		    {title:'模块备注',field:"note",width:300},
+		    {title:'创建时间',field:"ctime",hidden: true},//,formatter: getCMctime},
+		    {title:'创建者使用的IP',field:"cip",hidden: true},
+		    {title:'创建者',field:"creator",hidden: true},
+		    {title:'最后修改时间',field:"mtime",hidden: true},
+		    {title:'最后修改者使用的IP',field:"mip",hidden: true},
+		    {title:'最后修改者',field:"modifier",hidden: true}
+		]],
+		pagination:true,
+		rownumbers:true,
+		pageNumber: 1,
+		pageSize: query.pageSize,
+		queryParams:{jdata: encodeURI($.toJSON( noquery.jdata )) },
+		onBeforeLoad:function(param){
+// 			$('#btnSearch').linkbutton('disable');
+			document.getElementById('btnSearch').disabled=true;
+		},
+		onLoadSuccess:function(){
+// 			$('#btnSearch').linkbutton('enable');
+			document.getElementById('btnSearch').disabled=false;
+		}
+	});
+	var p = $('#grid').datagrid('getPager');
+	if (p){
+		$(p).pagination({
+			//total:50,
+			pageSize: query.pageSize,
+			pageNumber:1,
+			//pageList: [10,20,50,100],
+			onBeforeRefresh:function(){
+				//alert('before refresh');
+			},
+			onSelectPage:function(pageNumber, pageSize){
+				$('#grid').datagrid("options").pageNumber=pageNumber;
+				$('#grid').datagrid("options").pageSize=pageSize;
+				$('#grid').datagrid('reload',{ jdata: encodeURI( $.toJSON( query.jdata ) ) } );
+			}
+		});
+	}
+});
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+    <div data-options="region:'north',border:true,split:true" style="height:99px;background:#B3DFDA;" title="查询条件" >  
+    	<form id="form" method="post" style="margin:0;padding:0;">
+			<div style="padding:0px 0 0px 5px">
+				<table width="100%">
+                <tr>
+                    <td>模块级别:</td>
+                    <td>
+                        <select class="easyui-combobox" id="level" name="level" style="width:100px;">
+                        	<option value="" selected="selected">--选择--</option>
+                        	<option value="0">零级</option>
+                        	<option value="1">一级</option>
+                        	<option value="2">二级</option>
+                        	<option value="3">三级</option>
+                        	<option value="4">四级</option>
+                        </select>
+                    </td>
+                    <td>模块类型:</td>
+                    <td>
+                        <select class="easyui-combobox" id="leaf" name="leaf" style="width:100px;">
+                        	<option value="" selected="selected">--选择--</option>
+                        	<option value="true">叶子</option>
+                        	<option value="false">非叶子</option>
+                        </select>
+                    </td>
+                    <td>上级模块:</td>
+                    <td>
+<!--                         <input id="nmparent" name="nmparent" value=""> -->
+						<input class="easyui-combotree" 
+	                        id="parent" name="parent" 
+	                        data-options="url:'../../tree/tAuthorityModuleTREEquery_JEasyUI_CBT.action',method:'post',required:true" 
+	                        style="width:260px;">
+                    </td>
+                    <td>模块名称:</td>
+                    <td>
+                        <input id="name" name="name" value="" style="width:140px;">
+                    </td>
+                </tr>
+            	</table>
+			</div>
+			
+			<table width="100%" border="0" align="center">
+			<tr bgcolor="#E2EEFE" valign="bottom">
+				<td height="23"><div align="center"><!-- default height='21'  -->
+					<input id='btnSearch' type='button' onclick='submitForm()' value='查 询'/>&nbsp;
+					<input id='btnExpSimply' type='button' onclick="$('#EXPdlg').dialog('open')" value='导 出'/>&nbsp;
+					<input id='btnExpWizard' type='button' onclick="$('#EXPdlg1').dialog('open')" value='导出向导'/>&nbsp;
+					<input type='button' onclick="clearForm()" value='清 空'/>
+				</div></td>
+			</tr>
+			</table>
+        </form>
+    </div>
+    
+    <div data-options="region:'center',border:false" title="模块main" style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+	<div id="win" class="easyui-window" title="添加模块" style="width:600px;height:400px"  
+        data-options="modal:true,closed:true">
+	</div>
+	<!-- #########################   dialog  import Simply1  ######################################################################## -->	
+	<div id="IMPdlg_S1" class="easyui-dialog" title="通用导入" data-options="iconCls:'icon-export',
+		modal: true,
+		buttons: '#IMPdlg-buttons'" closed="true" style="width:380px;padding:10px">
+	    <fieldset title="文件类型">
+			<legend>&nbsp;文件类型&nbsp;</legend>
+			<table align="left">
+				<tr height="40px">
+		    		<td><input type='radio' name='IMPFileType4Simplely' value='xls' checked="checked"/><span>Excel数据表(*.xls)</span></td>
+		    	</tr>
+		    	<tr height="40px">
+		    		<td><input type='radio' name='IMPFileType4Simplely' value='txt'/><span>文本文件(*.txt)</span></td>
+		    	</tr>
+		    </table>
+	    </fieldset>
+    </div> 
+	<div id="IMPdlg-buttons">
+		<input type='button' onclick="javascript: $('#IMPdlg_S1').dialog('close'); exportSimply();" value='确 定'/>
+		&nbsp;&nbsp;
+		<input type='button' onclick="javascript:$('#IMPdlg_S1').dialog('close');" value='取 消'/>
+	</div>
+	
+	
+	<!-- #########################   dialog  import Simply2   ######################################################################## -->	
+	<div id="IMPdlg_S2" class="easyui-dialog" title="通用导入" data-options="iconCls:'icon-import',
+		modal: true,
+		buttons: '#IMPdlg-buttons'" closed="true" style="width:596px;height:180px;padding:10px">
+		<form id="IMPdlgForm" action="../../imp/tbPayerCommiInfoImpimportXLS.action" method="post" enctype="multipart/form-data" style="margin:0;padding:0;">
+	    	<span>选择文件:</span>
+				<input type='file' id="upload4Simplely" name='upload' size="60" 
+	    		style="margin-left:5px;margin-top:5px;"/>
+	    </form>
+    </div> 
+	<div id="IMPdlg-buttons">
+		<input type='button' onclick="javascript: importSimply();" value='确 定'/>
+		&nbsp;&nbsp;
+		<input type='button' onclick="javascript:$('#IMPdlg_S2').dialog('close');" value='取 消'/>
+	</div>
+	
+	
+	
+	
+	<!-- #########################  Import wizard. Import dialog1   ######################################################################## -->	
+	<div id="IMPdlg1" class="easyui-dialog" title="导入向导" data-options="modal: false ,
+		iconCls:'icon-import',
+		buttons: '#IMPdlg1-buttons'" closed="true" style="width:496px;height:438px;padding:10px">
+		<span style="font-size:18px;color:#0066cc">
+		这个向导允许你指定如何导入数据。你要选择哪种数据导入格式？（1/8）
+		</span>
+		<br/><br/><br/>
+		<fieldset title="文件类型">
+			<legend>&nbsp;文件类型&nbsp;</legend>
+			<table align="left">
+				<tr height="40px">
+		    		<td>
+		    			<input type='radio' name='IMPFileType4Wizard' value='xls' checked="checked"
+		    				onchange="if(this.checked) 
+		    					document.getElementById('IMPdlg3-divTXTOptions').style.display='none';"/>
+		    			<span>Excel数据表(*.xls)</span>
+		    		</td>
+		    	</tr>
+		    	<tr height="40px">
+		    		<td>
+		    			<input type='radio' name='IMPFileType4Wizard' value='txt'
+		    				onchange="if(this.checked) 
+		    					document.getElementById('IMPdlg3-divTXTOptions').style.display='inline';"/>
+		    			<span>文本文件(*.txt)</span>
+		    		</td>
+		    	</tr>
+		    </table>
+	    </fieldset>
+    </div>
+	<div id="IMPdlg1-buttons">
+		<input type="button" value="下一步>" onclick="$('#IMPdlg1').dialog('close');$('#IMPdlg2').dialog('open');"/>
+		&nbsp;
+		<input type="button" value="&nbsp;>>" onclick="$('#IMPdlg1').dialog('close');$('#IMPdlg8').dialog('open');"/>
+		&nbsp;&nbsp;
+		<input type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;" onclick="$('#IMPdlg1').dialog('close');"/> 
+	</div>
+	
+	<!-- --------   Import Wizard dialog2 -----------------  -->
+	<div id="IMPdlg2" class="easyui-dialog" title="导入向导" data-options="modal: false ,
+		iconCls:'icon-export',
+		buttons: '#IMPdlg2-buttons'" closed="true" style="width:496px;height:438px;padding:10px">
+		<span style="font-size:18px;color:#0066cc">
+		你必须选择一个文件作为数据源。（2/8）
+		</span>
+		<br/><br/><br/>
+		<table width=100%>
+			<tr>
+				<td>
+				导入从：<br/>
+				<input type="file" id="upload" name="upload" title="社保回盘文件" size="61"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<div style="display: none;">
+				编码：<br/>
+				<select id="IMPEncoding" name="IMPEncoding" style="width:100%;">
+					<option value="GBK">936 (ANSI/OEM - Simplified Chinese GBK)</option>
+			        <option value="GB2312" selected="selected">10008 (MAC - Simplified Chinese GB 2312)</option>
+			     	<option value="UTF-8">65001 (UTF-8)</option>
+				</select>
+				</div>
+				<div>
+					
+				</div>
+				</td>
+			</tr>
+		</table>		
+    </div>
+    
+    <div id="IMPdlg2-buttons">
+		<input type="button" value="<<&nbsp;" onclick="$('#IMPdlg2').dialog('close');$('#IMPdlg1').dialog('open');"/>
+		&nbsp;
+		<input type="button" value="<上一步" onclick="$('#IMPdlg2').dialog('close');$('#IMPdlg1').dialog('open');"/>
+		&nbsp;&nbsp;
+		<input type="button" value="下一步>" onclick="$('#IMPdlg2').dialog('close');$('#IMPdlg3').dialog('open');"/>
+		&nbsp;
+		<input type="button" value="&nbsp;>>" onclick="$('#IMPdlg2').dialog('close');$('#IMPdlg8').dialog('open');"/>
+		&nbsp;&nbsp;
+		<input type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;" onclick="$('#IMPdlg2').dialog('close');"/> 
+	</div>
+<script type="text/javascript">
+//解决缓存问题
+jQuery(document).ready(function(){
+// 	var fileType = WEF.getEXPFileType4Wizard();
+// 	if(fileType == "xls")
+// 	{
+// 		document.getElementById("EXPdlg3-divTXTOptions").style.display="none";
+// 	}
+// 	else if(fileType == "txt")
+// 	{
+// 		document.getElementById("EXPdlg3-divTXTOptions").style.display="inline";
+// 	}
+
+}); 
+</script>
+</body>

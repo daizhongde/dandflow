@@ -1,0 +1,47 @@
+<html>
+<head>
+<script type="text/javascript">
+	function showPosition(e) {
+		var x, y;
+		var e = e || window.event;
+
+		document.getElementById("x").value = e.clientX
+				+ document.body.scrollLeft
+				+ document.documentElement.scrollLeft;
+		document.getElementById("y").value = e.clientY
+				+ document.body.scrollTop + document.documentElement.scrollTop
+
+	}
+</script>
+</head>
+<body>
+	<div onmousemove="showPosition(event);"
+		style="height:100%; width:100%;">
+		x:<input id="x" type="text" value="" /> y:<input id="y" type="text"
+			value="" />
+	</div>
+	
+	
+	<div id="explanation">
+        <p>
+            初始化字符:
+        </p>
+        <p>
+            <textarea cols="16" rows="5" id="InitText">{"Position":{ "ID1001": "50px33"},{ "ID1002": "90px33"},"Relation":{ "firstName":"ID1001", "ID1002" }}
+            </textarea>
+        </p>
+        <p>
+            位置字符:
+        </p>
+        <p>
+            <textarea cols="16" rows="5" id="PositionText"></textarea>
+        </p>
+        <p>
+            关系字符:
+        </p>
+        <p>
+            <textarea cols="16" rows="5" id="RelationText"></textarea>
+        </p>
+    </div>
+</body>
+</html>

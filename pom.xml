@@ -1,0 +1,401 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>migration</groupId>
+  <artifactId>migration</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>war</packaging>
+  <name>migration</name>
+  <description/>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+   	<jersey.version>2.25.1</jersey.version>
+   	<guava.version>21.0</guava.version>
+   	<httpclient.version>4.5.3</httpclient.version>
+   	<cxf.version>3.1.12</cxf.version>
+   	
+	<!-- env -->
+	<mysql-connector-java.version>5.1.41</mysql-connector-java.version>
+	
+	<!-- ssh  2.5.10.1   2.5.12 -->
+	<struts2.version>2.5.12</struts2.version>
+	<!-- 3.2.18.RELEASE  4.2.9.RELEASE    4.3.10.RELEASE -->
+	<spring.version>4.3.10.RELEASE</spring.version>
+	<!-- 4.2.21.Final    4.3.11.Final(1.7.0_51 )   
+		5.0.12.Final(1.8.0_40)  5.1.9.Final(1.8.0_40)   
+		5.2.10.Final(1.8.0-121)-->
+	<hibernate.version>5.1.9.Final</hibernate.version>
+	
+	<!-- common -->
+	<io.version>2.5</io.version>
+	<commons-io.version>2.5</commons-io.version>
+	<commons-net.version>3.6</commons-net.version>
+	
+	<javax.mail.version>1.6.1</javax.mail.version>
+
+	<!-- tool -->
+	<fasterxml.jackson.version>2.8.8</fasterxml.jackson.version>
+	<codehaus.jackson.version>1.9.13</codehaus.jackson.version>
+	<poi.version>3.15</poi.version>
+	
+	<!-- hadoop -->
+	<hadoop.version>2.8.0</hadoop.version>
+	
+	<!-- log -->
+	<slf4j.version>1.7.25</slf4j.version>
+	
+	<!-- ckfinder  2.5.0  2.6.2.1  -->
+	<ckfinder.version>2.6.2.1</ckfinder.version>
+	<jexcelapi.version>2.6.12</jexcelapi.version>
+	
+	<jedis>2.9.0</jedis>
+	<spring-data-redis>2.0.5.RELEASE</spring-data-redis>
+	
+	
+	<!-- test -->
+	<junit.version>4.12</junit.version>
+  </properties>
+  
+  <dependencies>
+	<!-- userdefine project 
+	<dependency>
+		<groupId>person.daizhongde.virtue.util</groupId>
+ 			<artifactId>virtue-util</artifactId>
+ 			<version>0.0.1-SNAPSHOT</version>
+	</dependency> 
+	<dependency>
+		<groupId>person.daizhongde.virtue</groupId>
+ 			<artifactId>virtue-jdk17</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</dependency>
+	-->
+	<dependency>
+		<groupId>person.daizhongde.authority</groupId>
+		<artifactId>authority-jdk17</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</dependency>
+	
+	<dependency>
+	    <groupId>org.quartz-scheduler</groupId>
+	    <artifactId>quartz</artifactId>
+	    <version>2.3.0</version>
+	</dependency>
+
+	<dependency>
+        <groupId>org.glassfish.jersey.media</groupId>
+        <artifactId>jersey-media-json-jackson</artifactId>
+        <version>${jersey.version}</version>
+    </dependency>
+  		 <!-- ckfinder -->
+	<dependency>
+		<groupId>com.ckfinder</groupId>
+		<artifactId>ckfinder</artifactId>
+		<version>${ckfinder.version}</version>
+	</dependency>
+	
+	<!-- env -->
+	<dependency>
+		<groupId>mysql</groupId>
+		<artifactId>mysql-connector-java</artifactId>
+		<version>${mysql-connector-java.version}</version>
+		<scope>compile</scope>
+	</dependency>
+	<dependency>
+      <groupId>javax</groupId>
+      <artifactId>javaee-api</artifactId>
+      <version>7.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.web</groupId>
+      <artifactId>javax.servlet.jsp.jstl</artifactId>
+      <version>1.2.2</version>
+      <scope>provided</scope>
+    </dependency>
+
+	<dependency>
+		<groupId>com.sun.mail</groupId>
+		<artifactId>javax.mail</artifactId>
+		<version>${javax.mail.version}</version>
+	</dependency>
+	<dependency>
+		<groupId>javax.mail</groupId>
+		<artifactId>javax.mail-api</artifactId>
+		<version>${javax.mail.version}</version>
+	</dependency>
+
+	<!-- ssh -->
+	<dependency>
+	    <groupId>org.apache.struts</groupId>
+	    <artifactId>struts2-core</artifactId>
+	    <version>${struts2.version}</version>
+	</dependency>
+	<dependency>
+      		<groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>${spring.version}</version>
+    </dependency>
+	<dependency>
+	    <groupId>org.hibernate</groupId>
+	    <artifactId>hibernate-core</artifactId>
+	    <version>${hibernate.version}</version>
+	</dependency>
+	
+	<!-- ssh's plugins -->
+	<dependency>
+	    <groupId>org.apache.struts</groupId>
+	    <artifactId>struts2-config-browser-plugin</artifactId>
+	    <version>${struts2.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.struts</groupId>
+	    <artifactId>struts2-convention-plugin</artifactId>
+	    <version>${struts2.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.struts</groupId>
+	    <artifactId>struts2-json-plugin</artifactId>
+	    <version>${struts2.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.struts</groupId>
+	    <artifactId>struts2-rest-plugin</artifactId>
+	    <version>${struts2.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.struts</groupId>
+	    <artifactId>struts2-spring-plugin</artifactId>
+	    <version>${struts2.version}</version>
+	</dependency>
+	
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-aspects</artifactId>
+		<version>${spring.version}</version>
+		<scope>compile</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-web</artifactId>
+		<version>${spring.version}</version>
+		<scope>compile</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-context-support</artifactId>
+		<version>${spring.version}</version>
+		<scope>compile</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-tx</artifactId>
+		<version>${spring.version}</version>
+		<scope>compile</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-orm</artifactId>
+		<version>${spring.version}</version>
+		<scope>compile</scope>
+	</dependency>
+	
+	<!-- tool -->
+	<dependency>
+	    <groupId>com.fasterxml.jackson.core</groupId>
+	    <artifactId>jackson-core</artifactId>
+	    <version>${fasterxml.jackson.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.codehaus.jackson</groupId>
+	    <artifactId>jackson-jaxrs</artifactId>
+	    <version>${codehaus.jackson.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.directwebremoting</groupId>
+	    <artifactId>dwr</artifactId>
+	    <version>3.0.2-RELEASE</version>
+	</dependency>
+	 <dependency>  
+	    <groupId>com.fasterxml.jackson.core</groupId>  
+	    <artifactId>jackson-databind</artifactId>  
+	    <version>${fasterxml.jackson.version}</version>  
+	</dependency>  
+	<dependency>  
+	   <groupId>org.springframework</groupId>  
+	   <artifactId>spring-websocket</artifactId>  
+	   <version>${spring.version}</version>  
+	</dependency>  
+	<dependency>  
+	   <groupId>org.springframework</groupId>  
+	   <artifactId>spring-messaging</artifactId>  
+	   <version>${spring.version}</version>  
+	</dependency>  
+
+	<!-- poi -->
+	<dependency>
+	    <groupId>org.apache.poi</groupId>
+	    <artifactId>poi</artifactId>
+	    <version>${poi.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.poi</groupId>
+	    <artifactId>poi-excelant</artifactId>
+	    <version>${poi.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.poi</groupId>
+	    <artifactId>poi-ooxml</artifactId>
+	    <version>${poi.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.poi</groupId>
+	    <artifactId>poi-ooxml-schemas</artifactId>
+	    <version>${poi.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.poi</groupId>
+	    <artifactId>poi-scratchpad</artifactId>
+	    <version>${poi.version}</version>
+	</dependency>
+	
+	<!-- extra single -->
+	<dependency>
+	    <groupId>aopalliance</groupId>
+	    <artifactId>aopalliance</artifactId>
+	    <version>1.0</version>
+	</dependency>
+	<dependency>
+	    <groupId>javax.enterprise</groupId>
+	    <artifactId>cdi-api</artifactId>
+	    <version>1.2</version>
+	</dependency>
+	<dependency>
+	    <groupId>classworlds</groupId>
+	    <artifactId>classworlds</artifactId>
+	    <version>1.1</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.commons</groupId>
+	    <artifactId>commons-jci-core</artifactId>
+	    <version>1.1</version>
+	</dependency>
+	
+	<dependency>
+	    <groupId>net.sourceforge.jexcelapi</groupId>
+	    <artifactId>jxl</artifactId>
+	    <version>${jexcelapi.version}</version>
+	</dependency>
+
+    <!--  -->
+    <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guava.version}</version>
+    </dependency>
+       
+    <dependency>
+		<groupId>org.apache.httpcomponents</groupId>
+		<artifactId>httpclient</artifactId>
+		<version>${httpclient.version}</version>
+	</dependency>
+	<!-- 后期全改为rest之后可以把cxf去掉 -->
+	<dependency>
+	    <groupId>org.apache.cxf</groupId>
+	    <artifactId>cxf-rt-frontend-jaxws</artifactId>
+	    <version>${cxf.version}</version>
+	</dependency>
+	<!--  cxf.version  -->
+	<dependency>
+	    <groupId>org.apache.cxf</groupId>
+	    <artifactId>cxf-rt-transports-http</artifactId>
+	    <version>${cxf.version}</version>
+	</dependency>
+		
+	
+	     <!-- redis cache related.....start -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>${jedis}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-redis</artifactId>
+            <version>${spring-data-redis}</version>
+        </dependency>
+        <!-- redis cache related.....end -->
+	
+		<!-- test -->
+		<dependency>
+		    <groupId>junit</groupId>
+		    <artifactId>junit</artifactId>
+		    <version>${junit.version}</version>
+<!-- 		    <scope>test</scope> -->
+		</dependency>
+		
+		
+  </dependencies>
+  
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>src</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+      
+      <resource>
+        <directory>src</directory>
+        <filtering>true</filtering>
+        <includes>
+			<include>init.properties</include>
+			<include>log4j.properties</include>
+			<include>log4j2.xml</include>
+		</includes>
+      </resource>
+    </resources>
+    
+    <plugins>
+        <plugin>
+			<artifactId>maven-compiler-plugin</artifactId>
+			<version>3.5</version><!-- 2.3.2  3.3 3.5  3.6.2 -->
+			<configuration>
+				<source>1.8</source>
+				<target>1.8</target>
+			</configuration>
+		</plugin>
+		<plugin>
+			<artifactId>maven-war-plugin</artifactId>
+			<version>2.6</version><!-- 2.2  2.6  3.0.0   3.1.0  -->
+			<configuration>
+				<warSourceDirectory>${basedir}/WebRoot</warSourceDirectory>
+				<failOnMissingWebXml>false</failOnMissingWebXml>
+			</configuration>
+		</plugin>
+    </plugins>
+  </build>
+  
+  <profiles>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<filters>
+					<filter>profiles/dev-filter.properties</filter>
+				</filters>
+			</build>
+		</profile>
+		<profile>
+			<id>prod</id>
+			<build>
+				<filters>
+					<filter>profiles/prod-filter.properties</filter>
+				</filters>
+			</build>
+		</profile>
+	</profiles>
+</project>

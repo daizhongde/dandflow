@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>一致性稽核配置</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!-- 
+	<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/icon.css">
+	<style type="text/css">
+
+</style>
+	<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+	<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+	<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/plugins/easyuiExtends.js"></script>
+<script type="text/javascript" src="../../scripts/raphael-min.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../../scripts/const/const.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script> -->
+</head>
+<body>
+<script type="text/javascript">
+/** select default columns  */
+app.selectSelectedColumns = function ()
+{
+	var table = $('#auditcconfig_grid');
+// 	table.datagrid( 'unselectAll');
+	
+	var idarr = app.idstr.split(",");
+	
+	for(var i=0, j = idarr.length; i<j; i++ ){
+		table.datagrid( 'selectRecord', idarr[i]);
+	}
+	table.datagrid( 'scrollTo',0);
+};
+/** validate and assign value **/
+function pubPackingParameter(formId){
+	var formData = $('#'+formId).form( 'getData');
+
+	query.init();
+	for (var field in formData) {
+		if( formData[field] !== "" && field != "ope" ){
+			query.jdata.condition[field] = formData[field];
+			query.jdata.operator[field] = OPE.CONTAIN;
+			if( field=="audit_name" && formData["ope"] != "" ){
+				query.jdata.operator[field] = formData["ope"];
+			}
+		}
+	}
+	return true;
+};
+
+/** search data ,reload data @formPrefix business **/
+function pubSubmitForm(formPrefix){
+   	if( !pubPackingParameter( formPrefix+"_sform" ) ){
+   		return;
+   	}
+   	$('#'+formPrefix+'_grid').datagrid( 'reload', {tableName : "mig_auditc_consistency",jdata: encodeURI( $.toJSON( query.jdata ) ) } );
+};
+
+function pubClearForm(formPrefix){
+	$('#'+formPrefix+'_sform').form('clear');
+};
+</script>
+<div class="easyui-layout" fit="true">
+    <div data-options="region:'center', border:false" title="" style="overflow:hidden;" noheader="true">
+		<table id="auditcconfig_grid" class="easyui-datagrid" style="width:462px;height:268px"
+			data-options="rownumbers:true,
+			toolbar:'#tb',
+			fit : true,
+			showHeader: true,
+			showFooter: false,
+			selectOnCheck:true,
+			checkOnSelect:true,
+			idField: 'audit_id',
+			url:getContextPath()+'/query/commonJEasyUIQUERYdfind.action',
+			method:'post',
+			queryParams:{
+				tableName : 'mig_auditc_consistency',
+				jdata : encodeURI( $.toJSON( {act:'',condition:{},operator:{}} ) )
+			},
+			onLoadSuccess: app.selectSelectedColumns ">
+			<thead>
+				<tr>
+					<th data-options="field:'ck', checkbox: true"></th>
+					<th data-options="field:'audit_name', width: 240">Audit Item</th>
+					<th data-options="field:'mig_sql', width: 530">sql</th>
+					<th data-options="field:'sql_db', width: 220">DB Connection URL</th>
+					<th data-options="field:'mig_sql_rep', width:120">Param Template</th>
+					<th data-options="field:'author', width: 120">Author</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	<div id="tb" style="padding:2px 5px;">
+		<form id="auditcconfig_sform" method="post" style="margin:0;padding:0;">
+			Audit Item: <input class="easyui-combobox" 
+		                        id='ope_S' name="ope"
+		                        data-options="valueField:'value', textField:'label',
+		                        value:VIRTUE.operator.STARTWITH,
+		                        editable:false,
+								data:VIRTUE.OPECBBDATA,width:120,
+		                        required:true"/>
+                        <input id="audit_name" name="audit_name" value="" style="width:120px"/>
+              Author:<input id="author" name="author" type="text" value="" style="width:80px"/>
+        	<a class="easyui-linkbutton" data-options="iconCls:'icon-search'" href="javascript:void(0)" 
+              		onclick="pubSubmitForm('auditcconfig')" style="width:80px">Submit</a>
+            <a class="easyui-linkbutton" data-options="iconCls:'icon-clear'" href="javascript:void(0)" 
+		               		onclick="pubClearForm('auditcconfig')" style="width:80px">Clear</a>
+		</form>
+	</div>
+</div>
+</body>
+</html>

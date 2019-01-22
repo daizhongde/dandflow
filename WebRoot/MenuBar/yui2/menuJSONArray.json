@@ -1,0 +1,22 @@
+[ {
+	"id" : "2",
+	"itemdata" : [ {
+		"text" : "用户管理",
+		"url" : "xtgl/EmployeeManage.jsp"
+	}, {
+		"text" : "部门管理",
+		"url" : "xtgl/DepartmentManage.jsp"
+	}, {
+		"text" : "机构管理",
+		"url" : "xtgl/InstitutionManage.jsp"
+	}, {
+		"text" : "模块管理",
+		"url" : "admin/tAuthorityModule/module_main.html"
+	}, {
+		"text" : "角色管理",
+		"url" : "xtgl/RoleManage.jsp"
+	}, {
+		"text" : "级别管理",
+		"url" : "admin/tAuthorityLevel/level_main.html"
+	} ]
+}]

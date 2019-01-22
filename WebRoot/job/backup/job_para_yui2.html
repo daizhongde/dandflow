@@ -1,0 +1,380 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>作业参数管理</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+/* #datatable tr.selected { */
+/*     background-color: #426FD9; */
+/* } */
+</style>
+
+<link rel="stylesheet" type="text/css" href="/yui_2.9.0/build/fonts/fonts-min.css" />
+<link rel="stylesheet" type="text/css" href="/yui_2.9.0/build/datatable/assets/skins/sam/datatable.css" />
+
+<!-- CSS for Menu -->
+<link rel="stylesheet" type="text/css" href="/yui_2.9.0/build/menu/assets/skins/sam/menu.css"> 
+        
+<script type="text/javascript" src="/yui_2.9.0/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/connection/connection-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/json/json-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/element/element-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/datasource/datasource-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/event-delegate/event-delegate-min.js"></script>
+<script type="text/javascript" src="/yui_2.9.0/build/datatable/datatable-min.js"></script>
+
+<script type="text/javascript" src="/yui_2.9.0/build/container/container_core.js"></script>
+<!-- Menu source file -->
+<script type="text/javascript" src="/yui_2.9.0/build/menu/menu.js"></script>
+
+<script type="text/javascript" src="../scripts/virtue/virtue.js"></script>
+<!--there is no custom header content for this example-->
+</head>
+<body class="yui-skin-sam">
+	<div id="datatable"></div>
+	<div id="container"></div>
+<script type="text/javascript">
+var app = {};
+var Query = VIRTUE.query;
+var Add = VIRTUE.add;
+var Update = VIRTUE.update;
+var Del = VIRTUE.del;
+
+var Exp = VIRTUE.exp;
+var Operator = VIRTUE.operator;
+
+var startID = 1;// Indicate id range
+var newLevelCount = 0;
+
+var formatNlid = function(elLiner , oRecord, oColumn, oData) {
+// 	oData = new Number(oData);
+	switch( oData ){
+ 		case 0: elLiner.innerHTML = '零级'; break;
+ 		case 1: elLiner.innerHTML = '一级'; break;
+ 		case 2: elLiner.innerHTML = '二级'; break;
+ 		case 3: elLiner.innerHTML = '三级'; break;
+ 		case 4: elLiner.innerHTML = '四级'; break;
+ 		case 5: elLiner.innerHTML = '五级'; break;
+ 		case 6: elLiner.innerHTML = '六级'; break;
+ 		case 7: elLiner.innerHTML = '七级'; break;
+ 		case 8: elLiner.innerHTML = '八级'; break;
+ 		case 9: elLiner.innerHTML = '九级'; break;
+ 		case 10: elLiner.innerHTML = '十级'; break;
+ 		default: elLiner.innerHTML = oData;
+ 	}
+};
+
+var div = document.getElementById('container');
+var handleSuccess = function(o){
+	if(o.responseText !== undefined){
+		var responseText = eval("(" + o.responseText + ")");
+		if ( responseText.success ){
+// 			alert(o.argument.act);
+			if(o.argument.act == "add"){
+				var recordLen = app.myDataTable.getRecordSet().getLength();
+				var id = recordLen+ startID;
+				var name = "新建级别"+newLevelCount;
+				app.myDataTable.addRow({id: id, name: name }, recordLen );
+			}else if(o.argument.act == "modify"){
+				
+			}else if(o.argument.act == "del"){
+				var row = callback.argument.id;
+				app.myDataTable.deleteRow( row );
+			}
+		}else{
+			alert( responseText.msg);
+			//app.myDataSource.sendRequest();
+			app.myDataTable.load({
+				request : app.generateRequest()
+			});
+		}
+// 		div.innerHTML = "<li>Transaction id: " + o.tId + "</li>";
+// 		div.innerHTML += "<li>HTTP status: " + o.status + "</li>";
+// 		div.innerHTML += "<li>Status code message: " + o.statusText + "</li>";
+// 		div.innerHTML += "<li>HTTP headers: <ul>" + o.getAllResponseHeaders + "</ul></li>";
+// 		div.innerHTML += "<li>Server response: " + o.responseText + "</li>";
+// 		div.innerHTML += "<li>Argument object: Object ( [act] => " + o.argument.act +
+// 						 " [id] => " + o.argument.id +" )</li>";
+	}
+};
+
+var handleFailure = function(o){
+	if(o.responseText !== undefined){
+		div.innerHTML = "<ul><li>Transaction id: " + o.tId + "</li>";
+		div.innerHTML += "<li>HTTP status: " + o.status + "</li>";
+		div.innerHTML += "<li>Status code message: " + o.statusText + "</li></ul>";
+	}
+};
+
+var callback =
+{
+  success:handleSuccess,
+  failure:handleFailure,
+  argument: { act: "", id: -1 }
+};
+
+function makeRequest(sUrl, postData){
+	YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);
+};
+
+var addUrl = "../../curd/tAuthorityLevelCURDaddWithId.action"; 
+/** add a level  */
+function newLevel(){//使用一个window
+// 	alert("newLevel");
+	newLevelCount++;
+	var recordLen = app.myDataTable.getRecordSet().getLength();
+	var id = recordLen + startID;
+	var name = "新建级别"+newLevelCount;
+	Add.init();
+	Add.jdata.data.id = id;
+	Add.jdata.data.name = name;
+	callback.argument.act = "add";
+	makeRequest( addUrl, "jdata="+encodeURI( YAHOO.lang.JSON.stringify( Add.jdata ) ) );
+};
+
+var modifyUrl = "../../curd/tAuthorityLevelCURDmodify.action"; 
+/** modify saveEvent ( oArgs.editor , oArgs.newData , oArgs.oldData )  */
+function updateNLname(oArgs){
+// 	alert("updateNLname");
+// 	alert(oArgs.editor.getRecord().getData("id"));
+	if(oArgs.newData != oArgs.oldData){	
+		Update.init();
+		Update.jdata.data.name = oArgs.newData;
+		Update.jdata.condition.id = oArgs.editor.getRecord().getData("id"); 
+		Update.jdata.operator.id = Operator.EQUAL;
+		callback.argument.act = "modify";
+// 		callback.argument.name = oArgs.oldData;
+		makeRequest( modifyUrl, "jdata="+encodeURI( YAHOO.lang.JSON.stringify( Update.jdata ) ) );
+	}
+};
+/** modify saveEvent ( oArgs.editor , oArgs.newData , oArgs.oldData )  */
+function updateNLnote(oArgs){
+	if(oArgs.newData != oArgs.oldData){
+		Update.init();
+		Update.jdata.data.note = oArgs.newData;
+		Update.jdata.condition.id = oArgs.editor.getRecord().getData("id"); 
+		Update.jdata.operator.id = Operator.EQUAL;
+		callback.argument.act = "modify";
+// 		callback.argument.note = oArgs.oldData;
+		makeRequest( modifyUrl, "jdata="+encodeURI( YAHOO.lang.JSON.stringify( Update.jdata ) ) );
+	}
+};
+
+var delUrl = "../../curd/tAuthorityLevelCURDdelete.action"; 
+/** delete level */
+function deleteLevel(a,event,id){
+// 	alert("deleteLevel");
+// 	alert(a);
+// 	alert(event);
+// 	alert(id);
+  var rows = app.myDataTable.getSelectedRows();
+  var oRecord = app.myDataTable.getRecord(rows[0]);
+//   var oRecord = app.myDataTable.getRecord(app.myDataTable.getSelectedRows()[0]);
+  var name = oRecord.getData("name");
+//   alert(oRecord.getData("name"));
+  
+  var r=confirm("确认删除'"+name+"'吗?");
+  if (r==true)
+  {
+	Del.init();
+	Del.jdata.condition.id = oRecord.getData("id"); 
+	Del.jdata.operator.id = Operator.EQUAL;
+	callback.argument.act = "del";
+	callback.argument.id = rows[0];
+	makeRequest( delUrl, "jdata="+encodeURI( YAHOO.lang.JSON.stringify( Del.jdata ) ) );
+  }
+};
+
+app.DynamicData = function() {
+//     app.oDS = new YAHOO.util.XHRDataSource("../../cbb/tAuthorityLevelCBBgetCBBData_Id.action");
+//     app.oDS.responseType = YAHOO.util.XHRDataSource.TYPE_JSARRAY;
+//     app.oDS.responseSchema = {
+//     	fields: [ "text", "id" ]
+//     };
+//     app.oDS.maxCacheEntries = 5;
+    
+// 	var level =  [
+// 		{"value": 0, "label": "零级"},
+// 		{"value": 1, "label": "一级"},
+// 		{"value": 2, "label": "二级"},
+// 		{"value": 3, "label": "三级"},
+// 		{"value": 4, "label": "四级"},
+// 		{"value": 5, "label": "五级"},
+// 		{"value": 6, "label": "六级"},
+// 		{"value": 7, "label": "七级"},
+// 		{"value": 8, "label": "八级"},
+// 		{"value": 9, "label": "九级"},
+// 		{"value": 10, "label": "十级"}
+// 	];
+// new YAHOO.widget.DropdownCellEditor({dropdownOptions: level, disableBtns:true})
+	app.cellEditor = new YAHOO.widget.TextboxCellEditor({disableBtns: true});
+	app.cellEditor1 = new YAHOO.widget.TextareaCellEditor({disableBtns: false});
+	app.cellEditor.subscribe("saveEvent", updateNLname );
+	app.cellEditor1.subscribe("saveEvent", updateNLnote );
+
+	app.myColumnDefs = [
+        {key:"id", label: "级别", width:60, sortable: false, formatter: formatNlid },
+        {key:"name", label:"级别名称", width:80, formatter:YAHOO.widget.DataTable.formatText, editor: app.cellEditor },
+        {key:"note", label:"备注", width:400, formatter:YAHOO.widget.DataTable.formatText, editor: app.cellEditor1 }
+    ];
+
+    app.myDataSource = new YAHOO.util.DataSource("../../query/tAuthorityLevelYUI2QUERYdfind.action?");
+    app.myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+//         myDataSource.connXhrMode = "queueRequests";
+    app.myDataSource.responseSchema = {
+        resultsList: "records",
+        fields: [
+            {key:"id", parser:"number" },
+            {key:"name"},
+            {key:"note"}
+        ],
+        
+        metaFields: {
+            totalRecords: "totalRecords",
+            startIndex: "startIndex"
+        }
+    };
+    
+    app.initialRequest = function(oState, oSelf) {
+		oState = oState || { pagination: null, sortedBy: null };
+		var sort = (oState.sortedBy) ? oState.sortedBy.key : "id";
+		var dir = (oState.sortedBy && oState.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc";
+        var startIndex = 0;
+        
+        return  "sort=" + sort +
+                "&dir=" + dir +
+                "&startIndex=" + startIndex +
+                "&jdata=" + encodeURI( YAHOO.lang.JSON.stringify( Query.jdata ) );
+    };
+    
+    // Customize request sent to server to be able to set total # of records
+    app.generateRequest = function(oState, oSelf) {
+        // Get states or use defaults
+		oState = oState || { pagination: null, sortedBy: null };
+		var sort = (oState.sortedBy) ? oState.sortedBy.key : "id";
+		var dir = (oState.sortedBy && oState.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc";
+		var startIndex = 0;
+        
+        // Build custom request
+        return  "sort=" + sort +
+                "&dir=" + dir +
+                "&startIndex=" + startIndex +
+                "&jdata=" + encodeURI( YAHOO.lang.JSON.stringify( Query.jdata ) );
+    };
+    
+    // DataTable configuration
+    app.myConfigs = {
+    	//caption   : 'Area Codes by State',
+//     	width:"100%",
+//     	height:"32em",
+        generateRequest: app.generateRequest,
+        initialRequest: app.initialRequest(), // Initial request for first page of data
+        dynamicData: true, // Enables dynamic server-driven data
+        MSG_EMPTY: "没有记录!",
+        sortedBy : { key: "id", dir:YAHOO.widget.DataTable.CLASS_ASC } // Sets UI initial sort arrow, (dzd)this is only client sort
+// 		paginator : app.paginator
+    };
+    
+    app.myDataTable = new YAHOO.widget.DataTable("datatable", app.myColumnDefs,
+    		app.myDataSource, app.myConfigs );
+
+    // Subscribe to events for row selection
+// 	app.myDataTable.subscribe("rowMouseoverEvent", app.myDataTable.onEventHighlightRow);
+// 	app.myDataTable.subscribe("rowMouseoutEvent", app.myDataTable.onEventUnhighlightRow);
+// 	app.myDataTable.subscribe("rowClickEvent", app.myDataTable.onEventSelectRow);
+   
+ // Set up editing flow
+    var highlightEditableCell = function(oArgs) {
+        var elCell = oArgs.target;
+        if(YAHOO.util.Dom.hasClass(elCell, "yui-dt-editable")) {
+            this.highlightCell(elCell);
+        }
+    };
+    app.myDataTable.subscribe("cellMouseoverEvent", highlightEditableCell);
+    app.myDataTable.subscribe("cellMouseoutEvent", app.myDataTable.onEventUnhighlightCell);
+    app.myDataTable.subscribe("cellClickEvent", app.myDataTable.onEventShowCellEditor);
+
+	var oContextMenuItem ={
+		"add":[
+		    { text: "添加", onclick: { fn: newLevel } }
+		],
+		"addPdel":[
+		    { text: "添加", onclick: { fn: newLevel } },
+	        { text: "删除", onclick: { fn: deleteLevel } }
+		]
+	};
+		
+	var oSelectedTR, rendered;     // Whether or not the menu has been rendered
+	function onTriggerContextMenu(p_sType, p_aArgs) {
+// 		alert(p_sType);
+// 		alert(p_aArgs);
+	    var oTarget = this.contextEventTarget,
+	    	aMenuItems;
+	
+	    if (this.getRoot() == this) {
+	    	oSelectedTR = oTarget.nodeName.toUpperCase() == "TR" ? 
+					oTarget : Dom.getAncestorByTagName(oTarget, "TR");
+	    	
+	    	var record  = app.myDataTable.getRecord(oSelectedTR);
+	    	var recordIndex = app.myDataTable.getRecordIndex(record);
+	    	var total = app.myDataTable.getRecordSet().getLength();
+
+// 	    	app.myDataTable.getDataSource()
+	    	if ( recordIndex == total-1 ) {
+                aMenuItems = oContextMenuItem["addPdel"];
+            } else {
+                aMenuItems = oContextMenuItem["add"];
+            }
+	    	// Remove the existing content from the ContentMenu instance
+	        this.clearContent();
+			// Add the new set of items to the ContentMenu instance  
+			this.addItems(aMenuItems);
+			
+	        if (!rendered) {
+	            this.render(this.cfg.getProperty("container"));
+	        } else {
+	            this.render();
+	        }
+	// 		Dom.addClass(oSelectedTR, "selected");
+// 	        app.myDataTable.highlightRow(oSelectedTR); 
+	        app.myDataTable.selectRow(oSelectedTR); 
+	    }
+	}
+	function onContextMenuHide(p_sType, p_aArgs) {
+	    if (this.getRoot() == this && oSelectedTR) {
+	// 		Dom.removeClass(oSelectedTR, "selected");
+// 	        app.myDataTable.unhighlightRow(oSelectedTR); 
+	        app.myDataTable.unselectRow(oSelectedTR); 
+	    }
+	}
+	var oContextMenu = new YAHOO.widget.ContextMenu("contextmenu", {
+	        trigger: "datatable", 
+// 	        itemdata: oContextMenuItem,
+	        lazyload: true 
+	});
+	oContextMenu.subscribe("triggerContextMenu", onTriggerContextMenu);
+	oContextMenu.subscribe("hide", onContextMenuHide);
+	oContextMenu.subscribe("render", function() {rendered = true;});
+    
+    return {
+        oDS: app.myDataSource,
+        oDT: app.myDataTable
+    };
+}();
+
+YAHOO.util.Event.addListener(window, "load", app.DynamicData);
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
+</body>
+</html>

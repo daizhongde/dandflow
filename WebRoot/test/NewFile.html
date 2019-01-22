@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<title>RestClient</title>
+
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="expires" content="0">    
+	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+	<meta http-equiv="description" content="This is my page">
+	<meta http-equiv="Access-Control-Allow-Origin" content="*">
+<!-- <script type="text/javascript" src="../scripts/jquery-2.2.4.min.js"></script> -->
+
+<!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script> -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+
+<!-- <script type="text/javascript" src="../scripts/json/jquery.json-2.2.js"></script> -->
+<script type="text/javascript">
+
+var url = "http://192.168.2.100:1111/migration/ComInterFace/exeLinuxBin";
+
+	var body = $('#command').val();
+	console.log("body:"+body);
+
+sendRequest = function(){
+	$.ajax({
+// 		async: false,
+		cache: false,
+		type: "POST",
+		data: body,
+		url: "http://localhost:1111/migration/ComInterFace/exeLinuxBin",
+		contentType: "application/json; charset=UTF-8",
+		dataType: "jsonp",
+        crossDomain: true,
+// 	    processData: false, 
+		success: function(msg){
+			$('#result').val( msg );
+		},
+		error:function(XMLHttpRequest, textStatus, errorThrown) {
+
+			 // 通常 textStatus 和 errorThrown 之中
+		    // 只有一个会包含信息
+//		    this; // 调用本次AJAX请求时传递的options参数
+//		    $('#result').val( JSON.stringify(this) );
+//			$('#result').val( $.toJSON(this) );
+// 			console.log("1 XMLHttpRequest:"+$.toJSON(XMLHttpRequest));
+// 			console.log("2 textStatus:"+$.toJSON(textStatus));
+// 			console.log("3 errorThrown:"+ $.toJSON(errorThrown) );
+			
+			console.log(XMLHttpRequest.status);
+			console.log(XMLHttpRequest.readyState);
+			console.log(textStatus);
+		}});
+};
+
+
+sendRequest2 = function(){
+
+	 $.ajax({
+		 url: "http://localhost:1111/migration/ComInterFace/exeLinuxBin",
+	        type: 'post',
+	        data: body,
+	        dataType: 'JSONP',
+	        crossDomain: true,
+	        success: function(data){
+	            console.log(data);
+	        }
+	    });
+};
+
+sendRequest3 = function(){
+
+	$.ajax(url, {
+		type: 'post',
+		  data:  {
+				"comPara" : "",
+				"command" : "who",
+				"dryrunId" : 2,
+				"hostConn" : "stamp/nStamp-201707",
+				"hostIp" : "39.108.73.45:22",
+				"isCheck" : "0",
+				"iswait" : "0",
+				"jobId" : "JB00000273",
+				"jobInsId" : "0",
+				"taskId" : "TK00000514"
+			},
+		  dataType: 'jsonp',
+		  crossDomain: true,
+		  success: function(data) {
+		    if(data && data.resultcode == '200'){
+		      console.log(data.result.today);
+		    }
+		  }});
+};
+
+
+
+	sendRequest4 = function() {
+
+		data_param = {
+			"timeType" : "LAST_7_DAYS",
+			"hostType" : "ALL_HOSTS"
+		}
+		$.ajax({
+			url : url,
+			type : "POST",
+			data : body,
+			headers : {
+// 				"X-Auth-Token" : "open-sesame",
+				"Content-Type" : "application/json",
+				"Access-Control-Allow-Origin":"*"
+			},
+			beforeSend: function(request) {
+                request.setRequestHeader("Access-Control-Allow-Origin", "*");
+            },
+			contentType : 'application/json; charset=UTF-8',
+			dataType : "json",
+			success : function(data) {
+				alert(data); // Object 
+			},
+			error : function(XMLHttpRequest, textStatus, errorThrown) {
+				alert(XMLHttpRequest.status);
+				alert(XMLHttpRequest.readyState);
+				alert(textStatus);
+			},
+			complete : function(XMLHttpRequest, textStatus) {
+			}
+		});
+
+	};
+
+sendRequest5 = function() {
+	$.ajax({
+		  type: 'POST',
+		  url: url,
+		  data: body,
+
+			headers : {
+				"Access-Control-Allow-Origin":"*"
+			},
+		  contentType: 'application/json;charset=utf-8', //默认: "application/x-www-form-urlencoded"
+
+// 		  dataType: 'jsonp',
+		  crossDomain: true,
+		  timeout:10000, //超时时间设置，单位毫秒
+		  cache:true,
+		  async:true,
+		  beforeSend:function(XMLHttpRequest){//发送请求前可修改 XMLHttpRequest 对象的函数
+			  //add code
+		  },
+		  dataFilter:function(data,type){// // 对Ajax返回的原始数据进行预处理
+			  //add code
+		  },
+		  success:function(data,textStatus){//服务器返回数据，返回状态:请求成功后回调函数
+			  //alert(textStatus);
+			  if(textStatus=='success'){
+				  //alert(data.data.pageStatus);
+				  pageStatus=data.data.pageStatus;
+				 //
+			  }else{
+				 //
+			  }
+		  },
+		  error: function(XMLHttpRequest, textStatus, errorThrown) {//XMLHttpRequest 对象、错误信息、（可选）捕获的错误对象:请求失败后回调函数 
+			   //alert('error1:'+XMLHttpRequest.status);//0
+			   //alert('error2:'+XMLHttpRequest.readyState);//4
+			   //alert('error3:'+textStatus);//abort/timeout
+			  //alert("首页请求数据失败");
+		  },
+		  complete:function(XMLHttpRequest, textStatus){//XMLHttpRequest 对象，返回状态:请求完成后最终调用
+			  //alert(textStatus+'status:'+XMLHttpRequest.status);
+		      //textStatus 可能为：null、'success'、 'notmodified'、 'error'、 'timeout'、 'abort'或'parsererror'等
+			  if(textStatus=='error'){
+			　	 alert("首页请求数据已出错");
+			　}else if(textStatus=='timeout'){
+			　	 alert("首页请求数据已超时");
+			　}else if(textStatus=='abort'){
+			　	 alert("首页请求数据已中断");
+			　}
+		  }
+	});
+
+};
+	
+</script>
+</head>
+<body>
+<textarea id="command" rows="8" cols="100">
+ {
+	"comPara" : "",
+	"command" : "who",
+	"dryrunId" : 2,
+	"hostConn" : "stamp/nStamp-201707",
+	"hostIp" : "39.108.73.45:22",
+	"isCheck" : "0",
+	"iswait" : "0",
+	"jobId" : "JB00000273",
+	"jobInsId" : "0",
+	"taskId" : "TK00000514"
+}
+</textarea>
+<br/>
+<button  onclick="sendRequest5()">发送</button>
+<br/>
+<textarea id="result" rows="8" cols="100"></textarea>
+</body>
+</html>

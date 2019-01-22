@@ -1,0 +1,489 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>作业管理(domain leader)(开放按钮级权限控件后废弃) </title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" type="text/css"
+	href="../../scripts/jquery-easyui/1.4.1/themes/default/easyui.css" />
+<link rel="stylesheet" type="text/css"
+	href="../../scripts/jquery-easyui/1.4.1/themes/icon.css" />
+<script type="text/javascript"
+	src="../../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+	
+<script type="text/javascript"
+	src="../../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+<!-- 
+JEasyUI1.4.1要配jQuery v1.11.1(自己的jquery.js)
+JEasyUI1.3.5要配jquery-1.4.4.min.js
+ -->
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/plugins/easyuiExtends.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../../scripts/const/const.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+<script type="text/javascript" src="../../scripts/ajaxfileupload.js"></script>
+
+<script type="text/javascript">
+	var noquery = VIRTUE.noquery;
+	var query = VIRTUE.query;
+	var OPE = VIRTUE.operator;
+	var del = VIRTUE.del;
+
+	var app = {};
+	app.selectedRow = {};//记录数据表格中选择中的行
+
+	var jobType = ajaxReqRespText("/cbb/dicCBBgetDicByType.action?dicType=job_type");
+	jobType = eval("(" + jobType + ")");
+	
+	var author = ajaxReqRespText("/common/commonCommoncurrentUserLogname.action");
+// 	console.log("author:"+author)
+	
+	query.jdata.condition.type = '1';
+	query.jdata.operator.type = OPE.EQUAL;
+	
+	
+	function enterKeyDown(event)
+	{
+	    if(event.keyCode==13)
+	    {
+	    	submitForm();
+		}
+	};
+	
+	/** validate and assign value **/
+	function PackingParameter() {
+		var name = $('#jname').val();
+		var type = $('#jtype').combobox("getValue");
+		var author = $('#jauthor').val();
+
+		query.init();
+		if (name != "") {
+			query.jdata.condition.name = name;
+			query.jdata.operator.name = OPE.CONTAIN;
+		}
+		if (type != "" && type != null) {
+			query.jdata.condition.type = type;
+			query.jdata.operator.type = OPE.EQUAL;
+		}
+		if (author != "") {
+			query.jdata.condition.author = author;
+			query.jdata.operator.author = OPE.CONTAIN;
+		}
+		return true;
+	};
+
+	/** search data ,reload data  **/
+	function submitForm() {
+		if (!PackingParameter()) {
+			return;
+		}
+		$('#grid').datagrid('reload', {
+			jdata : encodeURI($.toJSON(query.jdata))
+		});
+	};
+	/**  清空  **/
+	function clearForm() {
+		$('#form').form('clear');
+	};
+
+	function removeJob(){
+		var rows = $('#grid').datagrid('getSelections');
+		if (rows.length != 0 ) {
+			
+			for(var i=0; i<rows.length; i++ ){
+				if( rows[i].author != author ){
+					alert("You can't remove other's job!");
+					return;
+				}
+			}
+			
+			$.messager.confirm('Confirm', 'Confirm Remove?', function(r) {
+				if (r) {
+					var job_id = new Array();
+					for(var i=0; i<rows.length; i++ ){
+						job_id.push(rows[i].id);
+					}
+					
+					var jdata = { job_id: job_id };
+					$.ajax({
+					   type: "POST",
+					   url: "../../busi/migJobInfoBUSIremoveJob.action",
+					   async: false,
+					   data: {
+						   jdata: encodeURI( $.toJSON( jdata ) )
+					   },
+					   success: function(oResponse){
+						   oResponse = eval("("+oResponse+")");
+							alert( oResponse.msg );
+							if (oResponse.success){
+								$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+							}
+					   }
+					});
+				}
+			});
+		}
+	};
+	
+	/** 查看作业  **/
+	function view() {
+		var rows = $('#grid').datagrid('getSelections');
+		if(rows.length!=1){
+			alert("Please select one row!");
+			return false;
+		};
+		var row = $('#grid').datagrid('getSelected');
+		if (row) {
+			app.selectedRow = row;
+			window.location.href = "../../curd/migJobInfoCURDbrowse.action?id="
+					+ row.id;
+			return false;//to support IE6
+		}
+	};
+	/** 导入作业excel文件  */
+	function importJobExcelFile() {
+		$("#importJobExcelFile").dialog(
+				{
+					title : "Import",
+					href : getContextPath()
+							+ "/migcommon/migJobInfo/migJobInfo_import.html",
+					iconCls : 'icon-edit',
+					modal : true,
+					closed : true,
+					resizable : true,
+					minimizable : true,
+					maximizable : true,
+					cache : false,
+					width : 800,
+					height : 150,
+					buttons : [ {
+						id: 'imp_btn',
+						text : 'OK',
+						iconCls : 'icon-ok',
+						handler : function() {
+							btnExcelI_onClick();
+							$('#imp_btn').linkbutton('disable');
+							return false;//for IE6 support
+						}
+					}, {
+						text : 'Cancel',
+						iconCls : 'icon-cancel',
+						handler : function() {
+							$('#importJobExcelFile').dialog('close');
+						}
+					} ]
+				});
+		$("#importJobExcelFile").dialog('open');
+	};
+
+	/**  上传前检查，并从数据库获取该批次的社保机构号   **/
+	function btnExcelI_onClick() {
+		var path = document.getElementById("upload").value;
+		if (path == "") {
+			alert("Please select file！");
+			return;
+		}
+		ajaxFileUpload();
+	};
+
+	/**  上传  **/
+	function ajaxFileUpload() {
+		$("#loading").ajaxStart(function() {
+			$(this).show();
+		}).ajaxComplete(function() {
+			$(this).hide();
+		});
+		$("#loading").show();
+		$.ajaxFileUpload({
+			url : getContextPath() + "/imp/migJobInfoIMPimportXLS.action",
+			secureuri : false,
+			fileElementId : 'upload',
+			//data: "",
+			dataType : 'text',
+			success : function(data, status) {
+				data = eval("(" + data + ")");
+				alert(data.msg);
+				if (data.success) {
+					$('#importJobExcelFile').dialog('close');
+					submitForm();
+				}
+				$("#loading").hide();
+			},
+			error : function(data, status, e) {
+				alert("Error:" + data + ",exception:" + e);
+				$("#loading").hide();
+			}
+		});
+	};
+	/** 实例化作业   **/
+	function instanceJob(){
+		var rows = $('#grid').datagrid('getSelections');
+		if(rows.length!=1){
+			alert("Please select one row!");
+			return false;
+		};
+		var row = $('#grid').datagrid('getSelected');
+		if (row ) {
+			app.selectedRow = row;
+
+			$("#instanceJobParam").dialog({
+				title : "Parameter Setting",
+				href :  getContextPath()+'/migcommon/migJobPara/migJobPara_instance.html',
+				iconCls : 'icon-edit',
+				modal : true,
+				closed : true,
+				resizable: true,
+				minimizable: true,
+				maximizable: true,
+				cache: false,
+				width : 500,
+				height : 350,
+				buttons: [{
+		            text:'OK',
+		            iconCls:'icon-ok',
+		            handler:function(){
+		            	app.instanceJobParam( );
+		            	return false;//for IE6 support
+		            }
+		        },{
+		            text:'Cancel',
+		            iconCls:'icon-cancel',
+		            handler:function(){
+		            	$("#instanceJobParam").dialog('close');
+		            }
+		        }]
+			});
+			$("#instanceJobParam").dialog('open');
+		}
+	};
+	app.instanceJobParam = function(){
+		if( ! $('#instanceJob_form').form("validate")
+				|| app.jobparaloaded==false
+				){
+			return;
+		}
+		
+		var formData = $('#instanceJob_form').form('getData', true);
+		var rows = $('#jobparam_grid').datagrid( 'getRows');
+		
+		var jdata = {
+			jobId: app.selectedRow.id, 
+			type: app.selectedRow.type, 
+			jobInsName: formData.jobInsName,
+			dryrunId: formData.dryrunId,
+			rows: rows
+		};
+
+		$.ajax({
+		   type: "POST",
+		   url: "../../busi/migJobInfoBUSIinstanceJob.action",
+		   async: false,
+		   data: {
+			   jdata: encodeURI( $.toJSON( jdata ) )
+		   },
+			success: function(oResponse){
+				oResponse = eval("("+oResponse+")");
+				alert( oResponse.msg );
+//	 			console.log(oResponse.success);
+//	 			$("#instanceJobParam").dialog('close');
+				if (oResponse.success){
+//	 				$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+					$("#instanceJobParam").dialog('close');
+				}
+		   }
+		});
+	};
+	var toolbar = [
+			{
+				text : 'New Job',
+				iconCls : 'icon-add',
+				disabled : false,
+				handler : function() {
+					window.location.href = "../../job/job_new.html";
+					return false;//to support IE6
+				}
+			},
+			{
+				text : 'Edit Job',
+				iconCls : 'icon-edit',
+				handler : function() {
+					var rows = $('#grid').datagrid('getSelections');
+					if(rows.length!=1){
+						alert("Please select one row!");
+						return false;
+					};
+					var row = $('#grid').datagrid('getSelected');
+					if (row.author != author) {
+						alert("You can't edit other's job!");
+						return;
+					};
+					if (row) {
+						app.selectedRow = row;
+						window.location.href = "../../curd/migJobInfoCURDinitModify.action?id="
+								+ row.id;
+						return false;//to support IE6
+					}
+				}
+			}, {
+				text : 'Remove Job',
+				iconCls : 'icon-remove',
+				handler : function() {
+					removeJob();
+				}
+			}, {
+				text : 'View Job',
+				iconCls : 'icon-search',
+				handler : function() {
+					view();
+					return false;
+				}
+			}, {
+				text : 'Import Job',
+				iconCls : 'icon-import',
+				handler : function() {
+					importJobExcelFile();
+					return false;
+				}
+			},{
+				text:'Instance Job',
+				iconCls:'icon-redo',
+				handler: function(){
+					var rows = $('#grid').datagrid('getSelections');
+					if(rows.length!=1){
+						alert("Please select one row!");
+						return false;
+					};
+					var row = $('#grid').datagrid('getSelected');
+					if (row.author != author) {
+						alert("You can't instance other's job!");
+						return;
+					};
+					instanceJob(); 
+				}
+			} ];
+
+	$(function() {
+		$('#grid').datagrid({
+			title : 'Search Result',
+			toolbar : toolbar,
+			width : 938,
+			height : 720,
+			nowrap : true,
+			striped : true,
+			fit : true,
+			url : "../../query/migJobInfoJEasyUIQUERYdfind.action",
+			idField : "id",
+			remoteSort : true,
+			sortName : "id",
+			sortOrder : "desc",
+			singleSelect : true,
+			columns : [ [ {
+				title : 'ID',
+				field : "id",
+				hidden : true
+			}, {
+				title : 'Job Name',
+				field : "name",
+				width : 280,
+				sortable : true
+			}, {
+				title : 'Job Type',
+				field : "type",
+				width : 120,
+				sortable : true,
+				formatter : function(value, row, index) {
+					for (var i = 0, j = jobType.length; i < j; i++) {
+						if (jobType[i].code == value) {
+							return jobType[i].value
+						}
+					}
+				}
+			}, {
+				title : 'Author',
+				field : "author",
+				width : 80,
+				sortable : true
+			}, {
+				title : 'Description',
+				field : "remark",
+				width : 280
+			}, {
+				title : 'Last Update Time',
+				field : "updatetime",
+				width : 130,
+				sortable : true
+			} ] ],
+			rownumbers : true,
+			pagination : true,
+			pageSize : 20,
+			queryParams : {
+				jdata : encodeURI($.toJSON(noquery.jdata))
+			},
+			onDblClickRow: function(index,row){
+				if (row.author == author) {
+					window.location.href = "../../curd/migJobInfoCURDinitModify.action?id="
+						+ row.id;
+				}else{
+					window.location.href = "../../curd/migJobInfoCURDbrowse.action?id="
+						+ row.id;
+				}				
+				return false;//to support IE6
+			},
+			onLoadSuccess: function(pageNumber, pageSize){
+				$('#grid').datagrid('clearSelections');
+			}
+		});
+
+	});
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0"
+	class="easyui-layout">
+	<div data-options="region:'north',border:true,split:true"
+		style="height:70px;background:#B3DFDA;" title="Job management(domain leader)--Search Condition(domainer)">
+		<form id="form" method="post" style="margin:0;padding:0;">
+			<div style="padding:0px 0 0px 5px">
+				<table>
+					<tr>
+						<td>Job Name:</td>
+						<td><input id="jname" name="name" value="" onkeydown="enterKeyDown(event)"
+							style="width:100px;"></td>
+						<td>Job Type:</td>
+						<td><input class="easyui-combobox" id='jtype' name="type"
+							editable="false"
+							data-options="valueField:'code', textField:'value',value:'1',
+                        data: jobType,
+                        onChange: function(newValue, oldValue){
+                        	submitForm();
+                        }" />
+
+						</td>
+						<td>Author:</td>
+						<td><input id="jauthor" name="author" value="" onkeydown="enterKeyDown(event)"
+							style="width:100px;"></td>
+						<td>
+							<div style="padding:0px 0 0px 15px">
+								<a href="javascript:void(0)" class="easyui-linkbutton"
+									iconCls="icon-search" onclick="submitForm()">Search</a> <a
+									href="javascript:void(0)" class="easyui-linkbutton"
+									iconCls="icon-clear" onclick="clearForm()">Clear</a>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</form>
+	</div>
+
+	<div data-options="region:'center',border:false" title=""
+		style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+
+	<div id="importJobExcelFile"></div>
+
+	<div id="instanceJobParam"></div>
+
+</body>
+</html>

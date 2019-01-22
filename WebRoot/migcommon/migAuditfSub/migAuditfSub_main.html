@@ -1,0 +1,387 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>稽核项内容明细定义</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/icon.css"/>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+<!-- <script type="text/javascript" src="../../scripts/jquery-1.4.4.min.js"></script> -->
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+<!-- <script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/locale/easyui-lang-zh_CN.js"></script> -->
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/plugins/easyuiExtends.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+
+<script type="text/javascript">
+var app = {};
+app.auditMainRow = {};//combogrid row
+
+app.cbbdata =  [
+				{ label: '1', value: '1' },
+				{ label: '2', value: '2' },
+				{ label: '3', value: '3' },
+				{ label: '4', value: '4' },
+				{ label: '5', value: '5' },
+				{ label: '6', value: '6' },
+				{ label: '7', value: '7' },
+				{ label: '8', value: '8' },
+				{ label: '9', value: '9' },
+				{ label: '10', value: '10' },
+				{ label: '11', value: '11' },
+				{ label: '12', value: '12' },
+				{ label: '13', value: '13' },
+				{ label: '14', value: '14' },
+				{ label: '15', value: '15' },
+				{ label: '16', value: '16' },
+				{ label: '17', value: '17' },
+				{ label: '18', value: '18' },
+				{ label: '19', value: '19' },
+				{ label: '20', value: '20' },
+				{ label: '21', value: '21' },
+				{ label: '22', value: '22' },
+				{ label: '23', value: '23' },
+				{ label: '24', value: '24' },
+				{ label: '25', value: '25' },
+				{ label: '26', value: '26' },
+				{ label: '27', value: '27' },
+				{ label: '28', value: '28' },
+				{ label: '29', value: '29' },
+				{ label: '30', value: '30' },
+				{ label: '31', value: '31' },
+				{ label: '32', value: '32' },
+				{ label: '33', value: '33' },
+				{ label: '34', value: '34' },
+				{ label: '35', value: '35' },
+				{ label: '36', value: '36' },
+				{ label: '37', value: '37' },
+				{ label: '38', value: '38' },
+				{ label: '39', value: '39' },
+				{ label: '40', value: '40' },
+				{ label: '41', value: '41' },
+				{ label: '42', value: '42' },
+				{ label: '43', value: '43' },
+				{ label: '44', value: '44' },
+				{ label: '45', value: '45' },
+				{ label: '46', value: '46' },
+				{ label: '47', value: '47' },
+				{ label: '48', value: '48' },
+				{ label: '49', value: '49' },
+				{ label: '50', value: '50' }];             
+                
+var query = VIRTUE.query;
+var noquery = VIRTUE.noquery;
+var OPE = VIRTUE.operator;
+
+var tableName = "MIG_AUDITF_MAIN";
+
+var fAuditOpt = ajaxReqRespText("/cbb/dicCBBgetDic2ByType.action?dicType=opt" );
+fAuditOpt = eval ("(" + fAuditOpt + ")");
+
+var domains = ajaxReqRespText("/cbb/dicCBBgetDicByType.action?dicType=Busi-Domain");
+	domains = eval("(" + domains + ")");
+
+/** format field audit type **/
+function fmtIsKey(n){
+// 	n = new Number(n);
+	switch(n){
+		case 0: return 'N'; break;
+		case 1: return 'Y'; break;
+		default: return n;
+	}
+};
+/** format field audit type **/
+function fmtAuditStatus(n){
+// 	n = new Number(n);
+	switch(n){
+		case 0: return 'Invalid'; break;
+		case 1: return 'Valid'; break;
+		default: return n;
+	}
+};
+
+function enterKeyDown(event)
+{
+    if(event.keyCode==13)
+    {
+    	submitForm();
+	}
+};
+
+/** validate and assign value **/
+function PackingParameter(){	
+	var formData = $('#s_form').form( 'getData');
+	query.init();
+	for (var field in formData) {
+		if( formData[field] !== "" ){
+			query.jdata.condition[field] = formData[field];
+			if(field=="faudit_main_id"){
+				query.jdata.operator[field] = OPE.EQUAL;
+			}else{
+				query.jdata.operator[field] = OPE.CONTAIN;
+			}
+		}
+	}
+	return true;
+};
+
+/** search data ,reload data  **/
+function submitForm(){
+   	if(!PackingParameter()){
+   		return;
+   	}
+   	$('#grid').datagrid( 'reload', {
+   		tableName : tableName,
+   		jdata: encodeURI( $.toJSON( query.jdata ) ) 
+   	} );
+};
+/**  清空  **/
+function clearForm(){
+	$('#s_form').form('clear');
+};
+
+function newRecord(){//使用一个window
+	var faudit_main_id = $('#faudit_main_id').combogrid('getValue');
+	app.faudit_id = faudit_main_id;
+	if(faudit_main_id==""){
+		alert("Please Select Audit Item First！");
+		return;
+	}
+	$('#win').window('open').window('setTitle', 'New');
+	$('#win').window("refresh", "migAuditfSub_add.html");
+}
+
+var read = {};
+read.jdata = { act: "read",
+		condition: {faudit_main_id: "", faudit_sub_index: ""}, 
+		operator : {faudit_main_id : OPE.EQUAL, faudit_sub_index : OPE.EQUAL} 
+	};
+function editRecord() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		read.jdata.condition.faudit_main_id = row.faudit_main_id;
+		read.jdata.condition.faudit_sub_index = row.faudit_sub_index;
+		$('#win').window('open').window('setTitle', 'Eidt');
+		$('#win').window("refresh", getContextPath()+"/curd/migAuditfSubCURDinitModify.action?tableName="+tableName+"&jdata="+encodeURI($.toJSON( read.jdata )));
+	}
+}
+
+function browseRecord() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		$('#win').window('open').window('setTitle', 'View');
+		read.jdata.condition.faudit_main_id = row.faudit_main_id;
+		read.jdata.condition.faudit_sub_index = row.faudit_sub_index;
+		$('#win').window("refresh", getContextPath()+"/curd/migAuditfSubCURDbrowse.action?tableName="+tableName+"&jdata="+encodeURI($.toJSON( read.jdata )));
+	}
+}
+
+var del = {};
+del.jdata = {act: "del",
+		condition: {faudit_main_id: "", faudit_sub_index: ""}, 
+		operator : {faudit_main_id : OPE.EQUAL, faudit_sub_index : OPE.EQUAL} 
+	};
+function destroyRecord(){
+	var row = $('#grid').datagrid('getSelected');
+	if (row){
+		$.messager.confirm('Comfirm','Comfirm Remove?',function(r){
+			if (r){
+				del.jdata.condition.faudit_main_id = row.faudit_main_id;
+				del.jdata.condition.faudit_sub_index = row.faudit_sub_index;
+				$.post( getContextPath()+"/curd/migAuditfSubCURDdelete.action", {
+					tableName : tableName,
+					jdata: encodeURI($.toJSON( del.jdata )) 
+				}, function(result, status){
+					alert(result.msg);
+					if (result.success){
+						$('#grid').datagrid('reload',{
+							tableName : tableName,
+							jdata: encodeURI( $.toJSON( query.jdata ) )
+						} );	// reload data
+					}
+				});
+			}
+		});
+	}
+};
+
+var toolbar = [{
+	text:'New Config',
+	iconCls:'icon-add',
+	handler:function(){
+		newRecord();
+	}
+},{
+	text:'Edit Config',
+	iconCls:'icon-edit',
+	handler:function(){
+		editRecord();
+	}
+},{
+	text:'Remove Config',
+	iconCls:'icon-remove',
+	handler:function(){
+		destroyRecord();
+	}
+},{
+	text:'View Config',
+	iconCls:'icon-search',
+	handler:function(){ 
+		browseRecord(); 
+	}
+}];
+
+$(function(){
+	$('#grid').datagrid({
+		title : 'Search Result',
+		toolbar : toolbar,
+		width : 938,
+		height : 720,
+		nowrap : true,
+		striped : true,
+		fit : true,
+		collapsible : true,
+		url: getContextPath()+"/query/migAuditfSubJEasyUIQUERYdfind.action",
+		idField : "faudit_sub_index",
+		remoteSort: true,
+		multiSort : false,
+		singleSelect : true,
+		columns : [ [ 
+			{ title : 'ID', field : 'faudit_main_id', width : 90, hidden: true }, 
+			{ title : 'Index', field : 'faudit_sub_index', width : 60, sortable: true }, 
+			{ title : 'Source Field', field : 'faudit_src_field',  width : 120, sortable: true },
+			{ title : 'Target Field', field : 'faudit_dst_field',  width : 120, sortable: true },
+			{ title : 'isKey', field : 'faudit_iskey',  width : 120, formatter: fmtIsKey },
+			{ title : 'Fields Correlation', field : 'faudit_opt',  width : 120, formatter: function(value,row, index ){
+// 				for(var el in fAuditOpt){
+				for(var i=0, j=fAuditOpt.length; i<j; i++){
+// 					console.log(fAuditOpt[i].code +"=="+ value+"?")
+					if( fAuditOpt[i].code == value ){
+						return fAuditOpt[i].value
+					}
+				}
+			} },
+			{ title : 'Create Time', field : 'faudit_createtime',  width : 130 },
+			{ title : 'Last Modify Time', field : 'faudit_modifytime',  width : 130 },
+			{ title : 'Status', field : 'faudit_status',  width : 120, formatter: fmtAuditStatus }
+		] ],
+		pagination : true,
+		rownumbers : false,
+		queryParams : {
+			tableName : tableName,
+			jdata: encodeURI( $.toJSON( noquery.jdata ) ) 
+		}
+	});
+	
+	$('#faudit_main_id').combogrid({
+		url : "../../query/migAuditfMainCBBQUERYdfind.action",
+		panelWidth : 500,
+		panelHeight : 200,
+		idField : 'faudit_id',
+		textField : 'faudit_name',
+		pagination : true,
+		fitColumns : false,
+		required : true,
+// 		editable : false,
+		rownumbers : true,
+		mode : 'remote',
+		delay : 500,
+		multiSort : true,
+		sortName : 'domain,faudit_name',
+		sortOrder : 'asc,asc',
+		pageSize : 5,
+		pageList : [ 5, 10 ],
+		onSelect: function(index,row){
+// 			alert("newValue:"+newValue+",oldValue:"+oldValue);
+			var g = $('#faudit_main_id').combogrid('grid');	// get datagrid object
+			app.auditMainRow = g.datagrid('getSelected');	// get the selected row
+// 			console.log($.toJSON(app.auditMainRow) );
+			submitForm();
+		},
+// 		frozenColumns: [],
+		columns : [ [ 
+        {
+   			field : 'faudit_id',
+   			title : 'ID',
+   			width : 100,
+   			hidden : true
+   		}, {
+   			field : 'domain',
+   			title : 'Domain',
+   			width : 100,
+   			sortable : true, formatter: function(value,row, index ){
+				for(var i=0, j=domains.length; i<j; i++){
+					if( domains[i].code == value ){
+						return domains[i].value;
+					}
+				}
+				return value;
+			} 
+   		}, {
+   			field : 'faudit_name',
+   			title : 'Audit Item',
+   			width : 100,
+   			sortable : true
+   		},{
+			field : 'faudit_srctable_name',
+			title : 'Source Table',
+			width : 100,
+			sortable : true
+		}, {
+			field : 'faudit_dsttable_name',
+			title : 'Target Table',
+			width : 100,
+			sortable : true
+		} ] ],
+        onChange: function(newValue, oldValue){
+        	submitForm();
+        }
+	});
+});
+
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+    <div data-options="region:'north',border:true,split:true" style="height:92px;background:#B3DFDA;" title="Search Condition" >  
+        <form id="s_form" method="post" style="margin:0;padding:0;">
+        <div style="padding:0px 0 0px 15px">
+            <table width="100%"> 
+                <tr>
+                    <td>Audit Item:</td>
+                    <td>
+                    	<input id="faudit_main_id" name="faudit_main_id" value="">
+                    </td>
+                    <td>Source Field:</td>
+                    <td>
+                        <input id="faudit_src_field" name="faudit_src_field" value="" onkeydown="enterKeyDown(event)">
+                    </td>
+                    <td>Target Field:</td>
+                    <td>
+                        <input id="faudit_dst_field" name="faudit_dst_field" value="" onkeydown="enterKeyDown(event)">
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <table width="100%" border="0" align="center">
+			<tr bgcolor="#E2EEFE" valign="bottom">
+				<td height="23"><div align="center"><!-- default height='21'  -->
+					<a class="easyui-linkbutton" data-options="iconCls:'icon-search'" href="javascript:void(0)" 
+               		onclick="submitForm()" style="width:80px">Submit</a>&nbsp;&nbsp;
+               		<a class="easyui-linkbutton" data-options="iconCls:'icon-clear'" href="javascript:void(0)" 
+               		onclick="clearForm()" style="width:80px">Clear</a>
+				</div></td>
+			</tr>
+		</table>
+		</form>
+    </div>
+    <div data-options="region:'center', border:false" title="" style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+	
+	<div id="win" class="easyui-window" title="添加" style="width:600px;height:400px"  
+        data-options="modal:true,closed:true">
+	</div>
+</body>
+</html>

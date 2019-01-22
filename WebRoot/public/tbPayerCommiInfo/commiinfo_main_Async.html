@@ -1,0 +1,948 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>代付签约信息</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.3.5/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.3.5/themes/icon.css"/>
+<style type="text/css">
+#mylayer1 {
+  position: absolute;
+  left: 50%;
+  top: 284px;
+}
+#mylayer {
+  position: absolute;
+  left: 400px;
+  top: 284px;
+}
+</style>
+<!-- <script type="text/javascript" src="../../scripts/jquery-easyui/1.3.5/jquery.min.js"></script> -->
+<script type="text/javascript" src="../../scripts/jquery-1.4.4.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.3.5/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.3.5/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+<!-- <script type="text/javascript" src="../../scripts/json/json-minified.js"></script>  -->
+<!-- <script type="text/javascript" src="../../scripts/json/json_parse.js"></script> -->
+<!-- <script type="text/javascript" src="../../scripts/json/json2.js"></script> -->
+<!-- <script type="text/javascript" src="../../scripts/json/json.js"></script> -->
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript">
+var noquery = VIRTUE.noquery;
+var query = VIRTUE.query;
+var exp = VIRTUE.exp;
+
+var del = VIRTUE.del;
+var read = VIRTUE.read;
+
+var OPE = VIRTUE.operator;
+
+// You can set value in js, or program will Get value from server config.
+exp.DefaultColumns = "PAY_ID|ACC_ID|ACC_CARD_ID|COMMI_INST_ID|MERCH_ID";//Get from server config
+if(exp.DefaultColumns==""){
+	jQuery.post( "../../exp/tbPayerCommiInfoEXPDefaultColumns.action", null,
+		function(oResponse, status){
+// 	 		alert(oResponse);
+			exp.DefaultColumns=oResponse;
+// 			alert(exp.DefaultColumns);
+	});
+};
+
+/** validate and assign value **/
+function PackingParameter(){
+	var pay_id = $('#pay_id').val();
+	var sign_name = $('#sign_name').val();
+	var acc_id = $('#acc_id').val();
+	var acc_card_id = $('#acc_card_id').val();
+	var commi_inst_id = $('#commi_inst_id').val();
+	var merch_id = $('#merch_id').val();
+	
+	query.init();
+	if(pay_id !== ""){
+		query.jdata.condition.pay_id = pay_id;
+		query.jdata.operator.pay_id = OPE.EQUAL;
+	}
+	if(sign_name !== ""){
+		query.jdata.condition.sign_name = sign_name;
+		query.jdata.operator.sign_name = OPE.EQUAL;
+	}
+	if(acc_id !== ""){
+		query.jdata.condition["acc_id"] = acc_id;
+		query.jdata.operator["acc_id"] = OPE.EQUAL;
+	}
+	if(acc_card_id !== ""){
+		query.jdata.condition.acc_card_id = acc_card_id;
+		query.jdata.operator.acc_card_id = OPE.EQUAL;
+	}
+	if(commi_inst_id !== ""){
+		query.jdata.condition.commi_inst_id = commi_inst_id;
+		query.jdata.operator.commi_inst_id = OPE.EQUAL;
+	}
+	if(merch_id !== ""){
+		query.jdata.condition.merch_id = merch_id;
+		query.jdata.operator.merch_id = OPE.EQUAL;
+	}
+	
+	exp.jdata.condition = query.jdata.condition;
+	exp.jdata.operator = query.jdata.operator;
+	return true;
+};
+
+/** search data ,reload data  **/
+function submitForm()
+{
+   	if(!PackingParameter()){
+   		return;
+   	}
+//  jdata = { act: 'query',condition: {'t1.nmlevel': [0,1,2,3]},operator : {'t1.nmlevel' : 13} };
+   	$('#grid').datagrid( 'reload', { jdata: encodeURI( $.toJSON( query.jdata ) ) } );
+   	
+};
+
+/**  清空  **/
+function clearForm()
+{
+// 	$('#form').form('clear');
+};
+
+/**  cancel pro  **/
+function disp_confirm()
+{
+  return confirm("向导未完成。如果你现在退出向导，新的导出将无法完成。要放弃向导吗？");
+};
+
+
+function getFileType()
+{
+// 	var robj1=document.EXPdlgForm.fileType;
+	var robj1=document.getElementsByName("fileType");
+	var fileType ="";
+	// ==javascript读取radio的值==
+	for(var i=0; i<robj1.length; i++)
+	{
+		if(robj1[i].checked)
+		{
+			fileType = robj1[i].value;
+// 			alert("fileType:"+robj1[i].value);
+			break;
+		}
+	}
+	return fileType;
+};
+
+/** export data, don't search   **/
+function exportWizard(){
+	$('#dlg').dialog('close');
+	var fileType = getFileType();
+	var exportType = getExportType();
+
+	
+	if(exportType=="default")
+	{
+// 		alert("default export");
+		exportFile(fileType);
+	}
+	else if(exportType=="custom")
+	{
+// 		alert("custom export");
+		var table = $('#dlg2-dg');
+		//selectAll, disable Two link button, check checkbox
+		table.datagrid( 'selectAll');
+// 		$('#btnSAll').linkbutton('disable');
+// 		$('#btnUSAll').linkbutton('disable');
+// 		document.getElementById('selectCol').checked='checked';
+// 		$('#selectCol').attr("checked",'checked'); 
+		
+		$('#dlg2').dialog('open');
+
+// 		jQuery.post( "../../exp/tbPayerCommiInfoEXPColumnNames.action", null,
+// 			function(oResponse, status){
+// 				alert(oResponse);
+// 				$('#dlg').dialog('close');
+// 				$('#dlg2').dialog('open');
+// 			});
+	}
+};
+
+/** custom export  */
+function customExport(){
+	$('#dlg2').dialog('close');
+	
+	var customColumns="";
+	var table = $('#dlg2-dg'); 
+	var rows = table.datagrid( 'getSelections');
+	for(var i=0, j=rows.length; i<j; i++){
+		if(i!=j-1){
+			customColumns+=rows[i].name+"|";
+		}else{
+			customColumns+=rows[i].name;
+		}
+	}
+	exportFile(getFileType(), customColumns);
+};
+
+/** export file  */
+function exportFile(fileType, customColumns){
+	if(!PackingParameter()){
+   		return;
+   	}
+// 	alert("customColumns:"+customColumns);
+	var action = "";
+	if(fileType == "xls")
+	{
+		action = "../../exp/tbPayerCommiInfoEXPexportXLS.action?_="+(new Date).getTime();
+	}
+	else if(fileType == "txt")
+	{
+		action = "../../exp/tbPayerCommiInfoEXPexportTXT.action?_="+(new Date).getTime();
+	}
+    var form = document.createElement("form");
+    document.body.appendChild(form);
+    var i = document.createElement("input");
+    i.type = "hidden";
+    i.name = "jdata";
+    i.value = encodeURI($.toJSON( exp.jdata ) );
+    form.appendChild(i);
+    
+    if(customColumns!=undefined && customColumns!="" && customColumns!=null)
+    {
+    	var j = document.createElement("input");
+        j.type = "hidden";
+        j.name = "customColumns";
+        j.value = customColumns;
+        form.appendChild(j);
+    }
+    
+    form.action = action;
+    form.method = "post";
+    
+//  一提交disable和show的效果立马就不见了哦
+    form.submit();
+};
+
+/** calc count  */
+function calcCount(){
+	$.ajax({
+	   type: "POST",
+	   url: "../../query/tbPayerCommiInfoJEasyUIQuerydfindTotal.action",
+	   data: {jdata: encodeURI($.toJSON( query.jdata ) )},
+	   async: false,//为了取函数返回值验证结果，这个是必须的
+	   success: function(msg){
+	     //alert( "Data got: " + msg );
+	     //alert("msg.total:"+msg.total);
+	     if(msg.total<=10000)
+	     {
+	    	 $('#dlg').dialog('open');
+	     }
+	     else if(msg.total>10000 && msg.total<=150000)
+	     {
+	     	 var r=confirm("记录超过1万条！确认要导出吗？");
+			 if (r==true)
+			 {
+			 	$.messager.alert("提示","后台生成文件可能需要几分钟，请不要关闭浏览器！耐心等待......"); 
+			 	$('#dlg').dialog('open');
+			 }
+	     }
+	     else if(msg.total>150000 && msg.total<=600000)
+	     {
+	     	alert("记录超过15万条只能以文本形式导出！");
+	     	document.getElementsByName("dataOptions")[1].checked="checked";
+	     	$('#dlg').dialog('open');
+	     }
+	     else if(msg.total>600000)
+	     {
+	     	alert("记录超过60万条不能导出！请缩小查询范围！");
+	     }
+	     else
+	     {
+	     	alert("导出失败！详情："+msg);
+	     }
+	   }
+	});
+};
+
+/** format level **/
+function fmtNmlevel(n){
+// 	n = new Number(n);
+	switch(n){
+		case 0: return '零级'; break;
+		case 1: return '一级'; break;
+		case 2: return '二级'; break;
+		case 3: return '三级'; break;
+		case 4: return '四级'; break;
+		default: return n;
+	}
+};
+
+/** format node type  **/
+function fmtCmleaf(s){
+	s = new String(s);
+	if(s=="true"){
+		return '叶子';
+	}else if(s == "false"){
+		return '非叶子';
+	}else{
+		return value;
+	}
+};
+
+// var url;
+// url = 'save_user.php';
+// url = 'update_user.php?id=' + row.id;
+
+function newModule(){  //使用一个window
+	$('#win').window('open').window('setTitle', '添加代付签约');
+	$('#win').window("refresh", "../../common/tbPayerCommiInfo/tbPayerCommiInfo_add.html");
+};
+
+function editModule() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		$('#win').window('open').window('setTitle', '编辑代付签约');
+		$('#win').window("refresh", "../../curd/tbPayerCommiInfoCURDinitModify.action?pojo.NMid="+row.id);
+	}
+}
+
+function browseModule() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		$('#win').window('open').window('setTitle', '浏览代付签约');
+		read.init();
+		read.jdata.condition.id = row.id;
+		read.jdata.operator.id = OPE.EQUAL;
+		$('#win').window("refresh", "../../curd/tbPayerCommiInfoCURDbrowse.action?jdata="+encodeURI($.toJSON( read.jdata )));
+	}
+};
+
+//del.jdata = {act: "del",condition: { id: "" },operator : {nmid : 1} };
+function destroyModule(){
+	var row = $('#grid').datagrid('getSelected');
+	if (row){
+		$.messager.confirm('确认','确认删除吗?',function(r){
+			if (r){
+				del.init();
+				del.jdata.condition.id = row.id;
+				del.jdata.operator.id = OPE.EQUAL;
+				$.post("../../curd/tbPayerCommiInfoCURDdelete.action", { jdata: encodeURI($.toJSON( del.jdata )) }, function(result, status){
+					alert(result.msg);
+					if (result.success){
+						$('#grid').datagrid('reload',{jdata: encodeURI( $.toJSON( query.jdata ) ) } );	// reload data
+					}
+				});
+			}
+		});
+	}
+};
+
+var toolbar = [{
+	text:'添加代付签约',
+	iconCls:'icon-add',
+	handler:function(){
+//		alert('add');
+		newModule();
+	}
+},{
+	text:'编辑代付签约',
+	iconCls:'icon-edit',
+	handler:function(){
+// 		$('#winU').window('open');
+		editModule();
+	}
+},{
+	text:'删除代付签约',
+	iconCls:'icon-remove',
+	handler:function(){
+// 		alert('remove')
+		destroyModule();
+	}
+},{
+	text:'查看代付签约',
+	iconCls:'icon-search',
+	handler:function(){ browseModule(); }
+},{
+	text:'导入代付签约',
+	iconCls:'icon-upload',
+	handler:function(){ browseModule(); }
+}];
+
+// var title="代付签约信息<center><input id='btnSearch' type='button' onclick='submitForm()' value='查询'/>"+
+// 	"<input id='btnExp' type='button' onclick='$(\"#dlg1\").dialog(\"open\")' value='导出'/>"+
+// 	"<input type='button' onclick='clearForm()' value='清空'/></center>";
+
+//program component
+$(function(){
+	$('#grid').datagrid({
+// 		title: "代付签约信息<span style='float:right'>导入</span>",
+		title: "代付签约信息",
+// 		title:title,
+		//iconCls:'icon-reload',
+		toolbar: toolbar,
+		width: 938,
+		height: 720,
+		nowrap: true,
+		striped: true,
+		fit: true,
+		collapsible: false,
+		url: "../../query/tbPayerCommiInfoJEasyUIQUERYdfind.action",
+// 		idField: "id",
+		remoteSort: false,
+// 		sortName:"prov_id",//TbPayerCommiInfoDAO
+// 		sortOrder:"asc",
+		multiSort:true,
+		singleSelect: true,
+// 		frozenColumns: [[
+// 			{title:'代付签约ID',field:"id", hidden: true},
+// 		    {title:'代付签约名称',field:"name", width:180}
+// 		]],
+		columns:[[
+			{title:"用户号", field:"pay_id", width: 140 },
+		    {title:"用户名", field:"sign_name", width: 80 },
+		    {title:"账号", field:"acc_id", width: 180 },
+		    {title:"卡号", field: "acc_card_id", width: 180 },
+		    {title:"签约机构", field: "commi_inst_id", width: 80  },
+		    {title:"委托单位", field: "merch_id", width: 120  }
+		]],
+		pagination:true,
+		rownumbers:true,
+		pageNumber: 1,
+		pageSize: query.pageSize,
+		queryParams:{jdata: encodeURI($.toJSON( noquery.jdata )) },
+		onBeforeLoad:function(param){
+// 			$('#btnSearch').linkbutton('disable');
+		},
+		onLoadSuccess:function(){
+// 			$('#btnSearch').linkbutton('enable');
+		}
+	});
+	var p = $('#grid').datagrid('getPager');
+	if (p){
+		$(p).pagination({
+			//total:50,
+			pageSize: query.pageSize,
+			pageNumber:1,
+			//pageList: [10,20,50,100],
+			onBeforeRefresh:function(){
+				//alert('before refresh');
+			},
+			onSelectPage:function(pageNumber, pageSize){
+				$('#grid').datagrid("options").pageNumber=pageNumber;
+				$('#grid').datagrid("options").pageSize=pageSize;
+				$('#grid').datagrid('reload',{ jdata: encodeURI( $.toJSON( query.jdata ) ) } );
+			}
+		});
+	}
+});
+
+
+var asyncLoadLevel = "";
+var asyncNodeId = "";
+
+/** async load node when demand  **/
+function checkNodeAndExpand(q ){
+	if(q.length==4)
+	{
+		asyncLoadLevel = 2;
+	}
+	else if(q.length==6)
+	{
+		asyncLoadLevel = 3;
+	}
+	var tempParam = { 
+		act: VIRTUE.act.QUERY, 
+		condition: {area_cd: id }, 
+		operator : {area_cd: OPE.EQUAL} 
+	};
+	jQuery.post( "../../query/tbAreaCdJEasyUIQuerydfindTotal.action", 
+		{ 
+			jdata: encodeURI($.toJSON( tempParam )) 
+		},
+		function(oResponse, status){
+			//alert(oResponse.total);
+			var asyncNode = t.tree('find', asyncNodeId );
+			if(asyncLoadLevel == 2)
+			{
+				var node = t.tree('find', q.substring(0,2)+'0000');
+				asyncNodeId = q+'00';
+				t.tree('expand', node.target);//async load node
+			}
+			else if(asyncLoadLevel == 3)
+			{
+				var node = t.tree('find', q.substring(0,4)+'00');
+				asyncNodeId = q;
+				t.tree('expand', node.target);//async load node
+			}
+		}
+	);
+};
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+    <div data-options="region:'north',border:true,split:true" style="height:149px;background:#B3DFDA;" title="查询条件" >
+        <form id="form" method="post" style="margin:0;padding:0;">    
+        <div style="padding:0px 0 0px 5px">
+			<table width="100%">
+				<tr>
+                    <td>业务区域:</td>
+                    <td>
+						<input class="easyui-combotree" 
+	                        id="area_cd" name="area_cd" 
+	                        data-options="url:'../../tree/tbAreaCdTREEquery_JEasyUI_CBT_Async.action',
+	                        method:'post',
+	                        required:true,
+	                        editable : true,
+	                        panelWidth: 280,
+	                        panelHeight: 320,
+	                        onSelect: function(node){
+								//alert(node.id+'-'+node.text);
+								//$('#area_cd').combotree('setValue', node.id+'-'+node.text);
+							},
+							onExpand:function(node){
+								var t = $('#area_cd').combotree('tree');
+								var asyncNode = t.tree('find', asyncNodeId );
+								if(asyncLoadLevel == 2)
+								{
+									t.tree('expandTo', asyncNode.target);
+									t.tree('select', asyncNode.target);
+									t.tree('scrollTo',asyncNode.target);
+									$('#area_cd').combotree('setValue', asyncNodeId.substring(0,4) );
+									asyncLoadLevel = '';
+								}
+								else if(asyncLoadLevel == 3)
+								{
+									t.tree('expandTo', asyncNode.target);
+									t.tree('select', asyncNode.target);
+									t.tree('scrollTo',asyncNode.target);
+									$('#area_cd').combotree('setValue', asyncNode.text);
+									asyncLoadLevel = '';
+								}
+								
+							},
+							keyHandler: {
+								//up: function(){ alert('up');},
+								//down: function(){ alert('down');},
+								/*
+								enter: function(){ 
+									var t = $('#area_cd').combotree('tree');
+									var asyncNode = t.tree('find', asyncNodeId );
+									$('#area_cd').combotree('setValue', asyncNode.text);
+								},*/
+								query: function(q){
+									var t = $('#area_cd').combotree('tree');	// get the tree object
+									if(q.length==4)
+									{
+										var node = t.tree('find', q+'00');
+										if(node==null || node=='undefined'){
+											//alert('node==null');
+											//query db wethether node exist in database
+
+											checkNodeAndExpand(q+'00');
+											/* 431200 wait for improve    
+											if(true){
+												asyncLoadLevel = 2;
+												var node = t.tree('find', q.substring(0,2)+'0000');
+												asyncNodeId = q+'00';
+												t.tree('expand', node.target);//async load node
+											}*/
+										}else{
+											//alert('node!=null');
+											t.tree('expandTo', node.target);
+											t.tree('select', node.target);
+											t.tree('scrollTo',node.target);
+										}
+									}
+									else if(q.length==6)
+									{
+										var node = t.tree('find', q);
+										if(node==null || node=='undefined'){
+											//alert('node==null');
+											//query db wethether node exist in database
+											
+											checkNodeAndExpand(q);
+											/* 431201 wait for improve   
+											if(true){
+												asyncLoadLevel = 3;
+												var node = t.tree('find', q.substring(0,4)+'00');
+												asyncNodeId = q;
+												t.tree('expand', node.target);//async load node
+											} */
+										}else{
+											//alert('node!=null');
+											t.tree('expandTo', node.target);
+											t.tree('select', node.target);
+											t.tree('scrollTo',node.target);
+										}
+									}
+								}
+							}" 
+	                        style="width:200px;">
+                    </td>
+                    <td>业务代码:</td>
+                    <td>
+                        <input id="ope_cd" name="ope_cd" value="" style="width:75px;">
+                    </td>
+                    <td>委托单位代码:</td>
+                    <td>
+                        <input id="merch_id" name="merch_id" value="" style="width:100px;">
+                    </td>
+                    <td>用户号:</td>
+                    <td>
+                        <input id="pay_id" name="pay_id" value="" style="width:140px;">
+                    </td>
+                </tr>
+                <tr>
+                    <td>账号:</td>
+                    <td>
+                        <input id="acc_id" name="acc_id" value="" style="width:140px;">
+                    </td>
+                    <td>卡号:</td>
+                    <td>
+                        <input id="acc_card_id" name="acc_card_id" value="" style="width:140px;">
+                    </td>
+                    <td>用户名:</td>
+                    <td>
+                        <input id="sign_name" name="sign_name" value="" style="width:100px;">
+                    </td>
+                    <td>状态:</td>
+                    <td>
+                        <select class="easyui-combobox" id="cc" name="stepno1" style="width:140px;">
+                        	<option value="0">签约未生效</option>
+                        	<option value="1" selected="selected">签约</option>
+	                        <option value="2">他行账户支付行号为空</option>
+	                        <option value="3">解约</option>
+	                        <option value="4">预签约</option>
+	                        <option value="5">预解约</option>
+	                        <option value="6">解约未生效</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>签约机构:</td>
+                    <td>
+                        <input id="commi_inst_id" name="commi_inst_id" value="" style="width:75px;">
+                    </td>
+                    <td>签约机构类型:</td>
+                    <td>
+                       <select class="easyui-combobox" id="cc" name="stepno1" style="width:60px;">
+                        	<option value="1" selected="selected">储蓄</option>
+	                        <option value="2">公司</option>
+                        </select>
+                    </td>
+                    <td>签约日期起:</td>
+                    <td>
+                    	<input id ="date1" name ="date1" required class="easyui-datebox" size="10"></input>
+                    </td>
+                    <td>止:</td>  
+                    <td>
+                    	<input id ="date2" name ="date2" required class="easyui-datebox" size="10"></input>
+                    </td>
+                </tr>
+<!--                 <tr bgcolor="#E2EEFE"> -->
+<!-- 					<td height="23" colspan="8"> -->
+<!-- 						<div style="padding:0px 0 0px 15px;" align="center"> -->
+<!-- 							<a id="btnSearch" href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()">查询</a> -->
+<!-- 							<a id="btnExp" href="javascript:void(0)" class="easyui-linkbutton" onclick="$('#dlg1').dialog('open')">导出</a> -->
+<!-- 							<a href="javascript:void(0)" class="easyui-linkbutton" onclick="clearForm()">清空</a> -->
+
+<!-- <input id='btnSearch' type='button' onclick='submitForm()' value='查询'/>&nbsp; -->
+<!-- <input id='btnExp' type='button' onclick="$('#dlg1').dialog('open')" value='导出'/>&nbsp; -->
+<!-- <input type='button' onclick="clearForm()" value='清空'/> -->
+<!-- 						</div> -->
+<!-- 				    </td> -->
+<!-- 				</tr> -->
+            </table>
+        </div>
+        
+        <table width="100%" border="0" align="center">
+			<tr bgcolor="#E2EEFE" valign="bottom">
+				<td height="23"><div align="center">
+					<input id='btnSearch' type='button' onclick='submitForm()' value='查 询'/>&nbsp;
+					<input id='btnExp' type='button' onclick="$('#dlg1').dialog('open')" value='导 出'/>&nbsp;
+					<input type='button' onclick="clearForm()" value='清 空'/>
+				</div></td>
+			</tr>
+		</table>
+		</form>
+    </div>
+    <div data-options="region:'center',border:false" title="代付签约main" style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+
+<!-- #########################   dialog1   ######################################################################## -->	
+<!-- 	;background-color:#F0F0F0 -->
+	<div id="dlg1" class="easyui-dialog" title="导出向导" data-options="modal: false ,
+		iconCls:'icon-download',
+		buttons: '#dlg1-buttons'" closed="true" style="width:496px;height:438px;padding:10px">
+		<span style="font-size:18px;color:#0066cc">
+		向导可以让你指定导出数据的细节。你要使用哪一种导出格式？（1/4）
+		</span>
+		<br/><br/><br/>
+<!-- 		<form id="EXPdlg1Form" action=""> -->
+			<fieldset title="文件类型">
+				<legend>&nbsp;文件类型&nbsp;</legend>
+				<table align="center" width="440px">
+					<tr height="40px">
+			    		<td><input type='radio' name='fileType' id="xlsRadio" value='xls' checked="checked"/><span>Excel数据表(*.xls)</span></td>
+			    	</tr>
+			    	<tr height="20px">
+			    		<td><input type='radio' name='fileType' value='txt'/><span>文本文件(*.txt)</span></td>
+			    	</tr>
+			    </table>
+		    </fieldset>
+<!-- 	    </form> -->
+    </div> 
+    
+    <div id="dlg1-buttons">
+<!-- 		<input type="button" value="<<&nbsp;" disabled="disabled"/> -->
+<!-- 		&nbsp; -->
+<!-- 		<input type="button" value="<上一步" disabled="disabled"/> -->
+<!-- 		&nbsp;&nbsp; -->
+		<input type="button" value="下一步>" onclick="$('#dlg1').dialog('close');$('#dlg2').dialog('open');"/>
+		&nbsp;
+		<input type="button" value="&nbsp;>>" onclick="$('#dlg1').dialog('close');$('#dlg4').dialog('open');"/>
+		&nbsp;&nbsp;
+		<input type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;" onclick="$('#dlg1').dialog('close');"/> 
+	</div>
+	<!-- if(disp_confirm()) 
+    <div id="dlg-buttons">
+	    <table>
+		    <tr>
+		    	<td><input type="button" value="<<"/>&nbsp;</td>
+		    	<td><input type="button" value="<上一步"/>&nbsp;&nbsp;</td>
+		    	<td><input type="button" value="下一步>"/>&nbsp;</td>
+		    	<td><input type="button" value=">>"/>&nbsp;&nbsp;</td>
+		    	<td><input type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;"/></td>
+			</tr>
+		</table>
+	</div>
+	<div id="dlg-buttons1">
+	  <a href="javascript:void(0)" class="easyui-linkbutton"  data-options="iconCls:'icon-ok'",
+		onclick="javascript: exportWizard()">确定</a>
+	  <a href="javascript:void(0)" class="easyui-linkbutton"
+		onclick="javascript:$('#dlg').dialog('close')">取消</a>
+	</div>
+	-->
+<!--  ############ ############   dialog2 toolbar,button and content      toolbar: '#dlg2-toolbar',  ############ ############        -->
+	<div id="dlg2" class="easyui-dialog" title="导出向导" data-options="modal: false ,
+		iconCls:'icon-download',
+		buttons: '#dlg2-buttons'" closed="true" style="width:496px;height:438px;padding:10px">
+		<span style="font-size:18px;color:#0066cc">
+		你可以选择导出哪些列。（2/4）
+		</span>
+		<br/><br/><br/>
+<!-- 		title="可用栏位："  -->
+		<table id="dlg2-dg" class="easyui-datagrid" style="width:462px;height:268px"
+			data-options="rownumbers:false,singleSelect:false,showHeader: true, showFooter: false, 
+			selectOnCheck:true,checkOnSelect:true,
+			url:'../../exp/tbPayerCommiInfoEXPColumnNames.action',method:'post'">
+			<thead>
+				<tr>
+					<th data-options="field:'ck',checkbox:true"></th>
+					<th data-options="field:'name',width:120">列名</th>
+					<th data-options="field:'name_zh',width:200">注释</th>
+				</tr>
+			</thead>
+		</table>
+		<table>
+			<tr>
+				<td>
+					<input id="btnSAllTbCol" type="button" value="只选择全部表列" onclick="" disabled="disabled"/>
+				</td>
+		    	<td><input id="selectCol" type='checkbox' name='selectCol' value='默认栏位' checked="checked"/></td>
+		    	<td><span>默认栏位</span></td>
+			</tr>
+		</table>
+    </div>
+    
+    <div id="dlg2-buttons">
+		<input type="button" value="<<&nbsp;" onclick="$('#dlg2').dialog('close');$('#dlg1').dialog('open');"/>
+		&nbsp;
+		<input type="button" value="<上一步" onclick="$('#dlg2').dialog('close');$('#dlg1').dialog('open');"/>
+		&nbsp;&nbsp;
+		<input type="button" value="下一步>" onclick="$('#dlg2').dialog('close');$('#dlg3').dialog('open');"/>
+		&nbsp;
+		<input type="button" value="&nbsp;>>" onclick="$('#dlg2').dialog('close');$('#dlg4').dialog('open');"/>
+		&nbsp;&nbsp;
+		<input type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;" onclick="$('#dlg2').dialog('close');"/> 
+	</div>
+    <!--    if(disp_confirm()) 
+    <div id="dlg2-toolbar">
+	    <table>
+		    <tr>
+		    	<td><a id="btnSAll" href="javascript:void(0)" class="easyui-linkbutton" data-options="disabled:true"
+					onclick="javascript: exportWizard()">全选</a>
+				</td>
+		    	<td><a id="btnUSALL" href="javascript:void(0)" class="easyui-linkbutton" data-options="disabled:true"
+					onclick="javascript:$('#dlg2').dialog('close')">全部取消选择</a></td>
+		    	<td><input id="selectCol" type='checkbox' name='selectCol' value='全部栏位' checked="checked"/></td>
+		    	<td><span>全部栏位</span></td>
+			</tr>
+		</table>
+	</div> 
+	<div id="dlg2-buttons">
+	  <a href="javascript:void(0)" class="easyui-linkbutton"  data-options="iconCls:'icon-ok'"
+		onclick="javascript: customExport()">确定</a>
+	  <a href="javascript:void(0)" class="easyui-linkbutton"
+		onclick="javascript:$('#dlg2').dialog('close')">取消</a>
+	</div>
+	-->
+<!-- #########################   dialog3   ######################################################################## -->		
+	<div id="dlg3" class="easyui-dialog" title="导出向导" data-options="modal: false ,
+		iconCls:'icon-download',
+		buttons: '#dlg3-buttons'" closed="true" style="width:496px;height:438px;padding:10px">
+		<span style="font-size:18px;color:#0066cc">
+		你可以定义一些附加的选项。（3/4）
+		</span>
+		<br/><br/><br/>
+		<table cellpadding="0" cellspacing="0" border="0">
+			<tr>
+				<td><input id="selectCol" type='checkbox' name='selectCol' value='包含列的标题' checked="checked" disabled="disabled"/></td>
+			    <td><span>包含列的标题</span></td>
+		    </tr>
+		</table>
+		<div style="display: block;">
+		<table cellpadding="0" cellspacing="0" border="0">
+			<tr>
+				<td width="130px"><span>记录分隔符:</span></td>
+			    <td width="75px">
+			    	<select id="recordseparator" name="recordseparator" style="width:65px;">
+    					<option value="CRLF" selected="selected">CRLF</option>
+                       	<option value="CR">CR</option>
+                       	<option value="LF">LF</option>
+					</select>
+				</td>
+			    <td></td>
+		    </tr>
+		    <tr>
+		    	<td><span>栏位分隔符:</span></td>
+				<td>
+					<select id="fieldseparator" name="fieldseparator" style="width:65px;">
+    					<option value="\t" selected="selected">定位</option>
+                       	<option value=";">分号(;)</option>
+                       	<option value=",">逗号(,)</option>
+                       	<option value=" ">空格</option>
+                       	<option value="">无</option>
+                       	<option value="other">其他符号</option>
+					</select>
+				</td>
+			    <td><input type="text" width="50px" size="2"/></td>
+		    </tr>
+		    <tr>
+				<td><span>文本限定符:</span></td>
+			    <td>
+					<select id="fieldseparator" name="fieldseparator" style="width:65px;">
+    					<option value="" selected="selected">无</option>
+                       	<option value="\"">"</option>
+                       	<option value="\'">'</option>
+					</select>
+				</td>
+			    <td></td>
+		    </tr>
+		</table>
+<!-- 	<form id="EXPdlg3Form" action=""> -->
+		<fieldset title="格式">
+			<legend>&nbsp;格式&nbsp;</legend>
+			<table align="center" width="440px">
+				<tr height="20px">
+					<td align="right" width="140px">日期排序:</td>
+		    		<td>
+						<select id="dateorder" name="dateorder" style="width:65px;">
+	    					<option value="MDY">MDY</option>
+	                       	<option value="DMY">DMY</option>
+	                       	<option value="YMD" selected="selected">YMD</option>
+	                       	<option value="YDM">YDM</option>
+	                       	<option value="DYM">DYM</option>
+	                       	<option value="MYD">MYD</option>
+						</select>
+					</td>
+		    	</tr>
+		    	<tr height="20px">
+		    		<td align="right">日期分隔符:</td>
+		    		<td><input type='text' name='dateseparator' value='/' size="5"/></td>
+		    	</tr>
+		    	<tr height="20px">
+		    		<td align="right">零填充日期:</td>
+		    		<td>
+						<select id="zerofilldate" name="zerofilldate" style="width:65px;">
+	    					<option value="否" selected="selected">否</option>
+	                       	<option value="是">是</option>
+						</select>
+					</td>
+		    	</tr>
+		    	<tr height="20px">
+		    		<td align="right">时间分隔符:</td>
+		    		<td><input type='text' name='timeseparator' value=':' size="5"/></td>
+		    	</tr>
+		    	<tr height="20px">
+		    		<td align="right">小数点符号:</td>
+		    		<td><input type='text' name='decimalsymbol' value='.' size="5"/></td>
+		    	</tr>
+		    	<tr height="20px">
+		    		<td align="right">二进制数据编码:</td>
+		    		<td>
+						<select id="recordseparator" name="recordseparator" style="width:65px;">
+	    					<option value="Base64" selected="selected">Base64</option>
+	                       	<option value="">无</option>
+						</select>
+					</td>
+		    	</tr>
+		    </table>
+		</fieldset>
+<!-- 	</form> -->
+		</div>
+    </div>
+    
+    <div id="dlg3-buttons">
+		<input type="button" value="<<&nbsp;" onclick="$('#dlg3').dialog('close');$('#dlg1').dialog('open');"/>
+		&nbsp;
+		<input type="button" value="<上一步" onclick="$('#dlg3').dialog('close');$('#dlg2').dialog('open');"/>
+		&nbsp;&nbsp;
+		<input type="button" value="下一步>" onclick="$('#dlg3').dialog('close');$('#dlg4').dialog('open');"/>
+		&nbsp;
+		<input type="button" value="&nbsp;>>" onclick="$('#dlg3').dialog('close');$('#dlg4').dialog('open');"/>
+		&nbsp;&nbsp;
+		<input type="button" value="&nbsp;&nbsp;取消&nbsp;&nbsp;" onclick="$('#dlg3').dialog('close');"/> 
+	</div>
+	
+<!-- #########################   dialog4   if(disp_confirm()) ######################################################################## -->		
+	<div id="dlg4" class="easyui-dialog" title="导出向导" data-options="modal: false ,
+		iconCls:'icon-download',
+		buttons: '#dlg4-buttons'" closed="true" style="width:496px;height:438px;padding:10px">
+		<span style="font-size:18px;color:#0066cc">
+		我们已收集向导导出数据时所需的全部信息。点击[开始]按钮开始导出。（4/4）
+		</span>
+		<br/><br/><br/>
+		<table width="445">
+			<tr>
+		    	<td>总计：<span id="total"></span></td>
+			</tr>
+			<tr>
+		    	<td>已处理：<span id="done"></span></td>
+			</tr>
+			<tr>
+		    	<td>时间：<span id="time"></span></td>
+			</tr>
+		</table>
+		
+		<textarea rows="10" cols="54"></textarea>
+    </div>
+    
+    <div id="dlg4-buttons">
+		<input type="button" value="<<&nbsp;" onclick="$('#dlg4').dialog('close');$('#dlg1').dialog('open');"/>
+		&nbsp;
+		<input type="button" value="<上一步" onclick="$('#dlg4').dialog('close');$('#dlg3').dialog('open');"/>
+		&nbsp;&nbsp;
+		<input type="button" value="下一步>" disabled="disabled"/>
+		&nbsp;
+		<input type="button" value="&nbsp;>>" disabled="disabled"/>
+		&nbsp;&nbsp;
+		<input type="button" value="&nbsp;&nbsp;开始&nbsp;&nbsp;"/>
+	</div>
+<script type="text/javascript">
+jQuery(document).ready(function(){
+// 	var table = $('#dlg2-dg');
+// 	table.datagrid( 'selectAll');
+}); 
+</script>
+</body>
+</html>

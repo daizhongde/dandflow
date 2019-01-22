@@ -1,0 +1,54 @@
+[{
+	"id" : {
+		"jobId" : "J100",
+		"nodeId" : "DA"
+	},
+	"isLeaf" : 1,
+	"nodeStatus" : "0",
+	"prepos" : "",
+	"postpos" : "DC",
+	"coords" : "110,70", "zb" : {"x" : 110,"y" : 70 },
+	"task" : {
+		"taskId" : "DA",
+		"taskName" : "任务DA",
+		"controlId" : "con007",
+		"comId" : "com00700",
+		"taskAuthor" : null,
+		"taskRemark" : null,
+		"taskUpdate" : null
+	}
+},{
+	"id" : {
+		"jobId" : "J100",
+		"nodeId" : "J101"
+	},
+	"isLeaf" : 1,
+	"nodeStatus" : "0",
+	"prepos" : "",
+	"postpos" : "DC",
+	"coords" : "110,70", "zb" : {"x" : 110,"y" : 70 },
+	"job" : {
+		"jobId" : "J101",
+		"jobName" : "作业101",
+		"jobAuthor" : "daizd",
+		"jobRemark" : "作业101备注",
+		"jobUpdate" : "2015-12-12 12:12:12"
+	}
+},{
+	"id" : {
+		"jobId" : "J100",
+		"nodeId" : "J101"
+	},
+	"isLeaf" : 1,
+	"nodeStatus" : "0",
+	"prepos" : "",
+	"postpos" : "DC",
+	"coords" : "110,70", "zb" : {"x" : 110,"y" : 70 },
+	"job" : {
+		"jobId" : "J101",
+		"jobName" : "作业101",
+		"jobAuthor" : "daizd",
+		"jobRemark" : "作业101备注",
+		"jobUpdate" : "2015-12-12 12:12:12"
+	}
+}]

@@ -1,0 +1,283 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>菜单条 YUI2.9.1</title>
+	<meta http-equiv="Cache-Control" content="no-store"/>
+	<meta http-equiv="Pragma" content="no-cache"/>
+	<meta http-equiv="Expires" content="0"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<link rel="stylesheet" type="text/css" href="/yui_2.9.0/build/reset-fonts-grids/reset-fonts-grids.css">
+	<link rel="stylesheet" type="text/css" href="/yui_2.9.0/build/menu/assets/skins/sam/menu.css">
+	<link rel="stylesheet" type="text/css" href="/yui_2.9.0/build/resize/assets/skins/sam/resize.css" />
+	<link rel="stylesheet" type="text/css" href="/yui_2.9.0/build/layout/assets/skins/sam/layout.css" />
+<style type="text/css">
+body {
+	margin:0;
+	padding:0;
+}
+.yui-skin-sam .yui-dt-liner { white-space:nowrap; } 
+#treeDiv1 {background: #fff; margin-top:1em; padding:1em; min-height:7em;}
+#examplecontainer {
+    padding:10px;
+}
+
+#resizablepanel .bd {
+    overflow:auto;
+    background-color:#fff;
+    padding:0px;
+    text-align:left; 
+}
+
+#resizablepanel .ft {
+    height:15px;
+    padding:0;
+}
+
+#resizablepanel .yui-resize-handle-br {
+    right:0;
+    bottom:0;
+    height: 8px;
+    width: 8px;
+    position:absolute;
+}
+
+#resizablepanel_c.hide-scrollbars .yui-resize .bd {
+    overflow: hidden;
+}
+
+#resizablepanel_c.show-scrollbars .yui-resize .bd {
+    overflow: auto;
+}
+
+#resizablepanel_c.show-scrollbars .underlay {
+    overflow: visible;
+}
+</style>
+
+    <script type="text/javascript" src="/yui_2.9.0/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="/yui_2.9.0/build/yahoo/yahoo-min.js"></script>
+	<script type="text/javascript" src="/yui_2.9.0/build/event/event-min.js"></script>
+	<script type="text/javascript" src="/yui_2.9.0/build/dom/dom-min.js"></script>
+	<script type="text/javascript" src="/yui_2.9.0/build/dragdrop/dragdrop-min.js"></script>
+	<script type="text/javascript" src="/yui_2.9.0/build/element/element-min.js"></script>
+	<script type="text/javascript" src="/yui_2.9.0/build/event-delegate/event-delegate-min.js"></script>
+	
+	<script type="text/javascript" src="/yui_2.9.0/build/resize/resize-min.js"></script>
+	<script type="text/javascript" src="/yui_2.9.0/build/animation/animation-min.js"></script>
+    <script type="text/javascript" src="/yui_2.9.0/build/layout/layout-min.js"></script>
+    <script type="text/javascript" src="/yui_2.9.0/build/container/container_core.js"></script>
+    <script type="text/javascript" src="/yui_2.9.0/build/menu/menu.js"></script>
+    <script type="text/javascript" src="/yui_2.9.0/build/utilities/utilities.js"></script>
+    
+    
+<script type="text/javascript">
+var app = {};
+
+YAHOO.util.Event.onContentReady("productsandservices", function () {
+	
+	var oMenuBar = new YAHOO.widget.MenuBar("productsandservices", { 
+        autosubmenudisplay: true, 
+        hidedelay: 750, 
+        lazyload: true });
+	
+    function onMenuClick(p_sType, p_aArgs, p_oValue) {
+    	alert("p_sType:"+p_sType);
+    	alert("p_aArgs:"+p_aArgs);
+    	alert("p_oValue:"+p_oValue);
+    };
+    
+    function onMenuItemClick(p_sType, p_aArgs, p_oValue) {
+    	alert("index: " + this.index + 
+                   ", text: " + this.cfg.getProperty("text") + 
+                   ", value: " + p_oValue);
+    };
+    
+	var sUrl = "../../tree/tAuthorityModuleTREEquery_YUI2_Menu.action";
+// 	var sUrl = "menuJSONArray.json";
+	var callback = {
+		success: function(oResponse) {
+			
+			var aSubmenuData = eval("(" + oResponse.responseText + ")");
+
+//		 	<li class="yuimenubaritem first-of-type">
+//		 		<a class="yuimenubaritemlabel" href="#communication">系统管理</a>
+//		 	</li>
+//		 	<li class="yuimenubaritem">
+//		 	    <a class="yuimenubaritemlabel" href="http://shopping.yahoo.com">开户机构维护</a>
+//		 	</li>
+			
+
+	        var ua = YAHOO.env.ua,
+	            oAnim;  // Animation instance
+	        function onSubmenuBeforeShow(p_sType, p_sArgs) {
+	            var oBody,
+	                oElement,
+	                oShadow,
+	                oUL;
+	            if (this.parent) {
+	                oElement = this.element;
+	                oShadow = oElement.lastChild;
+	                oShadow.style.height = "0px";
+	                if (oAnim && oAnim.isAnimated()) {
+	                    oAnim.stop();
+	                    oAnim = null;
+	                }
+	                oBody = this.body;
+	
+	                if (this.parent && 
+	                    !(this.parent instanceof YAHOO.widget.MenuBarItem)) {
+	                    if (ua.gecko || ua.opera) {
+	                        oBody.style.width = oBody.clientWidth + "px";
+	                    }
+	                    if (ua.ie == 7) {
+	                        oElement.style.width = oElement.clientWidth + "px";
+	                    }
+	                }
+	                oBody.style.overflow = "hidden";
+	                oUL = oBody.getElementsByTagName("ul")[0];
+	                oUL.style.marginTop = ("-" + oUL.offsetHeight + "px");
+	            }
+	        }
+
+	        function onTween(p_sType, p_aArgs, p_oShadow) {
+	            if (this.cfg.getProperty("iframe")) {
+	                this.syncIframe();
+	            }
+	            if (p_oShadow) {
+	                p_oShadow.style.height = this.element.offsetHeight + "px";
+	            }
+	        }
+	
+	        function onAnimationComplete(p_sType, p_aArgs, p_oShadow) {
+	            var oBody = this.body,
+	                oUL = oBody.getElementsByTagName("ul")[0];
+	
+	            if (p_oShadow) {
+	                p_oShadow.style.height = this.element.offsetHeight + "px";
+	            }
+	            oUL.style.marginTop = "";
+	            oBody.style.overflow = "";
+	
+	            if (this.parent && 
+	                !(this.parent instanceof YAHOO.widget.MenuBarItem)) {
+	                if (ua.gecko || ua.opera) {
+	                    oBody.style.width = "";
+	                }
+	                if (ua.ie == 7) {
+	                    this.element.style.width = "";
+	                }
+	            }
+	        }
+
+	        function onSubmenuShow(p_sType, p_sArgs) {
+	            var oElement,
+	                oShadow,
+	                oUL;
+	        
+	            if (this.parent) {
+	                oElement = this.element;
+	                oShadow = oElement.lastChild;
+	                oUL = this.body.getElementsByTagName("ul")[0];
+	                oAnim = new YAHOO.util.Anim(oUL, 
+	                    { marginTop: { to: 0 } },
+	                    .5, YAHOO.util.Easing.easeOut);
+	
+	                oAnim.onStart.subscribe(function () {
+	                    oShadow.style.height = "100%";
+	                });
+	                oAnim.animate();
+	                if (YAHOO.env.ua.ie) {
+	                    oShadow.style.height = oElement.offsetHeight + "px";
+	                    oAnim.onTween.subscribe(onTween, oShadow, this);
+	                }
+	                oAnim.onComplete.subscribe(onAnimationComplete, oShadow, this);
+	            }
+	        }
+	            
+	        oMenuBar.subscribe("beforeRender", function () {
+				var nSubmenus = aSubmenuData.length, i;
+				if (this.getRoot() == this) {
+					for (i = 0; i < nSubmenus; i++) {
+						this.getItem(i).cfg.setProperty("submenu", aSubmenuData[i]);
+					}
+				}
+	        });
+	        oMenuBar.subscribe("beforeShow", onSubmenuBeforeShow);
+	        oMenuBar.subscribe("show", onSubmenuShow);
+	        
+	        oMenuBar.subscribe("click", onMenuClick);
+	        
+	        oMenuBar.render();
+		},
+        timeout: 7000
+	};
+	
+	YAHOO.util.Connect.asyncRequest('POST', sUrl, callback);
+});
+        
+        
+YAHOO.example.doLayout = function() {
+	var Ex = YAHOO.namespace('example');
+	/**   */
+	//header: '基础数据&gt;&gt;材料模板',  collapse: true,
+	app.layout = new YAHOO.widget.Layout({
+        units: [
+            { position: 'center', body: 'center1',scroll: true, gutter: '0 0 0 0' }
+        ]
+    });
+    app.basefrm = YAHOO.util.Dom.get("basefrm");
+    app.layout.on('resize', function() {
+        if (app.basefrm) {
+        	//alert("有");
+        	YAHOO.util.Dom.setStyle( app.basefrm , "height" , (this.getSizes().center.h-37) + 'px');
+            //app.basefrm.set('height', (this.getSizes().center.h-74) + 'px');//114没有新增按钮,141:有button不在header,144有button在header,
+            //app.basefrm._syncColWidths();
+        }
+    }, app.layout, true);
+           
+    app.layout.on('render', function() {
+    	YAHOO.util.Dom.setStyle( app.basefrm , "height" , (this.getSizes().center.h-37) + 'px');//have reset.css -32  no reset.css -37
+    	//app.basefrm.set('height', (this.getSizes().center.h-74) + 'px');
+    }, app.layout, true);  
+    
+    app.layout.render();
+	
+    return {
+    };
+        
+};
+//YAHOO.example.DynamicData
+YAHOO.util.Event.addListener(window, "load", YAHOO.example.doLayout);
+
+</script>
+</head>
+<!-- height="90" -->
+<body class="yui-skin-sam" id="yahoo-com">			
+	<!-- center begin -->
+	<div id="center1">
+
+<!-- #################    top navigate     begin        ######################################     -->
+			<div id="productsandservices" class="yuimenubar yuimenubarnav">
+	            <div class="bd">
+	                <ul class="first-of-type">
+<!-- 	               		<li class="yuimenubaritem first-of-type"> -->
+<!--                         	<a class="yuimenubaritemlabel" href="#communication">系统管理</a> -->
+<!--                    		</li> -->
+<!--                         <li class="yuimenubaritem"> -->
+<!--                             <a class="yuimenubaritemlabel" href="http://shopping.yahoo.com">开户机构维护</a> -->
+<!--                     	</li> -->
+	                </ul>
+	            </div>
+			</div>
+<!-- #################   top navigate     end        ######################################     -->
+
+		<div id="mainframe">
+			<!-- #################   mainiframe     begin        ######################################     -->
+	        <iframe id="mainframe" name="mainframe" src="../../Webmain/welcome.html" frameborder="0" scrolling="auto" height="500" width="100%"></iframe>
+		    <!-- #################   mainiframe     end        ######################################     -->
+	    </div>
+	</div>
+	<!-- center end -->
+</body>
+</html>

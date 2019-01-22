@@ -1,0 +1,31 @@
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+	xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="urn:ComInterFace">
+	<SOAP-ENV:Header></SOAP-ENV:Header>
+	<SOAP-ENV:Body SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+		<ns2:ExecuteSqlResponse>
+			<retMsg>{success: false, msg:"sql err [ INSERT INTO
+				agr.`agr_prod_term_rla_21_00` SELECT * FROM
+				mig_pd.`agr_prod_term_rla_21` WHERE
+				SUBSTR(owner_id,-1)=0;&#xA;commit;&#xA;&#xA;INSERT INTO
+				agr.`agr_prod_term_rla_h_21_00`
+				(AGR_PROD_TERM_RLA_ID,AGREEMENT_ID,OWNER_ID,
+				AGR_VERSION_ID,TERM_ID,TERM_TITLE,
+				TERM_TYPE,TERM_VERSION_CODE,EFF_DATE,
+				EXP_DATE,OP_ID,ORG_ID,DONE_DATE,DONE_CODE,TERM_CODE,
+				STATE)&#xA;SELECT
+				AGR_PROD_TERM_RLA_ID,AGREEMENT_ID,OWNER_ID,10000000
+				AGR_VERSION_ID,TERM_ID,TERM_TITLE,
+				TERM_TYPE,TERM_VERSION_CODE,EFF_DATE,
+				EXP_DATE,OP_ID,ORG_ID,DONE_DATE,DONE_CODE,TERM_CODE, STATE FROM
+				mig_pd.`agr_prod_term_rla_21` WHERE
+				SUBSTR(owner_id,-1)=0;&#xA;commit;&#xA;&#xA;&#xA;&#xA;CREATE
+				INDEX index_agreement_id ON
+				mid_AGR.AGR_AGREEMENT_21(agreement_id);&#xA;CREATE INDEX
+				index_upagreement_id ON
+				mid_AGR.AGR_AGREEMENT_21(UP_AGREEMENT_ID);&#xA;&#xA;SET
+				@AGR_PARTY_AGR_QUARY_ID=1100000000; ...], errinfo[ Duplicate key
+				name \'index_agreement_id\' ]"}</retMsg>
+		</ns2:ExecuteSqlResponse>
+	</SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

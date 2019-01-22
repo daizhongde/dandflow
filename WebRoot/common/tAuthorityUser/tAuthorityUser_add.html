@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>添加用户 JDATA</title>
+<!-- 	<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.3.5/themes/default/easyui.css"/> -->
+<!-- 	<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.3.5/themes/icon.css"/> -->
+<!-- 	<script type="text/javascript" src="../../scripts/jquery-1.4.4.min.js" ></script> -->
+<!-- 	<script type="text/javascript" src="../../scripts/jquery-easyui/1.3.5/jquery.easyui.min.js"></script> -->
+<!-- 	<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script> -->
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+<div data-options="region:'center',border:false" title="用户main" style="overflow:hidden;" noheader="true">
+<!-- 	<div class="easyui-panel" title="New Topic" style="width:400px"> -->
+		<div style="padding:10px 0 10px 60px">
+	    <form id="add.form" method="post">
+	    	<table align="center">
+	    		<tr>
+	    			<td>所属机构:</td>
+	    			<td>
+<!-- 	    		_L3  	_Async -->
+						<input class="easyui-combotree" 
+	                        id="iid_C" name="pojo.NDid" 
+	                        data-options="url:'../../tree/tAuthorityInstTREEquery_JEasyUI_CBT_Async.action?id='+selectedIPId,
+	                        method:'post',
+	                        mode: 'remote',
+	                        value: selectedIId,
+	                        onShowPanel:function(){
+								var t = jQuery('#iid_C').combotree('tree');
+								//alert(selectedIId);
+								var node = t.tree( 'find', selectedIId );
+								//alert(selected.attributes.level );
+								t.tree('expandTo', node.target);
+								t.tree('scrollTo',node.target);
+							},
+							onLoadSuccess :  function( node, data ){
+								if(node===null){
+									var t = jQuery('#iid_C').combotree('tree');
+									var snode = t.tree( 'find', selectedIId );
+									if(snode===null)
+									{
+										//expand selectedIPId
+										var spnode = t.tree( 'find', selectedIPId );
+										t.tree('expand', spnode.target);
+									}
+								}
+							},
+							disabled:true,
+	                        required:true"
+	                        style="width:260px;">
+                    </td>
+	    		</tr>
+	    		<tr>
+	    			<td>用户登陆名:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="logname_C" name="pojo.CUlogname" data-options="required:true"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>用户姓名:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="name_C" name="pojo.CUname" data-options="required:true"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>密码:</td>
+	    			<td><input class="easyui-validatebox" type="password" id="password_C" name="pojo.CUpassword" data-options="required:true"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>确认密码:</td>
+	    			<td><input class="easyui-validatebox" type="password" id="password2_C" name="pojo.CUpassword" data-options="required:true"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>性别:</td>
+	    			<td><select class="easyui-combobox" id="sex_C" name="pojo.CUsex" style="width:200px;" data-options="required:true">
+	    			 		<option value="">--选择--</option>
+                        	<option value="男" selected="selected">男</option>
+                        	<option value="女">女</option>
+                        </select>
+                    </td>
+	    		</tr>
+	    		<tr>
+	    			<td>员工号:</td>
+	    			<td><input class="easyui-validatebox" type="text" id="employee_number_C" name="pojo.EmployeeNumber" data-options="required:true"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>上司ID:</td>
+	    			<td><input class="easyui-numberbox" type="text" id="supervisor_id_C" name="pojo.SupervisorId" data-options="required:true"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>联系电话:</td>
+	    			<td><input class="easyui-numberbox" type="text" id="phone_C" name="pojo.CUphone"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>办公电话:</td>
+	    			<td><input type="text" id="tel_C" name="pojo.CUtel"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>传真:</td>
+	    			<td><input type="text" id="fax_C" name="pojo.CUfax"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>电子邮箱:</td>
+	    			<td><input type="text" id="email_C" name="pojo.CUemail"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>QQ:</td>
+	    			<td><input class="easyui-numberbox" type="text" id="qq_C" name="pojo.CUqq"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>通迅地址:</td>
+	    			<td><input type="text" id="addr_C" name="pojo.CUaddr"></input></td>
+	    		</tr>
+				<tr>
+	    			<td>备注:</td>
+	    			<td><textarea id="note_C" name="pojo.CUnote" style="height:32px;width:260px;font-size: 12px;"></textarea></td>
+	    		</tr>
+	    	</table>
+	    </form>
+	    </div>
+	    <div style="text-align:center;padding:5px">
+	    	<input type='button' onclick="add.submitForm()" value="提交"/>
+	    </div>
+<!-- 	</div> -->
+<script type="text/javascript">
+var add = VIRTUE.add;
+
+add.submitForm = function (){
+	var logname = $('#logname_C').val();
+	var name = $('#name_C').val();
+	var password = $('#password_C').val();
+	var password2 = $('#password2_C').val();
+	var sex = $('#sex_C').combobox('getValue');
+	var employee_number = $('#employee_number_C').val();//add by daizd, 20160420
+	var supervisor_id = $('#supervisor_id_C').val();//add by daizd, 20160420
+	var phone = $('#phone_C').val();
+	var tel = $('#tel_C').val();
+	var fax = $('#fax_C').val();
+	var email = $('#email_C').val();
+	var qq = $('#qq_C').val();
+	var addr = $('#addr_C').val();
+	var iid = $('#iid_C').combotree('getValue');
+	var note = $('#note_C').val();
+	
+	if( password != password2 ){
+		alert("两次输入的密码不匹配！");
+		document.getElementById("password_C").focus();
+		return;
+	}
+	add.init();
+	add.jdata.data.logname = logname;
+	add.jdata.data.name = name;
+	add.jdata.data.password = password;
+	add.jdata.data.sex = sex;
+	add.jdata.data.employee_number = employee_number;//add by daizd, 20160420
+	add.jdata.data.supervisor_id = supervisor_id;//add by daizd, 20160420
+	add.jdata.data.phone = phone;
+	add.jdata.data.tel = tel;
+	add.jdata.data.fax = fax;
+	add.jdata.data.email = email;
+	add.jdata.data.qq = qq;
+	add.jdata.data.addr = addr;
+	add.jdata.data.iid = iid;
+	add.jdata.data.note = note;
+	
+	jQuery.post( "../../curd/tAuthorityUserCURDadd.action", { jdata: encodeURI($.toJSON( add.jdata )) },
+	   function(oResponse, status){
+// 		alert(oResponse);
+// 		oResponse = eval("(" + oResponse + ")");
+		alert(oResponse.msg);
+		if(oResponse.success == true){
+			$('#grid').datagrid('reload',{ jdata: encodeURI($.toJSON( query.jdata ) ) } );
+			$('#win').window('close');
+		}
+	   });
+};
+
+</script>
+</div>
+</body>
+</html>

@@ -1,0 +1,721 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>集邮菜单树-节点多的</title>
+<style type="text/css">
+body {
+	font-size: 12px;
+	line-height: 24px;
+	color: #000000;
+	text-decoration: none;
+	margin: 0px;
+	padding: 0px;
+	overflow: auto;
+	SCROLLBAR-FACE-COLOR: #E1EDF3;
+	SCROLLBAR-HIGHLIGHT-COLOR: #A5BFCC;
+	SCROLLBAR-SHADOW-COLOR: #ffffff;
+	SCROLLBAR-3DLIGHT-COLOR: #ffffff;
+	SCROLLBAR-ARROW-COLOR: #769FB4;
+	SCROLLBAR-TRACK-COLOR: #F4F4F4;
+	SCROLLBAR-DARKSHADOW-COLOR: #A5BFCC;
+	SCROLLBAR-BASE-COLOR: #22960D;
+	background-color: #FAFAFA;
+	background-repeat: no-repeat;
+}
+.maintable {
+	border-right-width: 1px;
+	border-right-style: none;
+	border-right-color: #666666;
+}
+
+a:link {
+	font-size: 12px;
+	color: #000000;
+	text-decoration: none;
+}
+a:visited {
+	font-size: 12px;
+	color: #000000;
+	text-decoration: none;
+	font-weight: normal;
+}
+a:hover {
+	font-size: 12px;
+	color: #ff6600;
+	text-decoration: none;
+	font-weight: normal;
+}
+a:active {
+	font-size: 12px;
+	color: #000000;
+	text-decoration: none;
+	font-weight: normal;
+}
+table {
+	font-size: 12px;
+	line-height: 22px;
+	color: #000000;
+}
+.menutable {
+	background-color: #C3E3FF;
+	border: 0px solid #666666;
+	padding: 0px;
+}
+
+
+.webfx-tree-container {
+	margin: 0px;
+	padding: 0px;
+	font: icon;
+	white-space: nowrap;
+}
+
+.webfx-tree-item {
+	padding: 0px;
+	margin: 0px;
+	font: icon;
+	color: black;
+	white-space: nowrap;
+}
+
+.webfx-tree-item a, .webfx-tree-item a:active, .webfx-tree-item a:hover {
+	margin-left: 3px;
+	padding: 1px 2px 1px 2px;
+}
+
+.webfx-tree-item a {
+	color: black;
+	text-decoration: none;
+}
+
+.webfx-tree-item a:hover {
+	color: blue;
+	text-decoration: underline;
+}
+
+.webfx-tree-item a:active {
+	background: #ff6600;
+	color: #ffffff;
+	text-decoration: none;
+}
+
+.webfx-tree-item img {
+	vertical-align: middle;
+	border: 0px;
+}
+
+.webfx-tree-icon {
+	width: 16px;
+	height: 24px;
+}
+.webfx-tree-item a.selected {
+	color: selectedtext;
+	background: selected;
+}
+
+.webfx-tree-item a.selected-inactive {
+	color: #ffffff;
+	background: #ff6600;
+}
+
+</style>
+<SCRIPT type="text/javascript">
+var ICONPATH = '../../images/webfx/';
+</SCRIPT>
+<script src="../../scripts/webfx/xtree.js"></script>
+</head>
+<body>
+	<table width="100%" height="100%" border="0" cellpadding="0"
+		cellspacing="0" class="menutable">
+		<tr>
+			<td valign="top">
+				<table width="100%" border="0" cellpadding="0" cellspacing="6"
+					class="maintable">
+					<tr>
+						<td><script language="javascript">
+						  var root = new WebFXTree('集邮业务管理系统');
+						  root.setBehavior('classic');
+						  
+						
+							var MENU_590000 = new WebFXTreeItem('预警管理');	
+						
+							root.add(MENU_590000);
+						
+							var MENU_560910 = new WebFXTreeItem('市购集邮品价格预警','../jyfx/sgyjsz/sgyjsz_main.jsp');	
+						
+							MENU_590000.add(MENU_560910);
+						
+							var MENU_560920 = new WebFXTreeItem('集团客户预警值设置','../jyfx/jtkhyjsz/jtkh_yjsz.jsp');	
+						
+							MENU_590000.add(MENU_560920);
+						
+							var MENU_560930 = new WebFXTreeItem('库存预警值设置','../jyfx/kcyj/kcyj_p/kcyj_main.jsp');	
+						
+							MENU_590000.add(MENU_560930);
+						
+							var MENU_560940 = new WebFXTreeItem('应收结算款预警值设置','../jyfx/jyyssz/jgysyj_main.jsp');	
+						
+							MENU_590000.add(MENU_560940);
+						
+							var MENU_5090000 = new WebFXTreeItem('集邮会员管理');	
+						
+							root.add(MENU_5090000);
+						
+							var MENU_5090011 = new WebFXTreeItem('集邮协会登记','../xtgl/hygl/jyxhdj_main.jsp');	
+						
+							MENU_5090000.add(MENU_5090011);
+						
+							var MENU_5090012 = new WebFXTreeItem('集邮会员管理','../xtgl/hygl/jyhy_main.jsp');	
+						
+							MENU_5090000.add(MENU_5090012);
+						
+							var MENU_5090013 = new WebFXTreeItem('预订积分资格维护','../xtgl/hygl/ydjfzgwh_main.jsp');	
+						
+							MENU_5090000.add(MENU_5090013);
+						
+							var MENU_5090014 = new WebFXTreeItem('集团客户会员管理(修改)','../xtgl/jtkhgl/jtkhgl_main.jsp');	
+						
+							MENU_5090000.add(MENU_5090014);
+						
+							var MENU_5090015 = new WebFXTreeItem('会员销售统计查询','../xtgl/hygl/hyxsmxtj_asynchronous.jsp');	
+						
+							MENU_5090000.add(MENU_5090015);
+						
+							var MENU_5090016 = new WebFXTreeItem('员工折扣设置(新)','../xtgl/xtcsgl/xtcsgl_main_ygzksz.jsp');	
+						
+							MENU_5090000.add(MENU_5090016);
+						
+							var MENU_5100000 = new WebFXTreeItem('邮资票品');	
+						
+							root.add(MENU_5100000);
+						
+							var MENU_5110000 = new WebFXTreeItem('发行管理');	
+						
+							MENU_5100000.add(MENU_5110000);
+						
+							var MENU_5110010 = new WebFXTreeItem('发行计划查询','../yzpp/fxgl/fxjh/fxjh_fbedview.jsp');	
+						
+							MENU_5110000.add(MENU_5110010);
+						
+							var MENU_5110020 = new WebFXTreeItem('模型信息查询','../yzpp/fxgl/mxgl/mxgl_gbedview.jsp');	
+						
+							MENU_5110000.add(MENU_5110020);
+						
+							var MENU_5120000 = new WebFXTreeItem('需求管理[票]');	
+						
+							MENU_5100000.add(MENU_5120000);
+						
+							var MENU_5120010 = new WebFXTreeItem('年度需求管理[票]','../xqgl/ndxqgl/ndxq_main.jsp');	
+						
+							MENU_5120000.add(MENU_5120010);
+						
+							var MENU_5120020 = new WebFXTreeItem('零星需求管理[票]','../xqgl/lxqlgl/lxqlgl_main.jsp');	
+						
+							MENU_5120000.add(MENU_5120020);
+						
+							var MENU_5130000 = new WebFXTreeItem('分配管理[票]');	
+						
+							MENU_5100000.add(MENU_5130000);
+						
+							var MENU_5130010 = new WebFXTreeItem('可分邮资票品的发布[票]','../yzpp/fpgl/fbgl/fbgl_main.jsp');	
+						
+							MENU_5130000.add(MENU_5130010);
+						
+							var MENU_5130020 = new WebFXTreeItem('可分邮资票品的查询[票]','../yzpp/fpgl/kfpcx/kfpyzppcx.jsp');	
+						
+							MENU_5130000.add(MENU_5130020);
+						
+							var MENU_5130030 = new WebFXTreeItem('分配计划单管理[票]','../yzpp/fpgl/fpjhd_p/fpjhdgl_p_main.jsp');	
+						
+							MENU_5130000.add(MENU_5130030);
+						
+							var MENU_5130040 = new WebFXTreeItem('分配单管理[票]','../yzpp/fpgl/fpdgl_p/fpdgl_p_main.jsp');	
+						
+							MENU_5130000.add(MENU_5130040);
+						
+							var MENU_5130050 = new WebFXTreeItem('退缴单管理[票]','../yzpp/fpgl/tjdgl/tjdgl_main.jsp');	
+						
+							MENU_5130000.add(MENU_5130050);
+						
+							var MENU_5130060 = new WebFXTreeItem('注销单管理[票]','../yzpp/fpgl/zxd/zxd_main.jsp');	
+						
+							MENU_5130000.add(MENU_5130060);
+						
+							var MENU_5130065 = new WebFXTreeItem('盘点管理[票]              ','../yzpp/fpgl/pdgl/pypk_main.jsp');	
+						
+							MENU_5130000.add(MENU_5130065);
+						
+							var MENU_5130070 = new WebFXTreeItem('入库单管理[票]','../yzpp/fpgl/rkdgl_p/rkdgl_p_main.jsp');	
+						
+							MENU_5130000.add(MENU_5130070);
+						
+							var MENU_5130080 = new WebFXTreeItem('出库单管理[票]','../yzpp/fpgl/rkdgl_p/ckdgl_p_main.jsp');	
+						
+							MENU_5130000.add(MENU_5130080);
+						
+							var MENU_5130090 = new WebFXTreeItem('综合查询[票]','../yzpp/zhcx/zhcx_main_xq.jsp');	
+						
+							MENU_5130000.add(MENU_5130090);
+						
+							var MENU_5130100 = new WebFXTreeItem('转库管理[票]','../yzpp/zkdgl/zkdgl_p_main.jsp');	
+						
+							MENU_5130000.add(MENU_5130100);
+						
+							var MENU_5130110 = new WebFXTreeItem('转库审批[票]','../yzpp/kfgl/zkdsp/zkdgl_psp_main.jsp');	
+						
+							MENU_5130000.add(MENU_5130110);
+						
+							var MENU_5140000 = new WebFXTreeItem('库房管理[票]');	
+						
+							MENU_5100000.add(MENU_5140000);
+						
+							var MENU_5140010 = new WebFXTreeItem('入库单复核[票]','../yzpp/kfgl/rkdfh_p/rkdfh_p_main.jsp');	
+						
+							MENU_5140000.add(MENU_5140010);
+						
+							var MENU_5140020 = new WebFXTreeItem('出库单复核[票]','../yzpp/kfgl/rkdfh_p/ckdfh_p_main.jsp');	
+						
+							MENU_5140000.add(MENU_5140020);
+						
+							var MENU_5140030 = new WebFXTreeItem('包版登记','../yzpp/kfgl/bbdjgl/bbdj_main.jsp');	
+						
+							MENU_5140000.add(MENU_5140030);
+						
+							var MENU_5140040 = new WebFXTreeItem('包版追踪','../yzpp/kfgl/bbzz/bbzz_main.jsp');	
+						
+							MENU_5140000.add(MENU_5140040);
+						
+							var MENU_5140050 = new WebFXTreeItem('库房查询[票]','../xtgl/kfcx/kfcx_main.jsp');	
+						
+							MENU_5140000.add(MENU_5140050);
+						
+							var MENU_5150000 = new WebFXTreeItem('价格管理[票]');	
+						
+							MENU_5100000.add(MENU_5150000);
+						
+							var MENU_5150010 = new WebFXTreeItem('结算比例管理[票]','../yzpp/jggl/jsblgl/jsblgl.jsp');	
+						
+							MENU_5150000.add(MENU_5150010);
+						
+							var MENU_5150020 = new WebFXTreeItem('结算价格管理[票]','../yzpp/jggl/jsjggl/jsjggl.jsp');	
+						
+							MENU_5150000.add(MENU_5150020);
+						
+							var MENU_5150040 = new WebFXTreeItem('零售调价权限设置[票]','../yzpp/jggl/jgsz/powerset.jsp');	
+						
+							MENU_5150000.add(MENU_5150040);
+						
+							var MENU_5150050 = new WebFXTreeItem('零售调价设置[票]','../yzpp/jggl/jgsz/sellprice.jsp');	
+						
+							MENU_5150000.add(MENU_5150050);
+						
+							var MENU_5150060 = new WebFXTreeItem('调价单查询[票]','../yzpp/jggl/tjdcx/tjdcx_yzpp.jsp');	
+						
+							MENU_5150000.add(MENU_5150060);
+						
+							var MENU_5200000 = new WebFXTreeItem('集邮品');	
+						
+							root.add(MENU_5200000);
+						
+							var MENU_5210000 = new WebFXTreeItem('基础信息管理');	
+						
+							MENU_5200000.add(MENU_5210000);
+						
+							var MENU_5210020 = new WebFXTreeItem('基础信息查询','../jyp/jcxgl/jcxxgl_gbedview.jsp');	
+						
+							MENU_5210000.add(MENU_5210020);
+						
+							var MENU_5211000 = new WebFXTreeItem('邮品征订管理');	
+						
+							MENU_5200000.add(MENU_5211000);
+						
+							var MENU_5211100 = new WebFXTreeItem('征订目录查询','../jyp/zdgl/zdml/zdml_gbview.jsp');	
+						
+							MENU_5211000.add(MENU_5211100);
+						
+							var MENU_5211200 = new WebFXTreeItem('征订申报','../jyp/zdgl/zdsb/zdsb_main.jsp');	
+						
+							MENU_5211000.add(MENU_5211200);
+						
+							var MENU_5220000 = new WebFXTreeItem('需求管理[品]');	
+						
+							MENU_5200000.add(MENU_5220000);
+						
+							var MENU_5220010 = new WebFXTreeItem('年度需求管理[品]','../xqgl/ndxqgl/ndxq_jyp_main.jsp');	
+						
+							MENU_5220000.add(MENU_5220010);
+						
+							var MENU_5220020 = new WebFXTreeItem('零星需求管理[品]','../jyp/xqgl/lxsq/lxqlgl_main.jsp');	
+						
+							MENU_5220000.add(MENU_5220020);
+						
+							var MENU_5230000 = new WebFXTreeItem('分配管理[品]');	
+						
+							MENU_5200000.add(MENU_5230000);
+						
+							var MENU_5230010 = new WebFXTreeItem('分配计划单管理[品]','../jyp/fpgl/fpjhd_p/fpmb_main.jsp');	
+						
+							MENU_5230000.add(MENU_5230010);
+						
+							var MENU_5230020 = new WebFXTreeItem('分配单管理[品]','../jyp/fpgl/fpdgl_p/fpdgl_p_main.jsp');	
+						
+							MENU_5230000.add(MENU_5230020);
+						
+							var MENU_5230030 = new WebFXTreeItem('退缴单管理[品]','../jyp/fpgl/tjdgl/tjdgl_main.jsp');	
+						
+							MENU_5230000.add(MENU_5230030);
+						
+							var MENU_5230040 = new WebFXTreeItem('注销单管理[品]','../jyp/fpgl/zxd/zxd_main.jsp');	
+						
+							MENU_5230000.add(MENU_5230040);
+						
+							var MENU_5230050 = new WebFXTreeItem('盘点管理[品]','../jyp/fpgl/pdgl/pypk_main.jsp');	
+						
+							MENU_5230000.add(MENU_5230050);
+						
+							var MENU_5230060 = new WebFXTreeItem('入库单管理[品]','../jyp/fpgl/rkdgl_p/rkdgl_p_main.jsp');	
+						
+							MENU_5230000.add(MENU_5230060);
+						
+							var MENU_5230070 = new WebFXTreeItem('出库单管理[品]','../jyp/fpgl/rkdgl_p/ckdgl_p_main.jsp');	
+						
+							MENU_5230000.add(MENU_5230070);
+						
+							var MENU_5230080 = new WebFXTreeItem('综合查询[品]','../jyp/zhcx/zhcx_main_xq.jsp');	
+						
+							MENU_5230000.add(MENU_5230080);
+						
+							var MENU_5230090 = new WebFXTreeItem('转库管理[品]','../jyp/zkdgl/zkdgl_jyp_main.jsp');	
+						
+							MENU_5230000.add(MENU_5230090);
+						
+							var MENU_5230100 = new WebFXTreeItem('转库审批[品]','../jyp/kfgl/zkdsp/zkdgl_jypsp_main.jsp');	
+						
+							MENU_5230000.add(MENU_5230100);
+						
+							var MENU_5240000 = new WebFXTreeItem('库房管理[品]');	
+						
+							MENU_5200000.add(MENU_5240000);
+						
+							var MENU_5240010 = new WebFXTreeItem('入库单复核[品]','../jyp/kfgl/rkdfh_p/rkdfh_p_main.jsp');	
+						
+							MENU_5240000.add(MENU_5240010);
+						
+							var MENU_5240020 = new WebFXTreeItem('出库单复核[品]','../jyp/kfgl/rkdfh_p/ckdfh_p_main.jsp');	
+						
+							MENU_5240000.add(MENU_5240020);
+						
+							var MENU_5240030 = new WebFXTreeItem('库房查询[品]','../jyp/kfgl/kfcx/kfcx_main.jsp');	
+						
+							MENU_5240000.add(MENU_5240030);
+						
+							var MENU_5250000 = new WebFXTreeItem('价格管理[品]');	
+						
+							MENU_5200000.add(MENU_5250000);
+						
+							var MENU_5250010 = new WebFXTreeItem('零售调价权限设置[品]','../jyp/jggl/jgsz/powerset.jsp');	
+						
+							MENU_5250000.add(MENU_5250010);
+						
+							var MENU_5250020 = new WebFXTreeItem('零售调价设置[品]','../jyp/jggl/jgsz/sellprice.jsp');	
+						
+							MENU_5250000.add(MENU_5250020);
+						
+							var MENU_5250030 = new WebFXTreeItem('结算比率管理[品]','../jyp/jggl/jsblgl/jsblgl.jsp');	
+						
+							MENU_5250000.add(MENU_5250030);
+						
+							var MENU_5250050 = new WebFXTreeItem('结算价格管理[品]','../jyp/jggl/jsjggl/jsjggl.jsp');	
+						
+							MENU_5250000.add(MENU_5250050);
+						
+							var MENU_5250060 = new WebFXTreeItem('调价单查询[品]','../jyp/jggl/tjdcx/tjdcx_jyp.jsp');	
+						
+							MENU_5250000.add(MENU_5250060);
+						
+							var MENU_5260000 = new WebFXTreeItem('形象年册管理');	
+						
+							MENU_5200000.add(MENU_5260000);
+						
+							var MENU_5260010 = new WebFXTreeItem('客户查询','../xxnc/khgl/khgl_main.jsp');	
+						
+							MENU_5260000.add(MENU_5260010);
+						
+							var MENU_5260020 = new WebFXTreeItem('项目申报','../xxnc/xmgl_c/sbd_main.jsp');	
+						
+							MENU_5260000.add(MENU_5260020);
+						
+							var MENU_5300000 = new WebFXTreeItem('预订情况查询');	
+						
+							root.add(MENU_5300000);
+						
+							var MENU_5300020 = new WebFXTreeItem('查询预订情况   ','../jyfx/ydqkcx/ydxx_ydlx_hz.jsp');	
+						
+							MENU_5300000.add(MENU_5300020);
+						
+							var MENU_5400000 = new WebFXTreeItem('系统管理');	
+						
+							root.add(MENU_5400000);
+						
+							var MENU_5400010 = new WebFXTreeItem('机构管理','../xtgl/jggl/jggl_p.jsp');	
+						
+							MENU_5400000.add(MENU_5400010);
+						
+							var MENU_5400020 = new WebFXTreeItem('系统参数管理模块','../xtgl/xtcsgl/xtcsgl_main.jsp');	
+						
+							MENU_5400000.add(MENU_5400020);
+						
+							var MENU_5400030 = new WebFXTreeItem('预订参数管理模块','../xtgl/ydcs/ydcs_main.jsp');	
+						
+							MENU_5400000.add(MENU_5400030);
+						
+							var MENU_5400031 = new WebFXTreeItem('网点通取统一设置','../xtgl/xtcsgl/xtcsgl_main_wdtq.jsp');	
+						
+							MENU_5400000.add(MENU_5400031);
+						
+							var MENU_5400070 = new WebFXTreeItem('库存初始化','../xtgl/initialstock/initialStock_main.jsp');	
+						
+							MENU_5400000.add(MENU_5400070);
+						
+							var MENU_5400080 = new WebFXTreeItem('库存初始化完成','../xtgl/initialstock/initialStock_main_check.jsp');	
+						
+							MENU_5400000.add(MENU_5400080);
+						
+							var MENU_5400090 = new WebFXTreeItem('库存初始化财务确认','../xtgl/initialstock/initialStock_cwhd.jsp');	
+						
+							MENU_5400000.add(MENU_5400090);
+						
+							var MENU_5500000 = new WebFXTreeItem('财务管理');	
+						
+							root.add(MENU_5500000);
+						
+							var MENU_5510000 = new WebFXTreeItem('帐务管理');	
+						
+							MENU_5500000.add(MENU_5510000);
+						
+							var MENU_5300100 = new WebFXTreeItem('出入明细总帐','../jyfx/kcbdqk/kcbd_cx.jsp');	
+						
+							MENU_5510000.add(MENU_5300100);
+						
+							var MENU_5510010 = new WebFXTreeItem('机构流水查询','../zwgl/zwgl/jglscx_main.jsp');	
+						
+							MENU_5510000.add(MENU_5510010);
+						
+							var MENU_5510020 = new WebFXTreeItem('机构明细查询','../zwgl/zwgl/jgmxcx_main.jsp');	
+						
+							MENU_5510000.add(MENU_5510020);
+						
+							var MENU_5510030 = new WebFXTreeItem('营业员收入[日报]查询','../zwgl/yyrb/rjcx_main.jsp');	
+						
+							MENU_5510000.add(MENU_5510030);
+						
+							var MENU_5510040 = new WebFXTreeItem('营业员缴款查询','../zwgl/yyjk/jkcx_main.jsp');	
+						
+							MENU_5510000.add(MENU_5510040);
+						
+							var MENU_5510050 = new WebFXTreeItem('集邮收入报告','../zwgl/jysr/jysr.jsp ');	
+						
+							MENU_5510000.add(MENU_5510050);
+						
+							var MENU_5510060 = new WebFXTreeItem('进发销存报表打印','../zwgl/jfxc/jfxc.jsp');	
+						
+							MENU_5510000.add(MENU_5510060);
+						
+							var MENU_5510070 = new WebFXTreeItem('机构进发销存预结查询','../zwgl/yjcx/yjcx_jgjfxc.jsp');	
+						
+							MENU_5510000.add(MENU_5510070);
+						
+							var MENU_5510080 = new WebFXTreeItem('库房进发销存预结查询','../zwgl/yjcx/yjcx_kfjfxc.jsp');	
+						
+							MENU_5510000.add(MENU_5510080);
+						
+							var MENU_5510090 = new WebFXTreeItem('预订盘盈管理','../zwgl/ydwqpy/ydwqpy_main.jsp');	
+						
+							MENU_5510000.add(MENU_5510090);
+						
+							var MENU_5520000 = new WebFXTreeItem('结算管理');	
+						
+							MENU_5500000.add(MENU_5520000);
+						
+							var MENU_5520010 = new WebFXTreeItem('应付结算单管理','../zwgl/jsgl/yfjsdgl/yfjsd_main.jsp');	
+						
+							MENU_5520000.add(MENU_5520010);
+						
+							var MENU_5530000 = new WebFXTreeItem('财务管理');	
+						
+							MENU_5500000.add(MENU_5530000);
+						
+							var MENU_5530010 = new WebFXTreeItem('应付结算单的勾核','../zwgl/yfjsdgh/yfjsdgh.jsp');	
+						
+							MENU_5530000.add(MENU_5530010);
+						
+							var MENU_5540000 = new WebFXTreeItem('退补款详情查询','../sqyw/ydtbkmxdc.jsp');	
+						
+							MENU_5500000.add(MENU_5540000);
+						
+							var MENU_5600000 = new WebFXTreeItem('代销             ');	
+						
+							root.add(MENU_5600000);
+						
+							var MENU_5610000 = new WebFXTreeItem('分配管理[代销]            ');	
+						
+							MENU_5600000.add(MENU_5610000);
+						
+							var MENU_5610010 = new WebFXTreeItem('分配单管理[代销]   ','../jxc/fpgl/fpdgl_p/fpdgl_p_main.jsp');	
+						
+							MENU_5610000.add(MENU_5610010);
+						
+							var MENU_5610020 = new WebFXTreeItem('退缴单管理[代销]   ','../jxc/fpgl/tjdgl/tjdgl_main.jsp');	
+						
+							MENU_5610000.add(MENU_5610020);
+						
+							var MENU_5610030 = new WebFXTreeItem('入库单管理[代销]   ','../jxc/fpgl/rkdgl_p/rkdgl_p_main.jsp');	
+						
+							MENU_5610000.add(MENU_5610030);
+						
+							var MENU_5610040 = new WebFXTreeItem('出库单管理[代销]   ','../jxc/fpgl/rkdgl_p/ckdgl_p_main.jsp');	
+						
+							MENU_5610000.add(MENU_5610040);
+						
+							var MENU_5620000 = new WebFXTreeItem('库房管理[代销]   ');	
+						
+							MENU_5600000.add(MENU_5620000);
+						
+							var MENU_5620010 = new WebFXTreeItem('入库单复核[代销]   ','../jxc/kfgl/rkdfh_p/rkdfh_p_main.jsp');	
+						
+							MENU_5620000.add(MENU_5620010);
+						
+							var MENU_5620020 = new WebFXTreeItem('出库单复核[代销]   ','../jxc/kfgl/rkdfh_p/ckdfh_p_main.jsp');	
+						
+							MENU_5620000.add(MENU_5620020);
+						
+							var MENU_5640000 = new WebFXTreeItem('结算[代销]');	
+						
+							MENU_5600000.add(MENU_5640000);
+						
+							var MENU_5640010 = new WebFXTreeItem('结算管理[代销]','../jxc/jsgl/jsgl_main.jsp');	
+						
+							MENU_5640000.add(MENU_5640010);
+						
+							var MENU_5640020 = new WebFXTreeItem('结算复核[代销]','../jxc/jsgl/jsfh.jsp');	
+						
+							MENU_5640000.add(MENU_5640020);
+						
+							var MENU_5640030 = new WebFXTreeItem('结算付款[代销]','../jxc/jsgl/jsfk.jsp');	
+						
+							MENU_5640000.add(MENU_5640030);
+						
+							var MENU_5640040 = new WebFXTreeItem('结算确认[代销]','../jxc/jsgl/jsqr.jsp');	
+						
+							MENU_5640000.add(MENU_5640040);
+						
+							var MENU_5640050 = new WebFXTreeItem('应收应付统计[代销]','../jxc/jsgl/ysyftj_ds.jsp');	
+						
+							MENU_5640000.add(MENU_5640050);
+						
+							var MENU_5640060 = new WebFXTreeItem('列收与销售明细查询','../jxc/jsgl/jsgl_lsxsmx.jsp');	
+						
+							MENU_5640000.add(MENU_5640060);
+						
+							var MENU_5650000 = new WebFXTreeItem('综合查询[代销]','../jxc/zhcx/zhcx_main.jsp');	
+						
+							MENU_5600000.add(MENU_5650000);
+						
+							var MENU_56000000 = new WebFXTreeItem('经营分析');	
+						
+							root.add(MENU_56000000);
+						
+							var MENU_560010 = new WebFXTreeItem('期末库存查询','../jyfx/qmkc/qmkccx_main.jsp');	
+						
+							MENU_56000000.add(MENU_560010);
+						
+							var MENU_560100 = new WebFXTreeItem('集邮商品库存调查分析','../jyfx/kcdc/jyfx_kcdc_cx.jsp');	
+						
+							MENU_56000000.add(MENU_560100);
+						
+							var MENU_560300 = new WebFXTreeItem('营业员销售情况汇总查询','../jyfx/qiantai/yyyxsqkhz.jsp');	
+						
+							MENU_56000000.add(MENU_560300);
+						
+							var MENU_560400 = new WebFXTreeItem('单位销售汇总查询','../jyfx/qiantai/dwxsqkhz.jsp');	
+						
+							MENU_56000000.add(MENU_560400);
+						
+							var MENU_560600 = new WebFXTreeItem('集邮品销售结构[按种类]','../jyfx/xsjgfx/cond/p_jyppxsjgfx_main.jsp');	
+						
+							MENU_56000000.add(MENU_560600);
+						
+							var MENU_560700 = new WebFXTreeItem('集邮品销售结构[按票品]','../jyfx/xsjgfx/cond/p_jyppxsjgfx_pp_main.jsp');	
+						
+							MENU_56000000.add(MENU_560700);
+						
+							var MENU_560800 = new WebFXTreeItem('业务收入与业务量比较分析','../jyfx/jysrfx/jysrbj_main.jsp');	
+						
+							MENU_56000000.add(MENU_560800);
+						
+							var MENU_560900 = new WebFXTreeItem('业务收入与业务量排名分析','../jyfx/jysrfx/jysrpm_main.jsp');	
+						
+							MENU_56000000.add(MENU_560900);
+						
+							var MENU_560905 = new WebFXTreeItem('销售明细查询','../sqyw/ybqq_main.jsp');	
+						
+							MENU_56000000.add(MENU_560905);
+						
+							var MENU_57000000 = new WebFXTreeItem('会员管理');	
+						
+							root.add(MENU_57000000);
+						
+							var MENU_5300080 = new WebFXTreeItem('会员销售查询','../jyfx/hyxscx/hyxscx_main.jsp');	
+						
+							MENU_57000000.add(MENU_5300080);
+						
+							var MENU_5300090 = new WebFXTreeItem('会员积分查询','../jyfx/hyjfcx/hyjfcx_main.jsp');	
+						
+							MENU_57000000.add(MENU_5300090);
+						
+							var MENU_5400060 = new WebFXTreeItem('会员基本信息管理模块','../xtgl/hygl/hygl_main.jsp');	
+						
+							MENU_57000000.add(MENU_5400060);
+						
+							var MENU_58000000 = new WebFXTreeItem('集团客户管理');	
+						
+							root.add(MENU_58000000);
+						
+							var MENU_560500 = new WebFXTreeItem('集团客户销售分析','../jyfx/qiantai/jtkhxsfx.jsp');	
+						
+							MENU_58000000.add(MENU_560500);
+						
+							var MENU_5300060 = new WebFXTreeItem('集团客户销售情况查询','../jyfx/jtkhxscx/jtkhxscx_main.jsp');	
+						
+							MENU_58000000.add(MENU_5300060);
+						
+							var MENU_5300070 = new WebFXTreeItem('集团客户帐务查询','../jyfx/jtkhzwcx/jtkhzwcx_main.jsp');	
+						
+							MENU_58000000.add(MENU_5300070);
+						
+							var MENU_5400050 = new WebFXTreeItem('集团客户信息管理模块','../xtgl/jtkhgl/jtkhgl_main.jsp');	
+						
+							MENU_58000000.add(MENU_5400050);
+						
+							var MENU_59000000 = new WebFXTreeItem('多维数据中心');	
+						
+							root.add(MENU_59000000);
+						
+							var MENU_59000010 = new WebFXTreeItem('任务中心','../sqyw/ybqq_main.jsp');	
+						
+							MENU_59000000.add(MENU_59000010);
+						
+							var MENU_59000020 = new WebFXTreeItem('通用下载','../sqyw/tyxz.jsp');	
+						
+							MENU_59000000.add(MENU_59000020);
+							  
+						  document.write(root);
+					        </script>
+					        </td>
+					      </tr>
+					    </table>
+					    </td>
+					  </tr>
+					</table>
+					</body>
+					</html>

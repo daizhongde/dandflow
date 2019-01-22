@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>合法性稽核配置树关系新增界面_配置从已有的配置中选择</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+</head>
+<body>
+<div class="easyui-layout" data-options="fit:true">
+	<div data-options="region:'center',border:false" title="" noheader="true">
+		<div style="padding:5px 0 5px 5px">
+		    <form id="c_form_rel" method="post" action="" style="margin:0;padding:0;">
+		    	<table align="center" width="100%">
+                <tr>
+                    <td>Parent:</td>
+                    <td>
+                        <input id="parent_rel" name="parent" value="" readonly="readonly">
+                    </td>
+                </tr>
+                <tr>
+                    <td>Name:</td>
+                    <td>
+                        <input id="name_rel" name="name" value="" class="easyui-validatebox" type="text" data-options="required:true">
+                    </td>
+                </tr>
+                <tr>
+                    <td>Content:</td>
+                    <td>
+                        <input id="content_rel" name="content" value="">
+                    </td>
+                </tr>
+<!--                 <tr> -->
+<!--                     <td>remark:</td> -->
+<!--                     <td> -->
+<!--                         <input id="remark_rel" name="remark" value=""> -->
+<!--                     </td> -->
+<!--                 </tr> -->
+            </table>
+            </form>
+        </div>
+    </div>
+    <div data-options="region:'south',border:false" style="text-align:right;padding:5px 5px 5px 0;background:#F4F4F4;">
+		<a class="easyui-linkbutton" data-options="iconCls:'icon-ok'" href="javascript:void(0)" onclick="javascript: addRel.submitForm()" style="width:80px">Submit</a>
+		<a class="easyui-linkbutton" data-options="iconCls:'icon-cancel'" href="javascript:void(0)" onclick="javascript:$('#win-small').window('close');" style="width:80px">Cancel</a>
+	</div>
+</div>
+<script type="text/javascript">
+
+$(function(){
+	$('#content_rel').combogrid({
+		url : "../../query/migAuditvConfigCBBQUERYdfind.action",
+		panelWidth : 550,
+		panelHeight : 200,
+		idField : 'audit_id',
+		textField : 'audit_name',
+		pagination : true,
+		fitColumns : false,
+		required : true,
+// 		editable : false,
+		rownumbers : true,
+		mode : 'remote',
+		delay : 500,
+		multiSort : true,
+		sortName : 'domain',
+		sortOrder : 'asc',
+		pageSize : 5,
+		pageList : [ 5, 10 ],
+		onSelect: function(index,row){ },
+// 		frozenColumns: [],
+		columns : [ [ 
+	        { title : 'Audit ID', field : 'audit_id',width : 90,hidden: true  },
+			{ title : 'domain', field : 'domain', width : 80, sortable: true, formatter: function(value,row, index ){
+				for(var i=0, j=domains.length; i<j; i++){
+					if( domains[i].code == value ){
+						return domains[i].value;
+					}
+				}
+				return value;
+			} },
+			{ title : 'table', field : 'table_name', width : 60, sortable: true  },
+			{ title : 'Item', field : 'audit_name', width : 120, sortable: true  },
+			{ title : 'Auditor', field : 'audit_author', width : 60  },
+			{ title : 'Create time',field : "ctime",width : 130,sortable : true}
+		] ]
+	});
+});
+var addRel = VIRTUE.add;
+addRel.submitForm = function (){
+	if( ! $('#c_form_rel').form("validate")  )
+	{
+		return;
+	}
+	var formData = $('#c_form_rel').form( 'getData');
+	addRel.init();
+	for (var field in formData) {
+		addRel.jdata.data[field] = formData[field];
+	}
+
+	jQuery.post( getContextPath()+"/curd/migAuditvConfigtreeCURDadd.action", 
+		{
+			jdata : $.toJSON( addRel.jdata ) 
+		},
+		function(oResponse, status){
+			alert(oResponse.msg);
+
+			if(oResponse.success == true){
+				$('#win-small').window('close');
+				var t = $('#tt');
+				var node = t.tree('getSelected');
+// 				var parent = t.tree('getParent', node.target)
+				t.tree('reload', node.target);
+			}
+	});
+};
+jQuery(document).ready(function(){
+	$("#parent_rel").val( app.foldId );
+}); 
+</script>
+</body>
+</html>

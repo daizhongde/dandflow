@@ -1,0 +1,22 @@
+struts2+spring4.0 integration:
+	struts.xml:
+	    <constant name="struts.objectFactory.spring.autoWire" value="type"/>
+
+
+To support the scoping of beans at the request, session, and global session levels (web-scoped beans), 
+some minor initial configuration is required before you define your beans. 
+(This initial setup is not required for the standard scopes, singleton and prototype.)
+
+If you use a Servlet 2.4+ web container, with requests processed outside of Spring's DispatcherServlet 
+(for example, when using JSF or Struts), 
+you need to add the following 
+javax.servlet.ServletRequestListener to the declarations in your web applications web.xml file:
+
+<listener>
+  <listener-class>
+      org.springframework.web.context.request.RequestContextListener
+  </listener-class>
+</listener>
+
+refer:
+http://static.springsource.org/spring/docs/3.1.0.M1/spring-framework-reference/html/beans.html#beans-factory-scopes-other

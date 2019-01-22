@@ -1,0 +1,516 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>合法性稽核配置树</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="keywords" content="jquery,ui,easy,easyui,web">
+	<meta name="description" content="easyui help you build your web page easily!">
+
+	<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.3.5/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.3.5/themes/icon.css">
+	<script type="text/javascript" src="../../scripts/jquery-1.4.4.min.js"></script>
+	<script type="text/javascript" src="../../scripts/jquery-easyui/1.3.5/jquery.easyui.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/plugins/easyuiExtends.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+
+<link rel="stylesheet" href="../../scripts/codemirror-5.10/lib/codemirror.css" />
+<link rel="stylesheet" href="../../scripts/codemirror-5.10/addon/display/fullscreen.css">
+<script src="../../scripts/codemirror-5.10/lib/codemirror.js"></script>
+<script src="../../scripts/codemirror-5.10/mode/sql/sql.js"></script>
+<link rel="stylesheet" href="../../scripts/codemirror-5.10/addon/hint/show-hint.css" />
+<script src="../../scripts/codemirror-5.10/addon/hint/show-hint.js"></script>
+<script src="../../scripts/codemirror-5.10/addon/hint/sql-hint.js"></script>
+<script src="../../scripts/codemirror-5.10/addon/display/fullscreen.js"></script>
+
+<style type="text/css">
+<!--
+.CodeMirror {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+body {
+    background-color: #C3E3FF;
+}
+#mylayer {
+  position: absolute;
+  left: 5px;
+  top: 30px;
+}
+.icon-unlink{
+	background:url('../../scripts/jquery-easyui/1.4.1/themes/icons/drawjob/unlink.png') no-repeat center center;
+}
+	-->
+</style>
+<script type="text/javascript">
+var newNodeCount = 0;
+var appendFlag = 0;
+var app={};
+app.foldId=0;
+app.configId=0;
+app.newNode = {};
+
+var query = VIRTUE.query;
+var OPE = VIRTUE.operator;
+var update = VIRTUE.update;
+
+var AuditLevels = ajaxReqRespText("/cbb/dicCBBgetDicByType.action?dicType=Config-Level");
+	AuditLevels = eval("(" + AuditLevels + ")");
+	
+var domains = ajaxReqRespText("/cbb/dicCBBgetDicByType.action?dicType=Busi-Domain");
+	domains = eval("(" + domains + ")");
+
+/** update right view panel  **/
+function updateView( node ){
+	if(node.attributes.isleaf==1 ){
+		if(isNotNvl(node.attributes.content)){
+			var pojo = ajaxReqRespText("/curd/migAuditvConfigCURDbrowseById.action?id="+node.attributes.content );
+			pojo = eval ("(" + pojo + ")");
+			for (var field in pojo) {
+				jQuery("#"+field).text(pojo[field]);
+			}
+		}else{
+			
+		}
+	}else{
+		app.oldFoldname = node.text;
+		$(this).tree('beginEdit',node.target);
+	}
+};
+function updateFoldname(node){
+	if(app.oldFoldname != node.text ){
+// 		alert(node.text);
+		update.init();
+		update.jdata.condition.id = node.id;
+		update.jdata.operator.id = OPE.EQUAL;
+		
+		update.jdata.data.name = node.text;
+		jQuery.post( "../../curd/migAuditvConfigtreeCURDmodify.action", { jdata: $.toJSON( update.jdata ) }, function( oResponse, status ){
+//	 		oResponse = eval("(" + oResponse + ")");
+			if(oResponse.success == true){
+				
+			}else{
+				alert(oResponse.msg);
+			}
+		});
+	}
+};
+</script>
+</head>
+<body class="easyui-layout">
+	<div data-options="region:'east',border:true,split:true" style="width:800px;padding:5px;background-color: rgb(228, 235, 241)" title="Config Detail" >
+		<!-- 信息已保存 -->
+		<div id="mylayer" style="display: none;background-color: #FFFFCC" ><font size="4" color="green">信息已保存!</font></div>
+	
+	    <form id="form" method="post" action="">
+	    	<table align="center">
+		    		<tr>
+		    			<td width="25%">Audit Item:</td>
+		    			<td width="25%">
+		    				<span id="audit_name"></span>
+		    			</td>
+		    			<td width="15%">Domain:</td>
+		    			<td width="35%">
+		    				<span id="domain_name"></span>
+		    			</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Table Name:</td>
+		    			<td>
+		    				<span id="table_name"></span>
+		    			</td>
+		    			<td>Expectation:</td>
+		    			<td>
+		    				<span id="audit_value"></span>
+		    			</td>
+		    		</tr>
+		    		
+		    		<tr>
+		    			<td>DB Connection URL:</td>
+		    			<td colspan="3">
+		    				<span id="src_db_connect"></span>
+		    			</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Parameter Template:</td>
+		    			<td colspan="3">
+		    				<span id="mig_sql_rep"></span>
+		    			</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Operator:</td>
+		    			<td>
+		    				<span id="operator"></span>
+		    			</td>
+		    			<td>Auditor:</td>
+		    			<td>
+		    				<span id="audit_author"></span>
+		    			</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Description:</td>
+		    			<td colspan="3">
+		    				<span id="remark"></span>
+		    			</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Source Audit SQL:</td>
+		    			<td colspan="3">
+		    				<span id="src_audit_sql"></span>
+<!-- 		    				<textarea id="src_audit_sql" name="src_audit_sql" style="height:100px;width:95%;font-size: 12px;"  -->
+<!-- 		    				onclick="open_sqleditor()" readonly="readonly"></textarea> -->
+		    			</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Audit Flag:</td>
+		    			<td>
+		    				<span id="audit_flag"></span>
+		    			</td>
+		    			<td></td>
+		    			<td>
+		    			</td>
+		    		</tr>
+	    	</table>
+	    </form>
+	</div>
+	<div data-options="region:'center',border: true" title="(LA)Configuration Tree--Config Tree" style="padding:10px 0 0 0;" noheader="false">
+		<ul id="tt" class="easyui-tree" data-options="url:'../../tree/migAuditvConfigtreeTREEquery_JEasyUI_Tree_Async.action',
+				method:'post', animate:true, dnd:false, lines:true,mode: 'remote',
+				onContextMenu: function(e,node){
+					e.preventDefault();
+					$(this).tree('select',node.target);
+					if(node.attributes.isleaf==0){
+						$('#mm-fold').menu('show',{
+							left: e.pageX,
+							top: e.pageY
+						});
+					}else{
+						if( isNotNvl(node.attributes.content) ){
+							$('#mm-leaf').menu('show',{
+								left: e.pageX,
+								top: e.pageY
+							});
+						}else{
+							$('#mm-nullleaf').menu('show',{
+								left: e.pageX,
+								top: e.pageY
+							});
+						}
+					}
+				},
+				//onExpand: function(node){
+				//	if(appendFlag==1){
+				//		append_F();
+				//		appendFlag=0;
+				//	}
+				//},
+				onClick: updateView,
+				onAfterEdit: updateFoldname"
+		></ul>
+	</div>
+	<div id="mm-fold" class="easyui-menu" style="width:120px;">
+		<div onclick="append()" data-options="iconCls:'icon-add'">add new config</div>
+		<div onclick="appendBySelect()" data-options="iconCls:'icon-add'">add existed config</div>
+		<div onclick="appendFold()" data-options="iconCls:'icon-add'">add fold</div>
+		<div onclick="removeFold()" data-options="iconCls:'icon-remove'">remove</div>
+		<div class="menu-sep"></div>
+		<div onclick="expand()">expand</div>
+		<div onclick="collapse()">collapse</div>
+		<div class="menu-sep"></div>
+		<div onclick="expandAll()">expandAll</div>
+		<div onclick="collapseAll()">collapseAll</div>
+	</div>
+	<div id="mm-leaf" class="easyui-menu" style="width:120px;">
+		<div onclick="modifyLeaf()" data-options="iconCls:'icon-add'">modify config</div>
+		<div onclick="modifyName()" data-options="iconCls:'icon-edit'">edit name</div>
+		<div onclick="unbind()" data-options="iconCls:'icon-unlink'">unbind</div>
+		<div onclick="removeLeaf()" data-options="iconCls:'icon-remove'">remove</div>
+	</div>
+	<div id="mm-nullleaf" class="easyui-menu" style="width:120px;">
+		<div onclick="append()" data-options="iconCls:'icon-undo'">bind new config</div>
+		<div onclick="appendBySelect()" data-options="iconCls:'icon-undo'">bind existed config</div>
+		<div onclick="modifyName()" data-options="iconCls:'icon-edit'">edit name</div>
+		<div onclick="removeLeaf()" data-options="iconCls:'icon-remove'">remove</div>
+	</div>
+	
+	<div id="win" class="easyui-window" title="添加" style="width:600px;height:450px"  
+        data-options="modal:true,closed:true,resizable:true">
+	</div>
+	<div id="win-small" class="easyui-window" title="新建" style="width:350px;height:250px"  
+        data-options="modal:true,closed:true">
+	</div>
+<script type="text/javascript">
+function appendBySelect(){
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	app.foldId = node.id;
+	
+	app.configId = 0;
+	$('#win-small').window('open').window('setTitle', 'New');
+	
+	if( node.attributes.isleaf==0 ){
+		$('#win-small').window("refresh", "migAuditvConfigtree_add.html?id="+app.foldId);
+	}else{
+		app.auditName=""
+		$('#win-small').window("refresh", "migAuditvConfigtree_add2.html?id="+app.foldId);
+	}
+};
+
+function appendFold(){
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	app.foldId = node.id;
+	
+	app.configId = 0;
+	$('#win-small').window('open').window('setTitle', 'New');
+	$('#win-small').window("refresh", "migAuditvConfigtree_add3.html?id="+app.foldId);
+};
+
+function removeFold(){
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	var parent = t.tree('getParent', node.target)
+	app.foldId = node.id;
+	
+	var del = {};
+	del.jdata = {act: "del",condition: { id: "" },operator : {id : 1} };
+	$.messager.confirm('Confirm','Confirm Remove?',function(r){
+		if (r){
+			del.jdata.condition.id = node.id;
+			del.jdata.condition.parent = parent.id;
+			console.log("parent.id:"+parent.id);
+			$.post( getContextPath()+"/curd/migAuditvConfigtreeCURDdelete.action", {
+				jdata:  $.toJSON( del.jdata )
+			}, function(result, status){
+				if (result.success){
+					
+				}else{
+					alert(result.msg);
+				}
+				var t = $('#tt');
+				var node = t.tree('getSelected');
+				var parent = t.tree('getParent', node.target)
+				t.tree('reload', parent.target);
+			});
+		}
+	});
+};
+	
+/** add a module event hander */
+function append() {
+// 	newNodeCount ++;
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	app.foldId = node.id;
+// 	app.selectedNode= node;
+// 	node.id
+/*  1:insert into config
+    2:insert into rel 
+    */
+// 	createJobNode( x, y,node );
+	$('#win').window('open').window('setTitle', 'New');
+	$('#win').window("refresh", "migAuditvConfig_add.html");
+	
+// 	if(node.state=="closed")//deal with asyc node
+// 	{
+// 		appendFlag = 1;
+// 		t.tree('expand', node.target);
+// 	}
+// 	else
+// 	{
+// 		append_F();
+// 	}
+};
+/** add a module,append a node finally */
+function append_F() {
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+			
+// 	var newNode = {
+// 		id: 'newNode' + newNodeCount,
+// 		text : 'newNode' + newNodeCount,
+// 		state: 'open',
+// 		attributes :{
+// 			leaf: 'true',
+// 			parent: node.id,
+// 			content: "",
+// 			remark: 'remark...'
+// 		}
+// 	};
+	
+	t.tree('append', {
+		parent : (node ? node.target : null),
+		data : [ app.newNode ]
+	} );
+	
+// 	find a node and then select it
+	var newNode1 = t.tree( 'find', 'newNode'+newNodeCount );
+// 	t.tree('select', newNode1.target);
+// 	t.tree('scrollTo',newNode1.target);
+// 	updateView( newNode1 );
+	
+	VIRTUE.add.init();
+	VIRTUE.add.jdata.data.name = newNode1.text;
+	VIRTUE.add.jdata.data.path = newNode1.attributes.url;
+	VIRTUE.add.jdata.data.leaf = newNode1.attributes.leaf;
+	VIRTUE.add.jdata.data.parent = newNode1.attributes.parent;
+	VIRTUE.add.jdata.data.level = newNode1.attributes.level;
+	VIRTUE.add.jdata.data.order = newNode1.attributes.order;
+	VIRTUE.add.jdata.data.note = newNode1.attributes.note;
+	
+	createModel( VIRTUE.add.jdata, newNode1 );
+}
+
+function modifyLeaf(){
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	
+	var read = {};
+	read.jdata = { act: "read",condition: {audit_id: ""}, operator : {audit_id:1} };
+	read.jdata.condition.audit_id = node.attributes.content;
+	$('#win').window('open').window('setTitle', 'Edit');
+	$('#win').window("refresh", getContextPath()+"/curd/migAuditvConfigCURDinitModify2.action?jdata="+$.toJSON( read.jdata ) );
+};
+function modifyName(){
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	
+	var read = {};
+	read.jdata = { act: "read",condition: {id: ""}, operator : {id:1} };
+	read.jdata.condition.id = node.id;
+	$('#win-small').window('open').window('setTitle', 'Edit');
+	$('#win-small').window("refresh", getContextPath()+"/curd/migAuditvConfigtreeCURDinitModify.action?jdata="+$.toJSON( read.jdata ) );
+};
+function unbind(){
+	var t = $('#tt');
+	var node = t.tree('getSelected')
+	
+	var update={};
+	update.jdata = { act: "update", data : {content: null }, algorithm:{}, condition: {id: node.id }, operator : {id:1} };
+// 	jQuery.post("../../curd/migAuditvConfigtreeCURDmodifyContent2NULL.action", {//两个都可以
+	jQuery.post("../../curd/migAuditvConfigtreeCURDmodify.action", {
+		jdata : jQuery.toJSON( update.jdata )
+	}, function(oResponse, status) {
+		if (oResponse.success == true) {
+
+		}else {
+			alert(oResponse.msg);
+		}
+// 		var t = $('#tt');
+// 		var node = t.tree('getSelected');
+		var parent = t.tree('getParent', node.target)
+		t.tree('reload', parent.target);
+	});
+};
+ /**
+  * del a module:
+  	1:cud.jdata.del.rows.push(1);
+  */
+function removeLeaf() {
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	var parent = t.tree('getParent', node.target)
+	
+	VIRTUE.del.init();
+	VIRTUE.del.jdata.condition.id = node.id; 
+	VIRTUE.del.jdata.condition.parent = parent.id; 
+	VIRTUE.del.jdata.operator.id = VIRTUE.operator.EQUAL;//default,this line can comment
+	destroyModel( VIRTUE.del.jdata, node );
+// 	$('#tt').tree('remove', node.target);
+};
+function collapse() {
+	var node = $('#tt').tree('getSelected');
+	$('#tt').tree('collapse', node.target);
+};
+function expand() {
+	var node = $('#tt').tree('getSelected');
+	$('#tt').tree('expand', node.target);
+};
+function collapseAll() {
+	$('#tt').tree('collapseAll');
+}
+function expandAll() {
+	$('#tt').tree('expandAll');
+}
+/** create db model 
+ *
+ @param jdata for sqlassembel
+ @param id new node's id
+ */
+function createModel( jdata, newNode1 ){
+	var t = $('#tt');
+	
+	jQuery.post("../../curd/migAuditvConfigtreeCURDaddRetId.action", {
+		jdata : encodeURI( jQuery.toJSON( jdata ) )
+	}, function(oResponse, status) {
+// 		oResponse = eval("(" + oResponse + ")");
+// 		alert(oResponse.msg);
+		if (oResponse.success == true) {
+			t.tree('update', {
+	 			target: newNode1.target,
+	 			id: oResponse.id
+	 		});
+			var newNode = t.tree( 'find', oResponse.id );
+		 	t.tree('select', newNode.target);
+		 	t.tree('scrollTo',newNode.target);
+		 	updateView( newNode );
+		}else{
+			alert(oResponse.msg);
+			t.tree( 'remove', newNode1.target );
+		}
+	});
+};
+
+/** update db model **/
+function updateModel( jdata, node ){
+	jQuery.post("../../curd/migAuditvConfigtreeCURDmodify.action", {
+		jdata : encodeURI( jQuery.toJSON( jdata ) )
+	}, function(oResponse, status) {
+		var t = jQuery('#tt');
+// 		oResponse = eval("(" + oResponse + ")");
+// 		alert(oResponse.msg);
+		if (oResponse.success == true) {
+			//弹出一个层一秒钟后消失
+		    document.getElementById("mylayer").style.display="inline";
+		    var t=setTimeout("document.getElementById('mylayer').style.display='none'",1000);
+		    
+			if( node != null && node != undefined )
+			{
+				t.tree( 'reload' );
+			}
+		}else if (oResponse.success == false) {
+			alert(oResponse.msg);
+			t.tree( 'reload' );
+		}
+	});
+};
+
+/** delete db model 
+ *@param jdata for sqlassembel
+  @param node to judge whether delete node is last node
+ */
+function destroyModel( jdata, node ){
+	/** there two post request, You can use a delete request do all back process, but it with Low efficiency  **/
+	jQuery.post("../../curd/migAuditvConfigtreeCURDdelete.action", {
+		jdata :  jQuery.toJSON( jdata )
+	}, function(oResponse, status) {
+		var t = $('#tt');
+// 		oResponse = eval("(" + oResponse + ")");
+// 		alert(oResponse.msg);
+		if (oResponse.success == true) {
+			
+		}else{
+			alert(oResponse.msg);
+		}
+		var t = $('#tt');
+		var node = t.tree('getSelected');
+		var parent = t.tree('getParent', node.target)
+		t.tree('reload', parent.target);
+	});
+};
+
+</script>
+</body>
+</html>

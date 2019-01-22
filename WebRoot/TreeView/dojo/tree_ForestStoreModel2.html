@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--
+ ! Excerpted from "Mastering Dojo",
+ ! published by The Pragmatic Bookshelf.
+ ! Copyrights apply to this code. It may not be used to create training material, 
+ ! courses, books, articles, and the like. Contact us if you are in doubt.
+ ! We make no guarantees that this code is fit for any purpose. 
+ ! Visit http://www.pragmaticprogrammer.com/titles/rgdojo for more book information.
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>菜单树 ForestStoreModel2</title>
+<!--     <style type="text/css"> -->
+<!--         @import "/dojo-1.9.1/dijit/themes/tundra/tundra.css"; -->
+<!--     </style> -->
+    <!-- 
+	http://ajax.googleapis.com/ajax/libs/dojo/1.9.1/dojo/dojo.js
+	http://dojotoolkit.org/reference-guide/1.9/_static/js/dojo/dojo.js
+	http://demos.dojotoolkit.org/dojo/dojo.js 
+	/dojo-1.9.1/dojo/dojo.js
+	 -->
+ 	<style type="text/css">
+		@import "/dojo-1.9.1/dijit/themes/claro/document.css";
+	</style>
+	<link id="themeStyles" rel="stylesheet" href="/dojo-1.9.1/dijit/themes/claro/claro.css"/>
+    <script type="text/javascript" src="/dojo-1.9.1/dojo/dojo.js"  djConfig="parseOnLoad: true"></script>
+<!--     <script type="text/javascript" src="/dojo-1.9.1/dijit/tests/boilerplate.js" ></script> -->
+    
+	<script type="text/javascript">
+		require([
+			"dojo/parser",
+			"dojo/data/ItemFileWriteStore",
+			"dijit/Tree",
+			"dijit/tree/ForestStoreModel",
+			"dijit/ColorPalette",
+			"dijit/Menu",
+			"dijit/MenuItem",
+			"dijit/PopupMenuItem",
+			"dojo/domReady!"
+		], function(parser){
+			parser.parse();
+		});
+	</script>
+</head>
+<body class="claro">
+   <!-- url="../../common/query_Dojo_TreeCommonmodule.action"    -->
+   <div dojoType="dojo.data.ItemFileReadStore" 
+        url="../../tree/tAuthorityModuleTREEquery_Dojo_Tree_NoRoot.action"
+        jsId="ordJson"></div>
+<!-- 
+	rootId="1", rootLabel="湖南社保金融卡省内前置系统R"
+    data-dojo-props="store: ordJson"
+    childrenAttrs="children"   
+    jsId="ordModel"
+ -->
+	<div data-dojo-id="continentStore" data-dojo-type="dojo/data/ItemFileWriteStore" data-dojo-props='url:"../../tree/tAuthorityModuleTREEquery_Dojo_Tree_NoRoot.action"'></div>
+	<div data-dojo-id="continentModel" data-dojo-type="dijit/tree/ForestStoreModel" data-dojo-props='store:continentStore, 
+		rootId:"1", rootLabel:"湖南社保金融卡省内前置系统R", childrenAttrs:["children"]'></div>
+
+	<div id="mytree" data-dojo-type="dijit/Tree" aria-label="mytree" data-dojo-props='model:continentModel, openOnClick:true, onLoad:function(){ console.log("loaded mytree (first tree)"); }'>
+<!-- 		<script type="dojo/method" data-dojo-event="onClick" data-dojo-args="item"> -->
+<!-- 			console.log("Execute of node " + continentStore.getLabel(item) -->
+<!-- 				+", population=" + continentStore.getValue(item, "population")); -->
+<!-- 		</script> -->
+<!-- 		<script type="dojo/method" data-dojo-event="onOpen" data-dojo-args="item"> -->
+<!-- 			console.log("Open of node " + (continentStore.getLabel(item) || "root")); -->
+<!-- 		</script> -->
+<!-- 		<script type="dojo/method" data-dojo-event="onClose" data-dojo-args="item"> -->
+<!-- 			console.log("Close of node " + (continentStore.getLabel(item) || "root")); -->
+<!-- 		</script> -->
+	</div>
+</body></html>        

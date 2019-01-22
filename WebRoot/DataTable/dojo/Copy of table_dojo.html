@@ -1,0 +1,287 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html dir="ltr">
+<head>
+	<title>数据表格 by dojo</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+	<link rel=stylesheet href="/dojo-1.9.1/dojox/grid/tests/enhanced/support/common.css"/>
+	<style type="text/css">
+		html, body {
+			width: 100%;	/* make the body expand to fill the visible window */
+			height: 100%;
+			overflow: hidden;	/* erase window level scrollbars */
+			padding: 0 0 0 0;
+			margin: 0 0 0 0;
+		}
+	</style>
+<script type="text/javascript" src="/dojo-1.9.1/dojo/dojo.js" data-dojo-config="isDebug:false, parseOnLoad: true"></script>
+<script type="text/javascript">
+dojo.require("dijit.dijit"); // optimize: load dijit layer
+//dojo.require("dojo.data.ItemFileWriteStore");
+
+dojo.require("dijit.layout.BorderContainer");
+dojo.require("dijit.layout.ContentPane");
+dojo.require('dijit.form.TextBox');
+dojo.require('dijit.form.NumberTextBox');
+dojo.require('dijit.form.Select');
+dojo.require('dijit.form.Button');
+dojo.require("dojox.data.QueryReadStore");
+dojo.require("dojox.grid.EnhancedGrid");
+dojo.require("dojox.grid.enhanced.plugins.Pagination");
+//dojo.require("dojox.grid.enhanced.plugins.DnD");
+//dojo.require("dojox.grid.enhanced.plugins.Menu");
+dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+//dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+//dojo.require(["dojo/parser", "dijit/form/Select"]);
+//dojo.require(["dojo/parser", "dijit/form/TextBox"]);
+//dojo.require(["dojo/parser", "dijit/form/Button"]);
+dojo.require("dojo.parser");
+dojo.require("dojo.json");
+
+/** format level **/
+function fmtNmlevel(value, idx){
+// 	n = new Number(n);
+	switch( value ){
+		case 0: return '零级'; break;
+		case 1: return '一级'; break;
+		case 2: return '二级'; break;
+		case 3: return '三级'; break;
+		case 4: return '四级'; break;
+		default: return value;
+	}
+};
+/** format node type  **/
+function fmtCmleaf(value, idx){
+	value = new String(value);
+	if( value == "true" ){
+		return '叶子';
+	}else if( value == "false" ){
+		return '非叶子';
+	}else{
+		return value;
+	}
+};
+
+var fixlayout = {
+	noscroll: true,
+    cells: [
+		{ field: "ID", name:"模块ID", datatype:"number", width: 4, hidden:true },
+		{ field: "NAME", name:"模块名称", datatype:"string", width: 15.5 }
+	]
+};
+    
+var mainlayout = {
+// 	onBeforeRow: beforerow,
+//	onAfterRow: afterrow,
+	cells: [
+		{ field: "LEVEL1", name:"模块级别", datatype:"string", width: 6, formatter: fmtNmlevel },
+		{ field: "LEAF", name:"模块类型", datatype:"string", width: 6, formatter: fmtCmleaf },
+		{ field: "ORDER1", name:"模块次序号", datatype:"string", width: 6},
+		{ field: "SUPER", name:"上级模块", datatype:"string", width: 15.5},
+		{ field: "TARGET", name:"链接目标", datatype:"string", hidden:true },
+		{ field: "ICONCLS", name:"模块图标样式", datatype:"string", hidden:true },
+		{ field: "EXPANDED", name:"展开状态", datatype:"boolean", hidden:true },
+		{ field: "CHECKED", name:"选定状态", datatype:"boolean", hidden:true },
+		{ field: "PATH", name:"模块路径", datatype:"string", width: 20},
+		{ field: "NOTE", name: "模块备注", datatype:"string", width: 20},
+		{ field: "CTIME", name: "创建时间", datatype:"date", hidden:true },
+		{ field: "CIP", name: "创建者使用的IP", datatype:"string", hidden:true },
+		{ field: "CUSER", name: "创建者", datatype:"string", hidden:true },
+		{ field: "MTIME", name: "最后修改时间", datatype:"time", hidden:true },
+		{ field: "MIP", name: "最后修改者使用的IP", datatype:"string", hidden:true },
+		{ field: "MUSER", name: "最后修改者", datatype:"string", hidden:true }
+	]
+};
+var layout = [ fixlayout, mainlayout ];
+
+/* var layout = [{
+	cells: [
+		{ field: "ID", name:"模块ID", datatype:"number", width: 4, hidden:true },
+		{ field: "NAME", name:"模块名称", datatype:"string", width: 15.5},
+		{ field: "LEVEL1", name:"模块级别", datatype:"string", width: 6, formatter: fmtNmlevel },
+		{ field: "LEAF", name:"模块类型", datatype:"string", width: 6, formatter: fmtCmleaf },
+		{ field: "ORDER1", name:"模块次序号", datatype:"string", width: 6},
+		{ field: "SUPER", name:"上级模块", datatype:"string", width: 15.5},
+		{ field: "TARGET", name:"链接目标", datatype:"string", hidden:true },
+		{ field: "ICONCLS", name:"模块图标样式", datatype:"string", hidden:true },
+		{ field: "EXPANDED", name:"展开状态", datatype:"boolean", hidden:true },
+		{ field: "CHECKED", name:"选定状态", datatype:"boolean", hidden:true },
+		{ field: "PATH", name:"模块路径", datatype:"string", width: 20},
+		{ field: "NOTE", name: "模块备注", datatype:"string", width: 20},
+		{ field: "CTIME", name: "创建时间", datatype:"date", hidden:true },
+		{ field: "CIP", name: "创建者使用的IP", datatype:"string", hidden:true },
+		{ field: "CUSER", name: "创建者", datatype:"string", hidden:true },
+		{ field: "MTIME", name: "最后修改时间", datatype:"time", hidden:true },
+		{ field: "MIP", name: "最后修改者使用的IP", datatype:"string", hidden:true },
+		{ field: "MUSER", name: "最后修改者", datatype:"string", hidden:true }
+	]
+}]; */
+	
+var plugins = {
+	pagination: {
+		pageSizes: [10, 25, 30, 50, 100, Infinity],// Array, custom the items per page button
+		description: true,	// boolean, custom whether or not the description will be displayed
+		sizeSwitch: true,	// boolean, custom whether or not the page size switch will be displayed
+		pageStepper: true,	// boolean, custom whether or not the page step will be displayed
+		gotoButton: true,	// boolean, custom whether or not the goto page button will be displayed
+		maxPageStep: 10,	// Integer, custom how many page step will be displayed
+		position: "bottom",	// String, custom the position of the pagination bar. There're two options: top, bottom
+		defaultPage: 1, 	// Integer, which page will be displayed by default 
+		defaultPageSize: 25 // Integer, what page size will be used by default
+	},
+	nestedSorting: true
+};
+
+//var jsonStr = dojo.json.stringify( jdata );
+//alert( jsonStr );
+
+//encodeURI( JSON.stringify(  jdata ) )
+/**
+// The parameter "query" contains the data that are sent to the server.
+var store = new dojox.data.QueryReadStore({url:'/search.php'});
+      store.fetch({query:{name:'a'}, queryOptions:{ignoreCase:false}});
+      // Since "serverQuery" is given, it overrules and those data are
+      // sent to the server.
+      store.fetch({serverQuery:{name:'a'}, queryOptions:{ignoreCase:false}});
+
+**/
+var queryOptions = {};
+// if(dojo.byId("ignoreCaseEnabled").checked){
+// 	queryOptions.ignoreCase = dojo.query("#fetchForm")[0].ignoreCase[0].checked;
+// }
+// if(dojo.byId("deepEnabled").checked){
+// 	queryOptions.deep = dojo.query("#fetchForm")[0].deep[0].checked;
+// }
+
+// fetch: function(request){
+// 	request.serverQuery = {q: request.query.name, start: request.start, count: request.count};
+// 	return this.inherited("fetch", arguments);
+// }
+			
+				//  request.serverQuery = {
+				//          q:request.query.name,
+				//          ignoreCase:request.queryOptions.ignoreCase,
+				//          deep:request.queryOptions.deep
+				//      };
+				
+var query = {};
+// query.q = dojo.byId("searchText").value;
+//query.jdata = dojo.json.stringify( jdata ) ;
+query.jdata = { act: "query",condition: { nmlevel: [0,1,2,3] },operator : { nmlevel : 13 } };
+// dojo.toJson(items)
+// dojo.toJson(request)
+
+// var request = {query: query, queryOptions: queryOptions};
+// request.start = 0;//app.start;
+// request.count = 20;//app.pageSize
+
+var app = { query: query, queryOptions: queryOptions };
+app.start = 0;
+app.count = 25;
+var jdata = { act: "noquery", condition: {}, operator : {} };
+
+store = new dojox.data.QueryReadStore({
+	requestMethod:"post",
+	//url: "../../dojoQuery/tAuthorityModuleDojoQUERYdfind.action?start=0&count=20&jdata=" + encodeURI( dojo.json.stringify( jdata ) ),//for unit test
+	url: "../../dojoQuery/tAuthorityModuleDojoQUERYdfind.action",
+	fetch: function( request ){
+		request.serverQuery = {
+			//q:request.query.name, 
+			jdata: encodeURI( dojo.json.stringify( app.query.jdata ) ),
+			//query:{ jdata: dojo.json.stringify( jdata ) }, 
+			//queryOptions: {}, 
+			//sort: [{attribute: 'LEVEL1', descending: true },{attribute: 'LEAF', descending: false}], 
+			start: app.start, 
+			count: app.count 
+		};
+		return this.inherited("fetch", arguments);
+	}
+});
+</script>
+</head>
+<body class="claro">
+<!-- 
+liveSplitters="true" persist="false" id="borderContainer" design="sidebar"
+data-dojo-props="design:'sidebar', gutters:true, liveSplitters:true, persist:true, id='borderContainer'"
+ -->
+	<div dojoType="dijit/layout/BorderContainer" liveSplitters="true" persist="false"
+		          id="verticalSplitParam" design="sidebar" style="width: 100%; height: 100%;">
+	
+<!-- region="top" splitter="false" style="height:90px;background:#B3DFDA;"  -->
+	  <div dojoType="dijit/layout/ContentPane" id="mysearch" title="查询条件"
+		             region="top" splitter="true" style="height:50px;background:#B3DFDA;" >
+		  <div style="padding:0px 0 0px 0px">  
+	        <form id="ff" method="post">  
+	            <table>  
+	                <tr>
+	                    <td>
+	                        <label for="nmlevel">模块级别:</label>
+							<select name="nmlevel" data-dojo-type="dijit/form/Select" style="width:200px;">
+								<option value="" selected="selected">--选择--</option>
+							    <option value="0">零级</option>
+							    <option value="1">一级</option>
+							    <option value="2">二级</option>
+							    <option value="3">三级</option>
+							    <option value="4">四级</option>
+							</select>
+	                    </td>
+	                    <td>
+	                        <label for="cmleaf">模块类型:</label>
+							<select name="cmleaf" data-dojo-type="dijit/form/Select" style="width:200px;">
+								<option value="" selected="selected">--选择--</option>
+							    <option value="true">叶子</option>
+							    <option value="false">非叶子</option>
+							</select>
+	                    </td>
+	                    <td>
+	                        <label for="nmparent">上级模块:</label>
+							<input type="text" name="nmparent" value=""
+							    data-dojo-type="dijit/form/TextBox"
+							    data-dojo-props="trim:true, propercase:false" id="nmparent" />
+	                    </td>
+	                    <td>
+	                        <label for="cmname">模块名称:</label>
+							<input type="text" name="cmname" value=""
+							    data-dojo-type="dijit/form/TextBox"
+							    data-dojo-props="trim:true, propercase:false" id="cmname" />
+	                    </td>
+	                    <td>
+	                    	<div style="padding:0px 0 0px 15px">
+	                        	<button data-dojo-type="dijit.form.Button" onclick="submitForm()">查询</button>
+								<button data-dojo-type="dijit.form.Button" onclick="clearForm()">清空</button>
+								<button data-dojo-type="dijit.form.Button" onclick="exportData()">导出</button>
+	                        </div>
+	                    </td>
+	                </tr>
+	            </table>
+	        </form>
+	        </div>
+		</div>
+		<!-- style="width: 100%; height: 100%" 
+		<div id="grid" dojoType="dojox/grid/EnhancedGrid" store="test_store[0]" structure="layout" plugins="plugins" summary="A customized grid summary"
+			  region="center" ></div>
+			  query="{ jdata:'encodeURI( dojo.json.stringify( jdata ) )' }"
+			  
+		grid = new dojox.grid.EnhancedGrid({
+			id: "grid",
+			store: test_store,
+			structure: layout,
+			rowSelector: "20px",
+			sortFields: [{attribute: 'LEVEL1', descending: true },{attribute: 'LEAF', descending: false}],//default sorting order
+			canSort: function(colIndex, field){
+				return colIndex != 0 && field != 'NAME';
+			},
+			plugins: {nestedSorting: true}
+		});
+		-->
+		<div id="grid" dojoType="dojox/grid/EnhancedGrid" store="store" structure="layout" plugins="plugins" summary="A customized grid summary"
+			rowsPerPage="app.count" 
+			sortFields="[{attribute: 'LEVEL1', descending: true },{attribute: 'LEAF', descending: false}]"
+			data-dojo-props="canSort: function(colIndex, field){
+				return colIndex != 0 && field != 'NAME' && field != 'PATH' && field != 'NOTE';
+			}"
+			region="center" ></div>
+		
+	</div>
+</body>
+</html>

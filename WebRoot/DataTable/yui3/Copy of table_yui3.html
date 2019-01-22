@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>数据表格 by YUI 3.10.3</title>
+<meta charset="UTF-8">
+
+<style>
+/* We use a base CSS class "yui3-pagview-bar" for the Paginator bar that is included in
+   the paginator-view package    */
+#pagContainerBar {
+	font-size: 12px;
+	vertical-align: middle;
+	padding: 4px 0;
+}
+
+#pagContainerBar img.pgControls {
+	width: auto;
+	height: 12px;
+	padding: 0 4px 0 4px;
+	border: none;
+	vertical-align: middle;
+	cursor: pointer;
+}
+
+#pagContainerBar img.yui3-pagview-disabled {
+	cursor: default;
+}
+</style>
+<!-- 
+	<script src="http://localhost:80/lib/3.10.3/build/yui/yui-min.js"></script>
+	<script src="http://yui.yahooapis.com/3.10.3/build/yui/yui-min.js"></script>
+	-->
+<script src="http://10.10.6.110:80/lib/3.10.3/build/yui/yui-min.js"></script>
+<script>
+	var app = {};
+	var query = {};
+	query.jdata = {
+		act : "query",
+		condition : {},
+		operator : {}
+	};
+	var request = {
+		query : query
+	};
+	request.start = 0;
+	request.count = 25;
+
+	// YUI().use("datatable", "datasource-get", "datasource-jsonschema", "datatable-datasource", function (Y) {
+	YUI({
+		filter : 'min',
+		combine : true
+// 		gallery : 'gallery-2013.01.16-21-05'
+	})
+			.use(
+					'node',
+					'datatable-sort',
+					'datatable-scroll',
+					'datatype',
+					'cssfonts',
+					'cssbutton',
+					'datasource-get',
+					"datasource-jsonschema",
+					"datatable-datasource",
+					'querystring-stringify',
+					"gallery-datatable-paginator",
+					'gallery-paginator-view',
+					function(Y) {
+
+						//
+					//  Setup a DataSource to use IO, with JSON parsing setup
+					//
+					    var url     = "../../yui3Query/tAuthorityModuleYUI3QUERYdfind.action";
+
+					    var ds = new Y.DataSource.Get( { source: url } );     // uses HTTP GET request via IO
+
+					    ds.plug(Y.Plugin.DataSourceJSONSchema, {
+					        schema: {
+					          resultListLocator: "Results",
+					          resultFields: [ "ID", "NAME", "LEVEL1", "LEAF","ORDER1", 
+					                          "SUPER", "TARGET", "ICONCLS", "EXPANDED", "CHECKED", 
+					                          "PATH", "NOTE", "CTIME", "CIP", "CUSER", 
+					                          "MTIME","MIP", "MUSER" ],
+
+					       // NOTE: the "meta" is important to retain from the response, for the paginator ....
+					       //       they map to the PaginatorModel attributes ...
+					          metaFields: {
+					              page:         "page",
+					              itemsPerPage: "itemsPerPage",
+					              totalItems:   "totalRecords"
+					          }
+					        }
+					    });
+
+					//
+					//  Paginator Bar Example
+					//
+					    var cols = [
+					        { key: "ID", label: "模块ID" },
+					        { key: "NAME",  label: "模块名称" },
+					        { key: "LEVEL1",   label: "模块级别", className:'align-center' },
+					        { key: "LEAF",  label: "模块类型" },
+					        { key: "ORDER1",  label: "模块次序号" },
+					        { key: "SUPER",  label: "上级模块" },
+					        { key: "TARGET",  label: "链接目标" },
+					        { key: "ICONCLS",  label: "模块图标样式" },
+					        { key: "EXPANDED",  label: "展开状态" },
+					        { key: "CHECKED",  label: "选定状态" },
+					        { key: "PATH",  label: "模块路径" },
+					        { key: "NOTE",  label: "模块备注" },
+					        { key: "CTIME",  label: "创建时间" },
+					        { key: "CIP",  label: "创建者使用的IP" },
+					        { key: "CUSER",  label: "创建者" },
+					        { key: "MTIME",  label: "最后修改时间" },
+					        { key: "MIP",  label: "最后修改者使用的IP" },
+					        { key: "MUSER",  label: "最后修改者" }
+					    ];
+
+					    var dtable = new Y.DataTable({
+					        columns:    cols,
+					        scrollable: 'y',
+					        sortable:   true,
+					        width:      '880px',
+					        height:     '265px',
+					        sortBy:     [ { LEVEL1:'desc'  }, { LEAF:'asc'} ],
+
+					        paginator: new Y.PaginatorView({
+					            model:              new Y.PaginatorModel({page:1, itemsPerPage:20}),
+					            container:          '#pagContainerBar',
+					            pageOptions:        [ 10, 20, 50 ]
+					        }),
+
+					        paginatorResize:    true,
+					        paginationSource:   "remote",
+
+					        // Since requestString Template and server response "comply" with the PaginatorModel
+					        //  properties ... then NO serverPaginatorMap is required ...
+
+					        requestStringTemplate: "?page={page}&itemsPerPage={itemsPerPage}&sortBy={sortBy}"+
+					        	"&jdata=" + encodeURI( Y.JSON.stringify( query.jdata ) )
+
+					    });
+
+
+					    dtable.plug(  Y.Plugin.DataTableDataSource, {
+					        datasource:	    ds
+					/*  This is one way of loading the data initially, but processPageRequest(1) is alot simpler !!
+					       initialRequest: Y.Lang.sub( dtable.get('requestStringTemplate'),{
+					                page:           dtable.paginator.model.get('page'),
+					                itemsPerPage:   dtable.paginator.model.get('itemsPerPage'),
+					                sortBy:         Y.JSON.stringify( dtable.get('sortBy') || {} ) || null
+					            })   */
+					    });
+
+					    // IMPORTANT:  The datatable MUST be rendered AFTER the "dtable.plug" statement above, or this breaks!!
+					    dtable.render('#tableBar');
+
+					    dtable.processPageRequest(1);
+
+					/* OR this works also,
+
+					This works also ... instead of 'initialRequest' method
+					    dtable.datasource.load({
+					        request: Y.Lang.sub( dtable.get('requestStringTemplate'),{
+					                page:           dtable.paginator.model.get('page'),
+					                itemsPerPage:   dtable.paginator.model.get('itemsPerPage'),
+					                sortBy:         Y.JSON.stringify( dtable.get('sortBy') || {} ) || null
+					            })
+					    });
+
+					*/
+					});
+</script>
+</head>
+<body class="yui3-skin-sam"> 
+
+	<div id="center">
+		<div id="datatable"></div>
+
+		<!--  Define the Paginator Bar HTML -->
+		<div id="pagContainerBar" class="yui3-pagview-bar"
+			style="visibility: hidden;">
+			
+<!-- http://stlsmiths.github.io/blunderalong/images/glyph/glyphicons_170_step_backward.png -->
+
+			<img src="/yui_3.10.3/blunderalong/images/glyph/glyphicons_170_step_backward.png"
+				class="pgControls {pageLinkClass}" data-pglink="first"
+				title="First Page" border="0" /> <img
+				src="/yui_3.10.3/blunderalong/images/glyph/glyphicons_173_backTES.png"
+				class="pgControls {pageLinkClass}" data-pglink="prev"
+				title="Prior Page" border="0" /> {inputPage} of {totalPages} <img
+				src="/yui_3.10.3/blunderalong/images/glyph/glyphicons_173_play.png"
+				class="pgControls {pageLinkClass}" data-pglink="next"
+				title="Next Page" border="0" /> <img
+				src="/yui_3.10.3/blunderalong/images/glyph/glyphicons_178_step_forward.png"
+				class="pgControls {pageLinkClass}" data-pglink="last"
+				title="Last Page" border="0" /> <span
+				style="float:right;margin-right:50px;">Rows per Page:
+				{selectRowsPerPage}</span>
+		</div>
+	</div>
+</body>
+</html>

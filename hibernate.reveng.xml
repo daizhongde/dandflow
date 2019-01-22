@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-reverse-engineering PUBLIC "-//Hibernate/Hibernate Reverse Engineering DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-reverse-engineering-3.0.dtd" >
+
+<hibernate-reverse-engineering>
+	<table name="t_authority_employee" catalog="tool">
+		<primary-key>
+			<key-column name="employee_number"
+				property="employee_number" />
+		</primary-key>
+		<column name="sbu_id" property="sbu_id"></column>
+		<column name="sbu" property="sbu"></column>
+		<column name="company_id" property="company_id"></column>
+		<column name="company" property="company"></column>
+		<column name="organization_id" property="organization_id"></column>
+		<column name="org_name" property="org_name"></column>
+		<column name="person_id" property="person_id"></column>
+		<column name="first_name" property="first_name"></column>
+		<column name="last_name" property="last_name"></column>
+		<column name="full_name" property="full_name"></column>
+		<column name="email_address" property="email_address"></column>
+		<column name="assignment_id" property="assignment_id"></column>
+		<column name="birth_date" property="birth_date"></column>
+		<column name="working_location" property="working_location"></column>
+		<column name="seat_no" property="seat_no"></column>
+		<column name="nt_account" property="nt_account"></column>
+		<column name="supervisor_id" property="supervisor_id"></column>
+		<column name="supervisor_name" property="supervisor_name"></column>
+		<column name="highest_degree" property="highest_degree"></column>
+		<column name="hire_date" property="hire_date"></column>
+	</table>
+</hibernate-reverse-engineering>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+	
+	<bean id="migRestClientService" class="person.daizhongde.migration.spring.service.restclient.MigRestClientServiceImpl" autowire="byType">
+		<property name="url" value="${REST.URL}"/>
+	</bean>
+	
+	 <!--方式一、使用jdk的实现  -->
+	 <!-- 连接超时为5秒钟，调用返回超时为 1天  24*60*60 000=86400000 -->
+    <bean id="ky.requestFactory" class="org.springframework.http.client.SimpleClientHttpRequestFactory" autowire="byName" lazy-init="true">
+        <property name="readTimeout" value="86400000"/>
+        <property name="connectTimeout" value="5000"/>
+    </bean>
+
+    <bean id="simpleRestTemplate" class="org.springframework.web.client.RestTemplate" autowire="byName" lazy-init="true">
+        <constructor-arg ref="ky.requestFactory"/>
+        <property name="messageConverters">
+            <list>
+                <bean class="org.springframework.http.converter.FormHttpMessageConverter"/>
+<!--            		<bean class="org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter"/> -->
+	            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/> 
+                <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                	<constructor-arg value="UTF-8"></constructor-arg> 
+                    <property name="supportedMediaTypes">
+                        <list>
+                            <value>text/plain;charset=UTF-8</value>
+                            <value>application/json;charset=UTF-8</value>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+</beans>

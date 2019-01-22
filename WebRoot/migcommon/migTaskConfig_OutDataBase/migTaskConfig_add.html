@@ -1,0 +1,359 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>新建</title>
+</head>
+<body>
+<div class="easyui-layout" data-options="fit:true">
+	<div data-options="region:'center',border:false" title="" noheader="true">
+	<div style="padding:10px 0 10px 5px">
+	    <form id="c_form" method="post" action="" style="margin:0;padding:0;">
+	    	<table align="center">
+	    		<tr>
+	    			<td>Config Type:</td>
+	    			<td>
+	    				<input class="easyui-combobox" 
+		                        id='mig_config_type_C' name="mig_config_type"
+		                        data-options="valueField:'code', textField:'value',
+		                        value:4,
+		                        editable:false,
+		                        readonly: true,
+								data:configType,
+		                        required:true"/>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Domain:</td>
+	    			<td>
+	    				<input class="easyui-combobox" 
+		                        id='domain_C' name="domain" value=""
+		                        data-options="valueField:'code', textField:'value',
+		                        editable:false,
+		                        required: true,
+								data: domains" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Source Table Name:</td>
+	    			<td>
+	    				<input id="mig_src_C" name="mig_src" class="easyui-validatebox"
+						  data-options="required: true" type="text" style='width:99%;' value="" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Source DB Connection URL:</td>
+	    			<td>
+	    				<input id="mig_src_conn_C" name="mig_src_conn" type="text" value="" width="300px" ></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Filter Condition:</td>
+	    			<td>
+	    				<textarea id="mig_where_C" name="mig_where" style="font-size: 12px;" rows="1" cols="60"></textarea>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Target Table Name:</td>
+	    			<td>
+	    				<input id="mig_dst_C" name="mig_dst" class="easyui-validatebox"
+						  data-options="required: true" type="text" style='width:99%;' value="" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Target DB Connection URL:</td>
+	    			<td>
+	    				<input id="mig_dst_conn_C" name="mig_dst_conn" type="text" value="" width="300px" ></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Description:</td>
+	    			<td><textarea id="mig_desc_C" name="mig_desc" style="font-size: 12px;" rows="2" cols="60"></textarea></td>
+	    		</tr>
+	    	</table>			
+	    </form>
+	</div>
+    </div>
+<script type="text/javascript">
+var add = VIRTUE.add;
+
+add.submitForm = function (){
+	if( ! $('#c_form').form("validate") )
+	{
+		return;
+	}
+	
+	var formData = $('#c_form').form( 'getData');
+	add.init();
+	for (var field in formData) {
+		add.jdata.data[field] = formData[field];
+	}
+
+	jQuery.post( getContextPath()+"/curd/migTaskConfigCURDadd.action", 
+		{
+			tableName : tableName,
+			authorColumnName : "mig_author",
+			jdata : $.toJSON( add.jdata )
+		},
+		function(oResponse, status){
+			alert(oResponse.msg);
+
+			if(oResponse.success == true){
+				$('#grid').datagrid('reload',{
+					tableName : tableName,
+					jdata: $.toJSON( query.jdata )
+				} );
+				$('#win').window('close');
+			}
+	});
+};
+add.clearForm = function (){
+	$('#c_form').form('clear');
+};
+add.open_dialog_srcconn = function(){
+	var mig_src_conn = $('#mig_src_conn_C').combo( 'getValue' );	
+	if( mig_src_conn != '' ){
+		var temp = mig_src_conn.split(/\|/);
+		if(temp.length==5){
+			$('#dbtype_C').combobox("setValue", temp[0] );
+			$('#ip_C').textbox("setValue", temp[1]);
+			$('#username_C').textbox("setValue", temp[2]);
+			$('#password_C').textbox("setValue", temp[3]);
+			$('#instance_C').textbox("setValue", temp[4]);
+		}
+	}
+	$('#dlg-migsrcconn').dialog('open');
+};
+add.open_dialog_dstconn = function(){
+	var mig_dst_conn = $('#mig_dst_conn_C').combo( 'getValue' );	
+	if( mig_dst_conn != '' ){
+		var temp = mig_dst_conn.split(/\|/);
+		if(temp.length==5){
+			$('#dbtype2_C').combobox("setValue", temp[0] );
+			$('#ip2_C').textbox("setValue", temp[1]);
+			$('#username2_C').textbox("setValue", temp[2]);
+			$('#password2_C').textbox("setValue", temp[3]);
+			$('#instance2_C').textbox("setValue", temp[4]);
+		}
+	}
+	$('#dlg-migdstconn').dialog('open');
+};
+
+$(function(){
+	$('#mig_src_conn_C').combogrid({
+		url : getContextPath()+"/query/commonCBBQUERYdfind.action",
+		panelWidth : 500,
+		panelHeight : 200,
+		idField : 'url',
+		textField : 'url',
+		editable:false,
+		pagination : false,
+		fitColumns : false,
+		required : true,
+		rownumbers : true,
+		mode : 'remote',
+		delay : 500,
+		sortName : 'url',
+		sortOrder : 'asc',
+		pageSize : 5,
+		pageList : [ 5, 10 ],
+		queryParams : {
+			tableName : "mig_config_connection",
+			columns: "url"
+		},
+		columns : [ [ {
+			field : 'name',
+			title : 'Name',
+			width : 120,
+			sortable : true
+		},{
+			field : 'url',
+			title : 'Connection URL',
+			width : 220,
+			sortable : true
+		}, {
+			field : 'remark',
+			title : 'Description',
+			width : 220,
+			sortable : false
+		}, {
+			field : 'ctime',
+			title : 'Create Time',
+			width : 130,
+			sortable : true
+		} ] ]
+	});
+	$('#mig_dst_conn_C').combogrid({
+		url : getContextPath()+"/query/commonCBBQUERYdfind.action",
+		panelWidth : 500,
+		panelHeight : 200,
+		idField : 'url',
+		textField : 'url',
+		editable:false,
+		pagination : false,
+		fitColumns : false,
+		required : true,
+		rownumbers : true,
+		mode : 'remote',
+		delay : 500,
+		sortName : 'url',
+		sortOrder : 'asc',
+		pageSize : 5,
+		pageList : [ 5, 10 ],
+		queryParams : {
+			tableName : "mig_config_connection",
+			columns: "url"
+		},
+		columns : [ [ {
+			field : 'name',
+			title : 'Name',
+			width : 120,
+			sortable : true
+		},{
+			field : 'url',
+			title : 'Connection URL',
+			width : 220,
+			sortable : true
+		}, {
+			field : 'remark',
+			title : 'Description',
+			width : 220,
+			sortable : false
+		}, {
+			field : 'ctime',
+			title : 'Create Time',
+			width : 130,
+			sortable : true
+		} ] ]
+	});
+});
+</script>
+	<div data-options="region:'south',border:false" style="text-align:right;padding:5px 5px 5px 0;background:#F4F4F4;">
+		<a class="easyui-linkbutton" data-options="iconCls:'icon-ok'" href="javascript:void(0)" onclick="javascript:add.submitForm()" style="width:80px">Submit</a>
+		<a class="easyui-linkbutton" data-options="iconCls:'icon-cancel'" href="javascript:void(0)" onclick="javascript:$('#win').dialog('close');" style="width:80px">Cancel</a>
+	</div>
+	
+	<!-- 源数据库连接串   ########################### -->
+	<div id="dlg-migsrcconn" class="easyui-dialog"
+		title="DB Connection URL Config" style="width:550px;height:180px;"
+			data-options="
+				modal:true,closed:true,
+				iconCls: 'icon-edit',
+				buttons: [{
+					text:'Ok',
+					iconCls:'icon-ok',
+					handler:function(){
+						if( ! $('#form-migsrcconn').form('validate') )
+						{
+							return;
+						}
+						var migsrcconn = '';
+						var formData = $('#form-migsrcconn').form( 'getData');
+						migsrcconn = formData['dbtype']+'|'+formData['ip']+'|'+formData['username']+'|'
+							+formData['password']+'|'+formData['instance'];
+						$('#mig_src_conn_C').combogrid( 'setValue', migsrcconn );
+						$('#dlg-migsrcconn').dialog('close');
+					}
+				},{
+					text:'Cancel',
+					handler:function(){
+						$('#dlg-migsrcconn').dialog('close');
+					}
+				}]
+			">
+		<form id="form-migsrcconn" method="post" action="" style="margin:0;padding:0;">
+	    	<table align="center" width="100%" border="1">
+				<tr>
+	    			<td>DB Type:</td>
+	    			<td colspan='3'>
+	    				<input class='easyui-combobox' id="dbtype_C"  name='dbtype' data-options="valueField:'code',textField:'value', 
+							editable:false,url:'../../cbb/dicCBBgetDic2ByType.action?dicType=db-type',method:'post',required:true"/>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>IP:</td>
+	    			<td>
+	    				<input class="easyui-textbox" type="text" id="ip_C" name="ip" data-options="required:true"></input>
+	    			</td>
+	    			<td>Instance:</td>
+	    			<td>
+	    				<input class="easyui-textbox" type="text" id="instance_C" name="instance" data-options="required:true"></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Username:</td>
+	    			<td>
+	    				<input class="easyui-textbox" type="text" id="username_C" name="username" data-options="required:true"></input>
+	    			</td>
+	    			<td>Password:</td>
+	    			<td>
+	    				<input class="easyui-textbox" type="text" id="password_C" name="password" data-options="required:true"></input>
+	    			</td>
+	    		</tr>
+	    	</table>			
+	    </form>
+	</div>
+	
+	<!-- 目标数据库连接串   ########################### -->
+	<div id="dlg-migdstconn" class="easyui-dialog"
+		title="DB Connection URL Config" style="width:550px;height:180px;"
+			data-options="
+				modal:true,closed:true,
+				iconCls: 'icon-edit',
+				buttons: [{
+					text:'Ok',
+					iconCls:'icon-ok',
+					handler:function(){
+						if( ! $('#form-migdstconn').form('validate') )
+						{
+							return;
+						}
+						var migdstconn = '';
+						var formData = $('#form-migdstconn').form( 'getData');
+						migdstconn = formData['dbtype']+'|'+formData['ip']+'|'+formData['username']+'|'
+							+formData['password']+'|'+formData['instance'];
+						$('#mig_dst_conn_C').combogrid( 'setValue', migdstconn );
+						$('#dlg-migdstconn').dialog('close');
+					}
+				},{
+					text:'Cancel',
+					handler:function(){
+						$('#dlg-migdstconn').dialog('close');
+					}
+				}]
+			">
+		<form id="form-migdstconn" method="post" action="" style="margin:0;padding:0;">
+	    	<table align="center" width="100%" border="1">
+				<tr>
+	    			<td>DB Type:</td>
+	    			<td colspan='3'>
+	    				<input class='easyui-combobox' id="dbtype2_C"  name='dbtype' data-options="valueField:'code',textField:'value', 
+							editable:false,url:'../../cbb/dicCBBgetDic2ByType.action?dicType=db-type',method:'post',required:true"/>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>IP:</td>
+	    			<td>
+	    				<input class="easyui-textbox" type="text" id="ip2_C" name="ip" data-options="required:true"></input>
+	    			</td>
+	    			<td>Instance:</td>
+	    			<td>
+	    				<input class="easyui-textbox" type="text" id="instance2_C" name="instance" data-options="required:true"></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Username:</td>
+	    			<td>
+	    				<input class="easyui-textbox" type="text" id="username2_C" name="username" data-options="required:true"></input>
+	    			</td>
+	    			<td>Password:</td>
+	    			<td>
+	    				<input class="easyui-textbox" type="text" id="password2_C" name="password" data-options="required:true"></input>
+	    			</td>
+	    		</tr>
+	    	</table>			
+	    </form>
+	</div>
+</div>
+</body>
+</html>

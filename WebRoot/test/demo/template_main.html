@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>自定义模板管理界面</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.3.5/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.3.5/themes/icon.css"/>
+<style type="text/css">
+
+</style>
+<script type="text/javascript" src="../../scripts/jquery-1.4.4.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.3.5/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.3.5/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+
+<script type="text/javascript">
+var noquery = VIRTUE.noquery;
+var query = VIRTUE.query;
+var exp = VIRTUE.exp;
+
+var del = VIRTUE.del;
+var read = VIRTUE.read;
+
+var OPE = VIRTUE.operator;
+
+/** validate and assign value **/
+function PackingParameter(){
+
+
+	query.init();
+
+	exp.jdata.condition = query.jdata.condition;
+	exp.jdata.operator = query.jdata.operator;
+	return true;
+};
+
+/** search data ,reload data  **/
+function submitForm(){
+//  下面的句话不需要加,因为在datagrid 每次onBeforeLoad都会做这个事
+// 	$('#btnSearch').linkbutton('disable');
+// 	document.getElementById('btnSearch').disabled=true;
+   	if(!PackingParameter()){
+   		return;
+   	}
+//  jdata = { act: 'query',condition: {'t1.nmlevel': [0,1,2,3]},operator : {'t1.nmlevel' : 13} };
+   	$('#grid').datagrid( 'reload', { jdata: encodeURI( $.toJSON( query.jdata ) ) } );
+   	
+//  下面的句话一定不能加,因为它的执行不用等待datagrid reload
+// 	$('#btnSearch').linkbutton('enable');
+//  document.getElementById('btnSearch').disabled=false;
+};
+
+/**  清空  **/
+function clearForm(){
+	$('#form').form('clear');
+};
+
+function fmtName(val,row){
+        return "<a href='#'>"+val+"</a>";
+   
+};
+
+var toolbar = [{
+	text:'上传模板',
+	iconCls:'icon-add',
+	handler:function(){
+//		alert('add');
+		newModule();
+	}
+},{
+	text:'更新模板',
+	iconCls:'icon-edit',
+	handler:function(){
+// 		$('#winU').window('open');
+		editModule();
+	}
+},{
+	text:'删除模板',
+	iconCls:'icon-remove',
+	handler:function(){
+// 		alert('remove')
+		destroyModule();
+	}
+},{
+	text:'查看模板',
+	iconCls:'icon-search',
+	handler:function(){ browseModule(); }
+},{
+	text:'编辑参数标签',//数据库参数表需要存：模板ID  参数名   参数类型   标签名  
+	iconCls:'icon-edit',
+	handler:function(){ browseModule(); }
+}
+// ,{
+// 	text:'导入',
+// 	iconCls:'icon-import',
+// 	handler:function(){ $("#IMPdlg").dialog("open"); }
+// },{
+// 	text:'导入向导',
+// 	iconCls:'icon-import',
+// 	handler:function(){ $("#IMPdlg1").dialog("open"); }
+// }
+];
+//program component
+$(function(){
+	$('#grid').datagrid({
+		title: '模块信息',
+		//iconCls:'icon-reload',
+		toolbar: toolbar,
+		width: 938,
+		height: 720,
+		nowrap: true,
+		striped: true,
+		fit: true,
+		collapsible: true,
+// 		url: "../../query/tAuthorityModuleJEasyUIQUERYdfind.action",
+		url: "data_template.json",
+		idField: "id",
+// 		remoteSort: true,
+// 		sortName:"level",
+// 		sortOrder:"desc",
+// 		multiSort:true,
+		singleSelect: true,
+		frozenColumns: [[
+            {title:'模块ID',field:"id", hidden: true},
+		    {title:'模板名称',field:"name", width:210,formatter: fmtName }
+		]],
+		columns:[[
+			{title:'大类',field:"cate1",width:70, sortable: true },
+		    {title:'小类',field:"cate2",width:70, sortable: true },
+		    
+		    {title:'上传时间',field:"ctime",hidden: false},//,formatter: getCMctime},
+		    {title:'上传者使用的IP',field:"cip",hidden: true},
+		    {title:'上传者',field:"creator",hidden: false},
+		    {title:'最后更新时间',field:"mtime",hidden: false},
+		    {title:'最后更新者使用的IP',field:"mip",hidden: true},
+		    {title:'最后更新人',field:"modifier",hidden: false}
+		]],
+		pagination:true,
+		rownumbers:true,
+		pageNumber: 1,
+		pageSize: query.pageSize,
+		queryParams:{jdata: encodeURI($.toJSON( noquery.jdata )) },
+		onBeforeLoad:function(param){
+// 			$('#btnSearch').linkbutton('disable');
+			document.getElementById('btnSearch').disabled=true;
+		},
+		onLoadSuccess:function(){
+// 			$('#btnSearch').linkbutton('enable');
+			document.getElementById('btnSearch').disabled=false;
+		}
+	});
+	var p = $('#grid').datagrid('getPager');
+	if (p){
+		$(p).pagination({
+			//total:50,
+			pageSize: query.pageSize,
+			pageNumber:1,
+			//pageList: [10,20,50,100],
+			onBeforeRefresh:function(){
+				//alert('before refresh');
+			},
+			onSelectPage:function(pageNumber, pageSize){
+				$('#grid').datagrid("options").pageNumber=pageNumber;
+				$('#grid').datagrid("options").pageSize=pageSize;
+				$('#grid').datagrid('reload',{ jdata: encodeURI( $.toJSON( query.jdata ) ) } );
+			}
+		});
+	}
+});
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+    <div data-options="region:'north',border:true,split:true" style="height:94px;background:#B3DFDA;" title="查询条件" >  
+    	<form id="form" method="post" style="margin:0;padding:0;">
+			<div style="padding:0px 0 0px 5px">
+				<table width="100%">
+                <tr>
+                    <td>模板名称:</td>
+                    <td>
+						<input id="name" name="name" value="" style="width:140px;">
+                    </td>
+                    <td>模板作者:</td>
+                    <td>
+                        <input id="author" name="author" value="" style="width:140px;">
+                    </td>
+                    <td>报表分类:</td>
+                    <td>
+                        <select class="easyui-combobox" id="level" name="level" style="width:100px;">
+                        	<option value="" selected="selected">--选择--</option>
+                        	<option value="0">订单</option>
+                        	<option value="1">进发销存</option>
+                        	<option value="2">账务</option>
+                        	<option value="3">预算</option>
+                        	<option value="4">四级</option>
+                        </select>
+                    </td>
+                    <td>报表子类:</td>
+                    <td>
+                        <select class="easyui-combobox" id="leaf" name="leaf" style="width:100px;">
+                        	<option value="" selected="selected">--选择--</option>
+                        	<option value="true">公司级</option>
+                        	<option value="false">厂级</option>
+                        </select>
+                    </td>
+                    
+                </tr>
+            	</table>
+			</div>
+			
+			<table width="100%" border="0" align="center">
+			<tr bgcolor="#E2EEFE" valign="bottom">
+				<td height="23"><div align="center"><!-- default height='21'  -->
+					<input id='btnSearch' type='button' onclick='submitForm()' value='查 询'/>&nbsp;
+<!-- 					<input id='btnExpSimply' type='button' onclick="$('#EXPdlg').dialog('open')" value='导 出'/>&nbsp; -->
+<!-- 					<input id='btnExpWizard' type='button' onclick="$('#EXPdlg1').dialog('open')" value='导出向导'/>&nbsp; -->
+					<input type='button' onclick="clearForm()" value='清 空'/>
+				</div></td>
+			</tr>
+			</table>
+        </form>
+    </div>
+    
+    <div data-options="region:'center',border:false" title="模块main" style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+
+
+<script type="text/javascript">
+
+</script>
+</body>

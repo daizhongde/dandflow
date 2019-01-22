@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>合法性稽核配置</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+
+var tableName2 = "mig_auditv_config";
+
+/** validate and assign value **/
+function PackingParameter2(){
+	var formData = $('#s_form2').form( 'getData');
+
+	query.init();
+	for (var field in formData) {
+		if( formData[field] !== "" ){
+			query.jdata.condition[field] = formData[field];
+			query.jdata.operator[field] = OPE.CONTAIN;
+		}
+	}
+	return true;
+};
+
+/** search data ,reload data  **/
+function submitForm2(){
+   	if(!PackingParameter2()){
+   		return;
+   	}
+   	$('#grid2').datagrid( 'reload', {
+//    		columnNames : "audit_id,audit_name,mig_sql,author,mig_sql_rep",
+   		tableName : tableName2,
+   		jdata: encodeURI( $.toJSON( query.jdata ) ) 
+   	} );
+};
+/**  清空  **/
+function clearForm2(){
+	$('#s_form').form('clear');
+};
+
+
+$(function(){
+	$('#grid2').datagrid({
+		title : '',
+		width : 938,
+		height : 720,
+		nowrap : true,
+		striped : true,
+		fit : true,
+		collapsible : true,
+		url: getContextPath()+"/query/commonJEasyUIQUERYdfind.action",
+		idField : "audit_id",
+		remoteSort: true,
+		multiSort : false,
+		singleSelect : true,
+		columns : [ [
+			{ title : '稽核id', field : 'audit_id',width : 90,hidden: true  },
+			{ title : '稽核code', field : 'audit_code', width : 120, sortable: true },
+			{ title : '域名', field : 'domain', width : 80, sortable: true }, 
+			{ title : '表名称', field : 'table_name', width : 120, sortable: true  },
+			{ title : '稽核项', field : 'audit_name', width : 120, sortable: true  },
+			{ title : '稽核源sql', field : 'src_audit_sql', width : 120  },
+			{ title : '期望值', field : 'audit_value', width : 120  },
+			{ title : '无效sql', field : 'invalid_data_sql', width : 120  },
+			{ title : '操作符', field : 'operator', width : 120  },
+			{ title : '稽核者', field : 'audit_author', width : 60  },
+			{ title : '备注', field : 'remark', width : 200, 
+				formatter: function(value,row, index ){
+					return value.length<=120 ? value : value.substring(0,120)+"...";
+				}  
+			},
+			{ title : '源连接串', field : 'src_db_connect', width : 120  },
+			{ title : '参数模版', field : 'mig_sql_rep', width : 200, 
+				formatter: function(value,row, index ){
+					return value.length<=120 ? value : value.substring(0,120)+"...";
+				}
+			}
+		] ],
+		pagination : true,
+		rownumbers : false,
+		queryParams : {
+			tableName : tableName2,
+			jdata: encodeURI( $.toJSON( query.jdata ) ) 
+		}
+	});
+});
+
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+
+    <div data-options="region:'north',border:true,split:true" style="height:118px;background:#B3DFDA;" title="查询条件" >  
+    	<form id="s_form2" method="post" style="margin:0;padding:0;">
+        <div style="padding:0px 0 0px 15px">
+            <table width="100%">
+                <tr>
+                    <td>稽核项:</td>
+                    <td>
+                        <input id="audit_name" name="audit_name" value="">
+                    </td>
+                    <td>域名:</td>
+                    <td>
+                        <input id="domain" name="domain" value="">
+                    </td>
+                    <td>表名称:</td>
+                    <td>
+                        <input id="table_name" name="table_name" value="">
+                    </td>
+                </tr>
+				<tr>
+					<td>稽核类型:</td>
+                    <td>
+                   		<input id="audit_type" name="audit_type" value="">
+                    </td>
+                    <td>类别:</td>
+                    <td>
+                        <input id="sql_type" name="sql_type" value="">
+                    </td>
+                    <td>无效标记:</td>
+                    <td>
+                        <input id="audit_flag" name="audit_flag" value="">
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <table width="100%" border="0" align="center">
+			<tr bgcolor="#E2EEFE" valign="bottom">
+				<td height="23"><div align="center"><!-- default height='21'  -->
+					<input id='btnSearch' type='button' onclick="submitForm2()" value='查 询'/>&nbsp;
+					<input type='button' onclick="clearForm2()" value='清 空'/>
+				</div></td>
+			</tr>
+		</table>
+		</form>
+    </div>
+    <div data-options="region:'center', border:false" title="" style="overflow:hidden;" noheader="true">
+		<table id="grid2"></table>
+	</div>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
+<meta name="renderer" content="webkit">
+<title>集邮metisMenu</title>
+    <!-- 全局js -->
+
+ 	<link href="../../scripts/bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../scripts/bootstrap-plugins/metis/2.7.3/css/metisMenu.min.css" rel="stylesheet">
+     <link href="../../scripts/bootstrap-plugins/metis/2.7.3/css/font-awesome.min.css" rel="stylesheet"> 
+ <!--   <link href="../../scripts/bootstrap-plugins/metis/2.7.3/css/mm-vertical.css" rel="stylesheet">-->
+    <link href="../../scripts/bootstrap-plugins/metis/2.7.3/css/index.css" rel="stylesheet">
+    
+	<script src="../../scripts/jquery-2.2.4.min.js"></script>
+	<script src="../../scripts/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+	<script src="../../scripts/bootstrap-plugins/metis/2.7.3/metisMenu.min.js"></script>
+    <script src="../../scripts/jquery-plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    
+<script type="text/javascript" src="../../tree/tAuthorityModuleTREEquery_GubuSoft_TreeJS_User.action"></script>
+</head>
+
+<body class="fixed-sidebar full-height-layout gray-bg" style="overflow:hidden">
+	<ul class="nav" id="side-menu">
+
+                    <!-- 左侧导航菜单开始 -->
+                    <!-- 
+                    <li>
+                        <a href="#">
+                            <i class="fa fa fa-bar-chart-o"></i>
+                            <span class="nav-label">系统管理</span>
+                            <span class="fa arrow"></span>
+                        </a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a class="J_menuItem" href="${path}/qygl/xtgl/jsgl/role_info">角色管理</a>
+                            </li>
+                            <li>
+                                <a class="J_menuItem" href="${path}/qygl/xtgl/yggl/staff_query">员工管理</a>
+                            </li>
+                            <li>
+                                <a class="J_menuItem" href="${path}/qygl/xtgl/mkgl/perm_info">模块管理</a>
+                            </li>
+                            <li>
+                                <a class="J_menuItem" href="${path}/qygl/xtgl/yggl/staff_discount">折扣管理</a>
+                            </li>
+                            <li>
+                                <a class="J_menuItem" href="${path}/qygl/xtgl/jggl/orgmanage_info">机构管理</a>
+                            </li>
+                            <li>
+                                <a class="J_menuItem" href="${path}/qygl/xtgl/jggl/department_info">部门管理</a>
+                            </li>  
+                            <li>
+                                <a class="J_menuItem" href="${path}/qygl/xtgl/jggl/stock_info">库房管理</a>
+                            </li>                                                                             
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fa fa fa-bar-chart-o"></i>
+                            <span class="nav-label">商品中心</span>
+                            <span class="fa arrow"></span>
+                        </a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a class="J_menuItem" href="${path}/yxtx/spgl/good_spgl">商品管理</a>
+                            </li>                                                   
+                        </ul>
+                    </li>
+                     <li>
+                        <a href="#">
+                            <i class="fa fa fa-user-plus"></i>
+                            <span class="nav-label">客户中心</span>
+                            <span class="fa arrow"></span>
+                        </a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa fa-user-plus"></i>
+                                    <span class="nav-label">集团客户中心</span>
+                                    <span class="fa arrow"></span>
+                                </a>
+                                <ul class="nav nav-third-level">
+                                    <li>
+                                        <a class="J_menuItem" href="${path}/khfw/khzx/jtkhzx/member_account_jtkh">集团账户</a>
+                                    </li>
+                                    <li>
+                                        <a class="J_menuItem" href="${path}/khfw/rzhyzx/order_member">集团订单查询</a>
+                                    </li>
+                                    <li>
+                                        <a class="J_menuItem" href="${path}/khfw/khzx/jtkhzx/jtzd_query">集团账单查询</a>
+                                    </li>
+                                </ul>          
+                            </li>  
+                            <li>
+                            	     <a href="#">
+                                    <i class="fa fa fa-user-plus"></i>
+                                    <span class="nav-label">认证会员中心</span>
+                                    <span class="fa arrow"></span>
+                                    </a>
+                                    <ul class="nav nav-third-level">
+                                        <li>
+                                            <a class="J_menuItem" href="${path}/khfw/khzx/rzhyzx/member_account_hy">会员账户</a>
+                                        </li>
+                                        <li>
+                                            <a class="J_menuItem" href="${path}/khfw/khzx/rzhyzx/member_main">会员注册/修改</a>
+                                        </li>                                                                               
+                                        <li>
+                                            <a class="J_menuItem" href="${path}/khfw/khzx/rzhyzx/member_query">会员查询</a>
+                                        </li>                                      
+                                         <li>
+                                            <a class="J_menuItem" href="${path}/khfw/khzx/rzhyzx/member_test">导出测试</a>
+                                        </li>  
+                                          <li>
+                                            <a class="J_menuItem" href="${path}/khfw/khzx/rzhyzx/hyzd_query">会员账单查询</a>
+                                        </li>                                           
+                                        <li>
+                                            <a class="J_menuItem" href="${path}/khfw/khzx/rzhyzx/lmk_query">联名卡查询</a>
+                                        </li>
+                                        <li>
+                                            <a class="J_menuItem" href="${path}/jspPath/lmkQy">联名卡签约</a>
+                                        </li>
+                                    </ul>
+ 
+                            </li>                   
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fa fa fa-user-plus"></i>
+                            <span class="nav-label">预收管理</span>
+                            <span class="fa arrow"></span>
+                        </a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa fa-user-plus"></i>
+                                    <span class="nav-label">集团客户</span>
+                                    <span class="fa arrow"></span>
+                                </a>
+                                <ul class="nav nav-third-level">
+                                    <li>
+                                        <a class="J_menuItem" href="${path}/khfw/ysgl/yscz_jtkh">预收充值</a>
+                                    </li>
+                                    <li>
+                                        <a class="J_menuItem" href="${path}/khfw/ysgl/ystk_jtkh">预收退款</a>
+                                    </li>
+                                    <li>
+                                        <a class="J_menuItem" href="${path}/khfw/ysgl/zhbdjl">账户变动记录</a>
+                                    </li>
+                                    <li>
+                                        <a class="J_menuItem" href="${path}/khfw/ysgl/zhbdjl_demo">账户变动记录Demo</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa fa-user-plus"></i>
+                                    <span class="nav-label">认证会员</span>
+                                    <span class="fa arrow"></span>
+                                </a>
+                                <ul class="nav nav-third-level">
+                                    <li>
+                                        <a class="J_menuItem" href="${path}/khfw/ysgl/yscz_hy">预收充值</a>
+                                    </li>
+                                    <li>
+                                        <a class="J_menuItem" href="${path}/khfw/ysgl/ystk_hy">预收退款</a>
+                                    </li>
+                                </ul>
+
+                            </li>                     
+                        </ul>
+                    </li>
+                     -->
+                    <!-- 左侧导航菜单结束 -->
+                </ul>
+       
+
+<script type="text/javascript">
+$(document).ready(function () {
+	if(jsonData.length==0){
+		alert("没有找到根模块!");
+	}
+
+	/** recursive create node. author: daizhongde dep.IT  
+	 * @param o       node
+	 * @param pFolder parentDocument
+	 * @param k       id
+	 * @param level   menu level
+	 */
+	function gNode( o, pFolder, k, level )
+	{
+		if(o.children===undefined){//create leaf node
+			pFolder.append("<li><a class=\"J_menuItem\" href=\""+o.url+"\")>"+o.text+"</a></li>");
+		
+		}else{//create noleaf node
+			var levelclass = "";
+			switch (level)
+			{
+			case 1:
+			  	levelclass="nav nav-second-level";
+			  	break;
+			case 2:
+			  	levelclass="nav nav-third-level";
+			  	break;
+			}
+			pFolder.append("<li><a href=\"#\"><i class=\"fa "+o.iconcls+"\"></i><span class=\"nav-label\">"+o.text+"</span><span class=\"fa arrow\"></span></a>"
+						  +"	<ul id='ulmenu"+o.id+"' class=\""+levelclass+"\"></ul>"
+						  +"</li>");
+			
+			for (var i in o.children){//recursive call itself
+				gNode( o.children[i], $("#ulmenu"+o.id), k, level+1 );
+			}
+		}
+	};
+
+	var childData = jsonData[0].children;
+	for (var k in childData){
+		//root level=0
+		gNode( childData[k], $("#side-menu"), k, 1 );
+	}
+    // MetsiMenu
+    $('#side-menu').metisMenu();
+});
+</script>
+</body>
+</html>

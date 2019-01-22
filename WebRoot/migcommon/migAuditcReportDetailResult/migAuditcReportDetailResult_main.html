@@ -1,0 +1,251 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>一致性稽核结果-差异分析录入</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/icon.css"/>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+<!-- <script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/locale/easyui-lang-zh_CN.js"></script> -->
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/plugins/easyuiExtends.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+
+<script type="text/javascript">
+var app = {};
+app.dryrunRow = {};
+
+var query = VIRTUE.query;
+var OPE = VIRTUE.operator;
+
+var tableName = "mig_auditc_report_detail_result";
+
+var domains = ajaxReqRespText("/cbb/dicCBBgetDicByType.action?dicType=Busi-Domain");
+	domains = eval("(" + domains + ")");
+
+fmtDomain = function(value,row, index ){
+	for(var i=0, j=domains.length; i<j; i++){
+		if( domains[i].code == value ){
+			return domains[i].value;
+		}
+	}
+	return value;
+};
+
+fmtDiffPrecent = function(value,row, index){
+	
+	if(row.src_count -row.dst_count == 0){
+		return "0.00%";
+	}else if( 0< (row.src_count -row.dst_count) / row.src_count
+			&& (row.src_count -row.dst_count) / row.src_count<0.0001 ){
+		return "<0.01%";
+	}else if( -0.0001 < (row.src_count -row.dst_count) / row.src_count
+			&& (row.src_count -row.dst_count) / row.src_count < 0 ){
+		return ">-0.01%";
+	}else if( 0.9999< (row.src_count -row.dst_count) / row.src_count
+			&& (row.src_count -row.dst_count) / row.src_count<1 ){
+		return ">99.99%";
+	}else if( -1 < (row.src_count -row.dst_count) / row.src_count
+			&& (row.src_count -row.dst_count) / row.src_count < -0.9999 ){
+		return "<-99.99%";
+	}
+// 	else if( (row.src_count -row.dst_count) / row.src_count < -1 ){
+//		return "<-100%";
+//	}else if( 1 < (row.src_count -row.dst_count) / row.src_count ){
+//		return ">100%";
+//	}
+	else{
+		return new Number((row.src_count -row.dst_count) / row.src_count).toFixed(4)*100+"%";
+	}
+};
+
+/** validate and assign value **/
+function PackingParameter(){
+	var formData = $('#s_form').form( 'getData');
+
+	query.init();
+	for (var field in formData) {
+		if( formData[field] !== "" ){
+			query.jdata.condition[field] = formData[field];
+			query.jdata.operator[field] = OPE.CONTAIN;
+		}
+	}
+	return true;
+};
+
+/** search data ,reload data  **/
+function submitForm(){
+   	if(!PackingParameter()){
+   		return;
+   	}
+   	$('#grid').datagrid( 'reload', {
+//    		columnNames : "id,audit_name,mig_sql,author,mig_sql_rep",
+   		tableName : tableName,
+   		jdata: encodeURI( $.toJSON( query.jdata ) ) 
+   	} );
+};
+/**  清空  **/
+function clearForm(){
+	$('#s_form').form('clear');
+};
+
+var read = {};
+read.jdata = { act: "read",condition: {id: ""}, operator : {id:1} };
+function editRecord() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		read.jdata.condition.id = row.id;
+		$('#win').window('open').window('setTitle', 'Edit');
+		$('#win').window("refresh", getContextPath()+"/curd/migAuditcReportDetailResultCURDinitModify.action?tableName="+tableName+"&jdata="+encodeURI($.toJSON( read.jdata )));
+	}
+};
+
+function browseRecord() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		$('#win').window('open').window('setTitle', 'View');
+		read.jdata.condition.id = row.id;
+		$('#win').window("refresh", getContextPath()+"/curd/migAuditcReportDetailResultCURDbrowse.action?tableName="+tableName+"&jdata="+encodeURI($.toJSON( read.jdata )));
+	}
+};
+
+var toolbar = [{
+	text:'Input Difference Reasons',
+	iconCls:'icon-edit',
+	handler:function(){
+		editRecord();
+	}
+},{
+	text:'View',
+	iconCls:'icon-search',
+	handler:function(){ 
+		browseRecord(); 
+	}
+}];
+
+$(function(){
+	$('#grid').datagrid({
+		title : 'Search Result',
+		toolbar : toolbar,
+		width : 938,
+		height : 720,
+		nowrap : true,
+		striped : true,
+		fit : true,
+		collapsible : true,
+		url: getContextPath()+"/query/migAuditcReportDetailResultJEasyUIQUERYdfindDiff.action",
+		idField : "id",
+		remoteSort: true,
+		multiSort : false,
+		singleSelect : true,
+		columns : [ [
+			{ title : 'id', field : 'id',width : 90, hidden: true  }, 
+			{ title : 'DryRun', field : 'dryrun_name', width : 120, sortable: true }, 
+			{ title : 'Domain Name', field : 'entity', width : 120, sortable: true, formatter: fmtDomain },
+			{ title : 'Sub Domain', field : 'audit_item', width : 120, sortable: true  },
+			{ title : 'Enum Description', field : 'enum_desc', width : 140  },
+			{ title : 'Source Data Count', field : 'src_count', width : 80  },
+			{ title : 'Target Data Count', field : 'dst_count', width : 80  },
+			{ title : 'Difference Rate', field : 'split_flag', width : 80,formatter: fmtDiffPrecent  },
+			{ title : 'Author', field : 'audit_author', width : 60  },
+			{ title : 'Difference Reasons', field : 'min_analysis', width : 140 }
+		] ],
+		pagination : true,
+		rownumbers : false,
+		queryParams : {
+// 			columnNames : "id,audit_name,mig_sql,author,mig_sql_rep",
+			tableName : tableName,
+			jdata: encodeURI( $.toJSON( query.jdata ) ) 
+		},
+		onSelect: function(index,row){
+			var temp = $('#grid').datagrid('getSelected');	// get the selected row
+			app.dryrunRow = {
+				mig_dryrun_id: temp.fares_dryrun_id, 
+				mig_dryrun_name: temp.dryrun_name, 
+				remark: ""
+			};
+		}
+	});
+	
+	$('#fares_dryrun_id').combogrid({
+		url : "../../query/commonCBBQUERYdfind.action",
+		queryParams : {
+			tableName : "v_dryrun_config",
+			columns: "mig_dryrun_name"
+		},
+		panelWidth : 500,
+		panelHeight : 200,
+		idField : 'mig_dryrun_id',
+		textField : 'mig_dryrun_name',
+		pagination : true,
+		fitColumns : false,
+		required : true,
+		rownumbers : true,
+		mode : 'remote',
+		delay : 500,
+		sortName : 'mig_dryrun_name',
+		sortOrder : 'asc',
+		pageSize : 5,
+		pageList : [ 5, 10 ],
+		onSelect: function(index,row){
+			submitForm();
+		},
+		columns : [ [
+			{ title : 'ID', field : 'mig_dryrun_id',width : 90, sortable: true }, 
+			{ title : 'Dry Run名称', field : 'mig_dryrun_name', width : 120, sortable: true }, 
+			{ title : '备注', field : 'remark',  width : 300 } 
+		] ]
+	});
+});
+
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+    <div data-options="region:'north',border:true,split:true" style="height:92px;background:#B3DFDA;" title="Search Condition" >  
+        <form id="s_form" method="post" style="margin:0;padding:0;">
+        <div style="padding:0px 0 0px 15px">
+            <table width="100%"> 
+                <tr>
+                    <td>Domain Name:</td>
+                    <td>
+                    	<input class="easyui-combobox"
+		                        id='entity' name="entity" value="" 
+		                        data-options="valueField:'code', textField:'value',
+		                        editable:false,
+								data: domains"/>
+                    </td>
+                    <td>Sub Domain:</td>
+                    <td>
+                        <input id="audit_item" name="audit_item" value="">
+                    </td>
+                    <td>DryRun:</td>
+                    <td>
+                        <input id="fares_dryrun_id" name="fares_dryrun_id" value="">
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <table width="100%" border="0" align="center">
+			<tr bgcolor="#E2EEFE" valign="bottom">
+				<td height="23"><div align="center"><!-- default height='21'  -->
+					<a class="easyui-linkbutton" data-options="iconCls:'icon-search'" href="javascript:void(0)" 
+               		onclick="submitForm()" style="width:80px">Submit</a>&nbsp;&nbsp;
+               		<a class="easyui-linkbutton" data-options="iconCls:'icon-clear'" href="javascript:void(0)" 
+               		onclick="clearForm()" style="width:80px">Clear</a>
+				</div></td>
+			</tr>
+		</table>
+		</form>
+    </div>
+    <div data-options="region:'center', border:false" title="" style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+	
+	<div id="win" class="easyui-window" title="添加" style="width:600px;height:400px"  
+        data-options="modal:true,closed:true">
+	</div>
+</body>
+</html>

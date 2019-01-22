@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+	    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+	    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd 
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd" >
+<!-- 
+	<context:component-scan base-package="person.daizhongde.migration.spring.service.quartz">
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+	</context:component-scan> 
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>  
+	-->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:init.properties</value>
+			</list>
+		</property>
+	</bean>
+<!-- 两个邮件服务bean  -->
+<!-- qq email  (smtp)   
+	<bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="protocol" value="${email.protocol}" />
+		<property name="host" value="${email.host}" />
+		<property name="port" value="${email.port}" />
+		<property name="username" value="${email.username}" />
+		<property name="password" value="${email.password}" />
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.${email.protocol}.auth">${email.auth}</prop>
+				<prop key="mail.smtp.timeout">25000</prop> 
+				<prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>  
+				<prop key="mail.smtp.port">465</prop>  
+				<prop key="mail.smtp.socketFactory.port">465</prop>  
+				<prop key="mail.smtp.socketFactory.fallback">false</prop>  
+			</props>
+		</property>
+	</bean> -->
+	<!-- hngy email (imap)    -->
+	<bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="protocol" value="${email.protocol}" />
+		<property name="host" value="${email.host}" />
+		<property name="port" value="${email.port}" />
+		<property name="username" value="${email.username}" />
+		<property name="password" value="${email.password}" />
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.${email.protocol}.auth">${email.auth}</prop>
+				<prop key="mail.smtp.timeout">25000</prop> 
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="accountEmailService"
+		class="person.daizhongde.migration.spring.service.impl.AccountEmailServiceImpl">
+		<property name="javaMailSender" ref="javaMailSender" />
+		<property name="systemEmail" value="${email.systemEmail}" />
+	</bean>
+	 
+    <!-- 定义数据源Bean, 使用spring-jdbc 数据源实现    -->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${datasource.driverClassName}"/>
+		<property name="url" value="${datasource.url}"/>
+		<property name="username" value="${datasource.username}"/>
+		<property name="password" value="${datasource.password}"/>
+	</bean>
+	<!-- 定义Hibernate的SessionFactory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<!-- 依赖注入数据源, 注入上面定义的dataSource -->
+		<property name="dataSource" ref="dataSource" />
+        <property name="mappingDirectoryLocations">
+          <list>
+            <value>classpath:com/asiainfo/migration/hibernate/pojo</value>
+          </list>
+        </property>
+
+		<!-- mappingResouces 指定classpath下具体映射文件名 -->
+		<property name="mappingLocations">
+			<list>
+				<!-- 以下用来列出Hibernate映射文件 -->
+				<value>classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityFunc.hbm.xml</value>
+				<value>classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityButton.hbm.xml</value>
+				<value>classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityRbrelation.hbm.xml</value>
+				<value>classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityModule.hbm.xml</value>
+				<value>
+					classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityLevel.hbm.xml
+				</value>
+				<value>
+					classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityRole.hbm.xml
+				</value>
+				<value>
+					classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityRmrelation.hbm.xml
+				</value>
+				<value>
+					classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityUrrelation.hbm.xml
+				</value>
+				<value>
+					classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityUser.hbm.xml
+				</value>
+				<value>
+					classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityInst.hbm.xml
+				</value></list>
+		</property>
+		
+		<!-- 定义Hibernate的SessionFactory的属性 -->
+		<property name="hibernateProperties">
+			<props>
+			<!--  when deploy to weblogic
+				<prop key="hibernate.transaction.factory_class">${hibernate.transaction.factory_class}</prop>
+				-->
+				<!-- 指定数据库方言 -->
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<!-- CHAR类型的, Hibernate取值时将其保存为Character类型,  而Character只能保存一个字符,  所以造成返回值中只存在一个字符。 
+					Hibernate官方已存在此bug, 却从未修复。 -->
+				<!-- 显示Hibernate持久化操作所生成的SQL -->
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<!-- 将SQL脚本进行格式化后再输出 -->
+				<prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+
+<!-- 				<prop key="hibernate.connection.isolation">8</prop> -->
+				<prop key="hibernate.connection.characterEncoding">${hibernate.connection.characterEncoding}</prop>
+				<prop key="hibernate.connection.useUnicode">${hibernate.connection.useUnicode}</prop>
+				<prop key="hibernate.jdbc.use_scrollable_resultset">${hibernate.jdbc.use_scrollable_resultset}</prop>
+<!-- 				org.hibernate.hql.classic.ClassicQueryTranslatorFactory  hibernate2.1
+					org.hibernate.hql.ast.ASTQueryTranslatorFactory   hibernate3.0
+					org.hibernate.hql.internal.ast.ASTQueryTranslatorFactory hibernate5.1 -->
+				<prop key="hibernate.query.factory_class">org.hibernate.hql.internal.ast.ASTQueryTranslatorFactory</prop>
+				<prop key="hibernate.query.substitutions">decode=decode,to_char=to_char,to_number=to_number,||=||,'=',INTERVAL=INTERVAL,SECOND=SECOND</prop>
+				<prop key="javax.persistence.validation.mode">none</prop>
+<!--  				<prop key="hibernate.hbm2ddl.auto">create</prop> -->
+			</props>
+		</property>		
+	</bean>
+	
+	<!-- 配置TransactionManager -->
+	<bean id="txManager"
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<import resource="classpath:com/asiainfo/migration/spring/applicationContext-migration.xml" />
+	<import resource="classpath:com/asiainfo/authority/spring/applicationContext-authority.xml" />
+	
+	<!-- 配置事务策略-切service SUPPORTS-->
+	<tx:advice id="servicetxAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="browse*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="list*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="load*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="get*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="is*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="generate*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="importKPIXLS" propagation="NOT_SUPPORTED" read-only="true" />
+			<tx:method name="*" propagation="REQUIRED"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<!-- 对dao配置事务策略 -->
+	<tx:advice id="daotxAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="updateJobInsState" propagation="REQUIRES_NEW" />
+			<tx:method name="sqlQueryUpdateJobInsState*" propagation="REQUIRES_NEW" />
+			<tx:method name="updateProcessState" propagation="REQUIRES_NEW" />
+			<tx:method name="sqlQueryUpdateProcessState*" propagation="REQUIRES_NEW" />
+			<tx:method name="sqlQuerySequenceNEXTVAL2" propagation="REQUIRES_NEW" />
+
+			<tx:method name="findStatusById" propagation="REQUIRES_NEW" read-only="true" />
+			<tx:method name="findProcessesWhose*" propagation="REQUIRES_NEW" read-only="true" />
+			<tx:method name="find2_*" propagation="REQUIRES_NEW" read-only="true" />
+			<tx:method name="findByJobInsIdAndNode" propagation="REQUIRES_NEW" read-only="true" />
+			
+			<tx:method name="RN_*" propagation="REQUIRES_NEW" />
+			<tx:method name="*" propagation="REQUIRED"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>
+		<aop:pointcut id="authorityServiceMethods" expression="execution(* person.daizhongde.authority.spring.service.impl.*.*(..))" />
+		<aop:advisor advice-ref="servicetxAdvice" pointcut-ref="authorityServiceMethods" />
+	</aop:config>
+	
+	<aop:config>
+		<aop:pointcut id="migrationServiceMethods" expression="execution(* person.daizhongde.migration.spring.service.*.*(..))" />
+		<aop:advisor advice-ref="servicetxAdvice" pointcut-ref="migrationServiceMethods" />
+	</aop:config>
+	
+	<aop:config>
+		<aop:pointcut id="migrationDAOMethods" expression="execution(* person.daizhongde.migration.hibernate.dao.*.*(..))" />
+		<aop:advisor advice-ref="daotxAdvice" pointcut-ref="migrationDAOMethods" />
+	</aop:config>
+	
+	<bean id="jdbcSConnection" class="person.daizhongde.virtue.jdbc.JDBCSpringConnection">
+		<property name="dataSource">
+			<ref bean="dataSource" /> 
+		</property>
+	</bean>
+	
+	<bean id="ea_MD5" class="person.daizhongde.virtue.codec.EA_MD5Impl"/>
+	<bean id="ea_SHA1" class="person.daizhongde.virtue.codec.EA_SHA1Impl"/>
+	
+	<bean id="pwdUtil" class="person.daizhongde.virtue.codec.PasswordUtil">
+		<property name="EA">
+			<ref bean="ea_SHA1"/>
+		</property>
+	</bean>
+	
+	<bean id="springContextUtil" class="person.daizhongde.virtue.spring.util.SpringContextUtil"/>
+</beans>

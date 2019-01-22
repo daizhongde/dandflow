@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Try Bootstrap Online dynamic tab</title>
+   <link href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+   <script src="http://cdn.static.runoob.com/libs/jquery/2.0.0/jquery.js"></script>
+   <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<input type="button" name="add" value="add" onclick="addtab();"/>
+
+<input type="text" id="tabid" name="tabid" value="ejb"/>
+<input type="button" name="remove" value="remove" onclick="removetab();"/>
+
+<hr>
+   <p class="active-tab"><strong>Active Tab</strong>: <span></span></p>
+   <p class="previous-tab"><strong>Previous Tab</strong>: <span></span></p>
+<hr>
+
+
+<ul id="myTab" class="nav nav-tabs">
+   <li id="lihome" class="active" ><a href="#home" data-toggle="tab">home</a></li>
+   <li id="liios" ><a href="#ios" data-toggle="tab">ios</a></li>
+   <li id="lijmeter" ><a href="#baidu" data-toggle="tab">baidu</a></li>
+   <li id="liejb" ><a href="#copote" data-toggle="tab">copote</a></li>
+   
+</ul>
+<div id="myTabContent" class="tab-content">
+   <div class="tab-pane fade in active" id="home">
+      <p>Tutorials Point is a place for beginners in all technical areas. 
+         This website covers most of the latest technoligies and explains 
+         each of the technology with simple examples. You also have a 
+         <b>tryit</b> editor, wherein you can edit your code and 
+         try out different possibilities of the examples.</p>
+   </div>
+   <div class="tab-pane fade" id="ios">
+      <p>iOS is a mobile operating system developed and distributed by Apple 
+         Inc. Originally released in 2007 for the iPhone, iPod Touch, and 
+         Apple TV. iOS is derived from OS X, with which it shares the 
+         Darwin foundation. iOS is Apple's mobile version of the 
+         OS X operating system used on Apple computers.</p>
+   </div>
+   <div class="tab-pane fade" id="baidu" style="width:100%;height:700px">
+      <iframe id="menufrm1" name="menufrm1" src="http://www.csdn.net"  style="width:100%;height:100%" marginheight="0" marginwidth="0" frameborder="0" 
+       ></iframe>
+   </div> 
+   <div class="tab-pane fade" id="copote" style="width:100%;height:700px">
+      <iframe id="menufrm2" name="menufrm2" src="http://www.runoob.com/"  style="width:100%;height:100%" marginheight="0" marginwidth="0" frameborder="0"></iframe>
+   </div>
+   
+</div>
+
+
+
+<script>
+
+	$(function() {
+		$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+			// Get the name of active tab
+			var activeTab = $(e.target).text();
+			// Get the name of previous tab
+			var previousTab = $(e.relatedTarget).text();
+			$(".active-tab span").html(activeTab);
+			$(".previous-tab span").html(previousTab);
+		});
+	});
+
+	var i = 1;
+	var myTab = "myTab";// tab ul id
+	var myTabContent = "myTabContent";// tabcontent div ID
+
+	/* add tab  */
+	addtab = function() {
+		var tabid = "tab" + i;//tab a href value after #
+		var liid = "li" + tabid
+
+		// 	   var tabname = "tabname"+i;
+		var tabname = "tab" + i;//这里name和id设置一样，方便看删除效果
+		var iframeIDandName = "iframe" + i;// content iframe name
+		var iframesrc = "http://www.baidu.com";
+
+		var li = document.createElement("li");
+		li["id"] = liid;
+		li.className = "";
+		var a = document.createElement("a");
+		a.href = "#" + tabid;
+		// 	    a["data-toggle"] = "tab";
+		// 	    a["aria-expanded"] = "false";
+		a.setAttribute("data-toggle", "tab");
+		a.setAttribute("aria-expanded", "false");
+
+		a.innerHTML = tabname;
+		li.appendChild(a);
+		// 	    <li class=""><a href="#ios" data-toggle="tab" aria-expanded="false">iOS</a></li>
+		document.getElementById(myTab).appendChild(li);
+
+		var div = document.createElement("div");
+		// 	    div["class"]="tab-pane fade";
+		div.className = "tab-pane fade";
+		div["id"] = tabid;
+		div["style"]="width:100%;height:700px";
+		
+		var iframe = document.createElement("iframe");
+		iframe.id = iframeIDandName;
+		iframe.name = iframeIDandName;
+		iframe.src = iframesrc;
+		iframe.style = "width:100%;height:100%";
+
+		iframe["marginheight"] = "0";
+		iframe["marginwidth"] = "0";
+		iframe["frameborder"] = "0";
+		
+		div.appendChild(iframe);
+		// 	    <div class="tab-pane fade" id="ejb" style="width:100%;height:700px">
+		//       <iframe id="menufrm" name="menufrm" src="MyJsp.jsp" style="width:100%;height:100%" marginheight="0" marginwidth="0" frameborder="0"></iframe>
+		//    </div>
+		document.getElementById(myTabContent).appendChild(div);
+
+		i++;
+	};
+
+	/* remove tab  */
+	removetab = function() {
+		var tabid = $("#tabid").val();
+		console.log(tabid);
+		var node = document.getElementById(tabid);
+		if (!node) {
+			alert("no this tab:" + tabid);
+			return false;
+		}
+		// 	   alert(tabid);
+		//remove content first, than remove tab ul
+		// 	   document.getElementById(tabid).parentNode.removeChild(this);
+		document.getElementById(myTabContent).removeChild(
+				document.getElementById(tabid));
+		document.getElementById(myTab).removeChild(
+				document.getElementById("li" + tabid));
+
+	};
+</script>
+
+</body>
+</html>

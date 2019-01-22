@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  	<meta charset="UTF-8">
+    <title>新增作业</title>
+	
+    <meta name="keywords" content="keyword1,keyword2,keyword3">
+    <meta name="description" content="this is my page">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+<style type="text/css">
+<!--
+
+body{
+/* 	background-color: rgb(228, 235, 241); */
+    background-color: rgb(87, 200, 243);
+}
+-->
+</style>
+
+<link rel="stylesheet" type="text/css" href="../scripts/jquery-easyui/1.4.1/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../scripts/jquery-easyui/1.4.1/themes/icon.css"/>
+<script type="text/javascript" src="../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+<script type="text/javascript" src="../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+
+<script type="text/javascript">
+function submitForm(){
+	
+// 	alert(document.newJobform.jobName.value);
+	var jobName = document.newJobform.jobName.value;
+	var type = document.newJobform.type.value;
+	var jobRemark = document.newJobform.jobRemark.value;
+	if(jobName == ""){
+		alert("Job Name is required！");
+		return;
+	}
+	if(type == ""){
+		alert("Job Type is required！");
+		return;
+	}
+	if(jobRemark == ""){
+		alert("Job Remark is required！");
+		return;
+	}
+	$.ajax({
+	   type: "POST",
+	   url: "../curd/migJobInfoCURDaddRetId.action",
+	   data: {
+		   jdata: "{jobName:'"+jobName+"',type:'"+type+"',jobRemark:'"+jobRemark+"'}"
+	   },
+	   success: function(oResponse){
+		   if(oResponse.success == true){
+			   window.location.href="../curd/migJobInfoCURDinitModify.action?id="+oResponse.id;
+		   }else{
+			   alert(oResponse.msg);
+		   }
+	   }
+	}); 
+};
+/* jQuery(document).ready(function(){
+	$('#p').panel('move',{
+	    left:100,
+	    top:100
+	});
+} */
+</script>
+</head>
+<body>
+	<div style="margin:20px 0 10px 300px;">
+    <div id="p" class="easyui-panel" title="My Panel" 
+        style="width:600px;height:400px;padding:10px;background:#fafafa;position:absolute;"
+        data-options="iconCls:'icon-add',closable:true,left:220,top:50,border:true,
+                collapsible:true,minimizable:true,maximizable:true">
+		<form action="#" name="newJobform">
+			<table>
+				<tr>
+					<td>Job name：</td>
+					<td><input type="text" name="jobName"></td>
+				</tr>
+				<tr>
+					<td>Job type：</td>
+					<td>
+					<!-- 
+						<select id="jtype" name="type">
+						  <option value ="">-选择-</option>
+						  <option value ="1">一般作业</option>
+						  <option value ="2">字段级稽核作业</option>
+						  <option value ="3">合法性稽核作业</option>
+						  <option value ="4">一致性稽核作业</option>
+						</select> -->
+						<input class="easyui-combobox" 
+	                        id='jtype' name="type" value="" editable="false"
+	                        data-options="valueField:'code', textField:'value',url:'../cbb/dicCBBgetDicByType.action?dicType=job_type',
+	                        method:'post'"/>
+					</td>
+				</tr>
+				<tr>
+					<td>Job description：</td>
+					<td><textarea rows="5" cols="50" name="jobRemark"></textarea> </td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>
+						<a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()">Next></a>
+					</td>
+				</tr>
+			</table>
+		</form>
+	</div>
+	</div>
+</body>
+</html>
