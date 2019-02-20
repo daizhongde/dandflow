@@ -70,9 +70,9 @@
 	</dependency>
 	-->
 	<dependency>
-		<groupId>person.daizhongde.authority</groupId>
-		<artifactId>authority-jdk17</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<groupId>person.daizhongde</groupId>
+		<artifactId>authority</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
 	</dependency>
 	
 	<dependency>
@@ -357,24 +357,16 @@
       </resource>
     </resources>
     
-    <plugins>
-        <plugin>
-			<artifactId>maven-compiler-plugin</artifactId>
-			<version>3.5</version><!-- 2.3.2  3.3 3.5  3.6.2 -->
-			<configuration>
-				<source>1.8</source>
-				<target>1.8</target>
-			</configuration>
-		</plugin>
-		<plugin>
-			<artifactId>maven-war-plugin</artifactId>
-			<version>2.6</version><!-- 2.2  2.6  3.0.0   3.1.0  -->
-			<configuration>
-				<warSourceDirectory>${basedir}/WebRoot</warSourceDirectory>
-				<failOnMissingWebXml>false</failOnMissingWebXml>
-			</configuration>
-		</plugin>
-    </plugins>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <!--排除war deploy-->
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
   </build>
   
   <profiles>

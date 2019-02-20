@@ -36,6 +36,21 @@
 			<table id="jobparam_grid"></table>
 		</div>
 	</form>
+	
+	<a href="javascript:void(0)" id="mb" class="easyui-menubutton"
+	    data-options="menu:'#mm',iconCls:'icon-edit'">Edit</a>
+	<div id="mm" style="width:150px;">
+	    <div data-options="iconCls:'icon-undo'">Undo</div>
+	    <div data-options="iconCls:'icon-redo'">Redo</div>
+	    <div class="menu-sep"></div>
+	    <div>Cut</div>
+	    <div>Copy</div>
+	    <div>Paste</div>
+	    <div class="menu-sep"></div>
+	    <div data-options="iconCls:'icon-remove'">Delete</div>
+	    <div>Select All</div>
+	</div>
+
 	</div>
 <script type="text/javascript">
 var insPojo = {
@@ -114,19 +129,43 @@ app.jobparam_toolbar = [ {
 		return false;
 	}
 }, '-', {
-	text : 'Add C Params',
+	text : 'Add sit Params',
 	disabled: false,
 	iconCls : 'icon-add',
 	handler : function() {
-		jobparam_addCP();
+		jobparam_addSIT();
 		return false;
 	}
 }, '-', {
-	text : 'Add R Params',
+	text : 'uat',
 	disabled: false,
 	iconCls : 'icon-add',
 	handler : function() {
-		jobparam_addRP();
+		jobparam_addUAT();
+		return false;
+	}
+}, '-', {
+	text : 'prod',
+	disabled: false,
+	iconCls : 'icon-add',
+	handler : function() {
+		jobparam_addPROD();
+		return false;
+	}
+}, '-', {
+	text : '测试51',
+	disabled: false,
+	iconCls : 'icon-add',
+	handler : function() {
+		jobparam_addSRCTEST();
+		return false;
+	}
+}, '-', {
+	text : '生产11',
+	disabled: false,
+	iconCls : 'icon-add',
+	handler : function() {
+		jobparam_addSRCPROD();
 		return false;
 	}
 }];
@@ -151,10 +190,10 @@ $('#jobparam_grid').datagrid({
 	},
 	columns : [ [
 		{ title : 'ID', field : 'nodeId', hidden: true }, 
-		{ title : 'Variable', field : 'para', editor : { type : 'text'}, width : 90 }, 
-		{ title : 'Value', field : 'paraValue', editor : { type : 'text'}, width : 90 }, 
-		{ title : 'Type', field : 'paraType', editor : { type : 'text'}, width : 90, hidden: true }, 
-		{ title : 'Name', field : 'paraName', editor : { type : 'text'}, width : 90 }
+		{ title : 'Variable', field : 'para', editor : { type : 'text'}, width : 120 }, 
+		{ title : 'Value', field : 'paraValue', editor : { type : 'text'}, width : 400 }, 
+		{ title : 'Type', field : 'paraType', editor : { type : 'text'}, width : 120, hidden: true }, 
+		{ title : 'Name', field : 'paraName', editor : { type : 'text'}, width : 120 }
 	] ],
 	pagination : false,
 	rownumbers : false,
@@ -226,24 +265,41 @@ function jobparam_reject() {
 	$('#jobparam_grid').datagrid('rejectChanges');
 	jobparam_editIndex = undefined;
 };
-function jobparam_addCP() {
+function jobparam_addSIT() {
 	if (jobparam_endEditing()) {
-		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"DIP",paraValue:env.C.DIP,paraType:"1",paraName:"DIP" });
-		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"PORT",paraValue:env.C.PORT,paraType:"1",paraName:"PORT" });
-		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"HIP",paraValue:"1",paraType:"1",paraName:"HIP" });
-		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"USERPASS",paraValue:"1",paraType:"1",paraName:"USERPASS" });
-		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"ENV",paraValue:"C",paraType:"1",paraName:"ENV" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"$HIP",paraValue:env.sit.HIP,paraType:"1",paraName:"HIP" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"$MySQLPARAM",paraValue:env.sit.MySQLPARAM,paraType:"1",paraName:"MySQLPARAM" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"$DBNAME",paraValue:env.sit.DBNAME,paraType:"1",paraName:"DBNAME" });
 	}
 };
-function jobparam_addRP() {
+function jobparam_addUAT() {
 	if (jobparam_endEditing()) {
-		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"DIP",paraValue:env.R.DIP,paraType:"1",paraName:"DIP" });
-		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"PORT",paraValue:env.R.PORT,paraType:"1",paraName:"PORT" });
-		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"HIP",paraValue:"1",paraType:"1",paraName:"HIP" });
-		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"USERPASS",paraValue:"1",paraType:"1",paraName:"USERPASS" });
-		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"ENV",paraValue:"R",paraType:"1",paraName:"ENV" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"$HIP",paraValue:env.uat.HIP,paraType:"1",paraName:"HIP" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"$MySQLPARAM",paraValue:env.uat.MySQLPARAM,paraType:"1",paraName:"MySQLPARAM" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"$DBNAME",paraValue:env.uat.DBNAME,paraType:"1",paraName:"DBNAME" });
 	}
 };
+function jobparam_addPROD() {
+	if (jobparam_endEditing()) {
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"$HIP",paraValue:env.prod.HIP,paraType:"1",paraName:"HIP" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"$MySQLPARAM",paraValue:env.prod.MySQLPARAM,paraType:"1",paraName:"MySQLPARAM" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"$DBNAME",paraValue:env.prod.DBNAME,paraType:"1",paraName:"DBNAME" });
+	}
+};
+/** source environment   **/
+function jobparam_addSRCTEST() {
+	if (jobparam_endEditing()) {
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"$HIP",paraValue:env.src_test.HIP,paraType:"1",paraName:"HIP" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"$OraclePARAM",paraValue:env.src_test.OraclePARAM,paraType:"1",paraName:"OraclePARAM" });
+	}
+};
+function jobparam_addSRCPROD() {
+	if (jobparam_endEditing()) {
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"$HIP",paraValue:env.src_prod.HIP,paraType:"1",paraName:"HIP" });
+		$('#jobparam_grid').datagrid('appendRow',{ nodeId: insPojo.jobId,para:"$OraclePARAM",paraValue:env.src_prod.OraclePARAM,paraType:"1",paraName:"OraclePARAM" });
+	}
+};
+
 </script>
 </body>
 </html>

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import person.daizhongde.migration.constant.MIGINIT;
 import person.daizhongde.migration.spring.service.ConstantService;
 
 import person.daizhongde.virtue.constant.INIT;
@@ -16,17 +17,36 @@ public class ConstantServiceImpl implements ConstantService {
 
 	@Override
 	public Object dfindENV() {
-		Map<String, Map> env = new HashMap(2);
-		Map<String, String> envC = new HashMap(2);
-//		envC.put("DIP", INIT.connextion_ip);
-//		envC.put("PORT", INIT.connextion_port);
+		Map<String, Map<String, String>> env = new HashMap<String, Map<String, String>>(3);
+		Map<String, String> envSIT = new HashMap<String, String>(3);
+		envSIT.put("HIP", MIGINIT.sit_HIP);
+		envSIT.put("MySQLPARAM", MIGINIT.sit_MySQLPARAM);
+		envSIT.put("DBNAME", MIGINIT.sit_DBNAME);
 		
-		Map<String, String> envR = new HashMap(2);
-//		envR.put("DIP", INIT.retail_ip);
-//		envR.put("PORT", INIT.retail_port);
+		Map<String, String> envUAT = new HashMap<String, String>(3);
+		envUAT.put("HIP", MIGINIT.uat_HIP);
+		envUAT.put("MySQLPARAM", MIGINIT.uat_MySQLPARAM);
+		envUAT.put("DBNAME", MIGINIT.uat_DBNAME);
 		
-		env.put("C",envC);
-		env.put("R",envR);
+		Map<String, String> envPROD = new HashMap<String, String>(3);
+		envPROD.put("HIP", MIGINIT.prod_HIP);
+		envPROD.put("MySQLPARAM", MIGINIT.prod_MySQLPARAM);
+		envPROD.put("DBNAME", MIGINIT.prod_DBNAME);
+		
+		env.put("sit", envSIT);
+		env.put("uat", envUAT);
+		env.put("prod", envPROD);
+		
+		Map<String, String> envSRCTEST = new HashMap<String, String>(3);
+		envSRCTEST.put("HIP", MIGINIT.src_test_HIP);
+		envSRCTEST.put("OraclePARAM", MIGINIT.src_test_OraclePARAM);
+		
+		Map<String, String> envSRCPROD = new HashMap<String, String>(3);
+		envSRCPROD.put("HIP", MIGINIT.src_prod_HIP);
+		envSRCPROD.put("OraclePARAM", MIGINIT.src_prod_OraclePARAM);
+		
+		env.put("src_test", envSRCTEST);
+		env.put("src_prod", envSRCPROD);
 		return env;
 	}
 	

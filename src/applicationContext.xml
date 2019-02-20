@@ -76,7 +76,7 @@
 		<property name="dataSource" ref="dataSource" />
         <property name="mappingDirectoryLocations">
           <list>
-            <value>classpath:com/asiainfo/migration/hibernate/pojo</value>
+            <value>classpath:person/daizhongde/migration/hibernate/pojo</value>
           </list>
         </property>
 
@@ -84,27 +84,27 @@
 		<property name="mappingLocations">
 			<list>
 				<!-- 以下用来列出Hibernate映射文件 -->
-				<value>classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityFunc.hbm.xml</value>
-				<value>classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityButton.hbm.xml</value>
-				<value>classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityRbrelation.hbm.xml</value>
-				<value>classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityModule.hbm.xml</value>
+				<value>classpath*:person/daizhongde/authority/hibernate/pojo/TAuthorityFunc.hbm.xml</value>
+				<value>classpath*:person/daizhongde/authority/hibernate/pojo/TAuthorityButton.hbm.xml</value>
+				<value>classpath*:person/daizhongde/authority/hibernate/pojo/TAuthorityRbrelation.hbm.xml</value>
+				<value>classpath*:person/daizhongde/authority/hibernate/pojo/TAuthorityModule.hbm.xml</value>
 				<value>
-					classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityLevel.hbm.xml
+					classpath*:person/daizhongde/authority/hibernate/pojo/TAuthorityLevel.hbm.xml
 				</value>
 				<value>
-					classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityRole.hbm.xml
+					classpath*:person/daizhongde/authority/hibernate/pojo/TAuthorityRole.hbm.xml
 				</value>
 				<value>
-					classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityRmrelation.hbm.xml
+					classpath*:person/daizhongde/authority/hibernate/pojo/TAuthorityRmrelation.hbm.xml
 				</value>
 				<value>
-					classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityUrrelation.hbm.xml
+					classpath*:person/daizhongde/authority/hibernate/pojo/TAuthorityUrrelation.hbm.xml
 				</value>
 				<value>
-					classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityUser.hbm.xml
+					classpath*:person/daizhongde/authority/hibernate/pojo/TAuthorityUser.hbm.xml
 				</value>
 				<value>
-					classpath*:com/asiainfo/authority/hibernate/pojo/TAuthorityInst.hbm.xml
+					classpath*:person/daizhongde/authority/hibernate/pojo/TAuthorityInst.hbm.xml
 				</value></list>
 		</property>
 		
@@ -144,8 +144,8 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
-	<import resource="classpath:com/asiainfo/migration/spring/applicationContext-migration.xml" />
-	<import resource="classpath:com/asiainfo/authority/spring/applicationContext-authority.xml" />
+	<import resource="classpath:person/daizhongde/migration/spring/applicationContext-migration.xml" />
+	<import resource="classpath:person/daizhongde/authority/spring/applicationContext-authority.xml" />
 	
 	<!-- 配置事务策略-切service SUPPORTS-->
 	<tx:advice id="servicetxAdvice" transaction-manager="txManager">
