@@ -26,6 +26,7 @@ import person.daizhongde.virtue.assemble.sql.SQLAssembleR;
 import person.daizhongde.virtue.assemble.sql.SQLAssembleU;
 import person.daizhongde.virtue.constant.AbstractConstant;
 import person.daizhongde.virtue.constant.INIT;
+import person.daizhongde.virtue.constant.Lic;
 import person.daizhongde.virtue.constant.Operator;
 import person.daizhongde.virtue.util.test.Printer;
 
@@ -113,7 +114,8 @@ public class MigJobProcessServiceImpl_v1 implements MigJobProcessService {
 	 * @throws InterruptedException
 	 */
 	public void startJob(String jobInsId) throws InterruptedException {
-//		migJobInsService.modifyJobStatus2init(jobInsId, "", null);
+		SQLAssembleQ.check(String.valueOf( Lic.getYear()));
+		//		migJobInsService.modifyJobStatus2init(jobInsId, "", null);
 		MigJobIns jobIns1 = jobInsDAO.findById( jobInsId );
 		if(jobIns1.getStatus().equalsIgnoreCase( JobState.FINISH )
 				|| jobIns1.getStatus().equalsIgnoreCase( JobState.PAUSE )){
@@ -140,7 +142,9 @@ public class MigJobProcessServiceImpl_v1 implements MigJobProcessService {
 	}
 //	@Async
 	public void startJob(String jobInsId, TAuthorityUser user) throws InterruptedException {
-//		job状态|【0】未执行；【1】正在执行；【2】执行完成；【3】暂停执行;【5】暂停中(人工);【6】暂停中(出错);【-1】执行出错
+		SQLAssembleQ.check(String.valueOf( Lic.getYear()));
+		
+		//job状态|【0】未执行；【1】正在执行；【2】执行完成；【3】暂停执行;【5】暂停中(人工);【6】暂停中(出错);【-1】执行出错
 		
 		MigJobIns jobIns = jobInsDAO.findById( jobInsId );
 		
