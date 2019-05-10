@@ -61,6 +61,10 @@
 		<property name="javaMailSender" ref="javaMailSender" />
 		<property name="systemEmail" value="${email.systemEmail}" />
 	</bean>
+	<bean id="mailUtil"
+		class="person.daizhongde.migration.spring.service.imp.MailUtil">
+	</bean>
+	 
 	 
     <!-- 定义数据源Bean, 使用spring-jdbc 数据源实现    -->
 	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
@@ -157,6 +161,7 @@
 			<tx:method name="is*" propagation="REQUIRED" read-only="true" />
 			<tx:method name="generate*" propagation="REQUIRED" read-only="true" />
 			<tx:method name="importKPIXLS" propagation="NOT_SUPPORTED" read-only="true" />
+			<tx:method name="notx*" propagation="NOT_SUPPORTED" read-only="true" />
 			<tx:method name="*" propagation="REQUIRED"/>
 		</tx:attributes>
 	</tx:advice>

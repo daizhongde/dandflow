@@ -153,13 +153,13 @@ function editRecord() {
 		$('#win').window('open').window('setTitle', 'Edit');
 		//mig_dst mig_dst_conn mig_where
 		if( row.mig_dst.replace(/ /g, "") != "" && row.mig_dst_conn.replace(/ /g, "") == "" && row.mig_where.replace(/ /g, "") == "" ){
-			$('#win').window("refresh", getContextPath()+"/curd/commonCURDinitModify2.action?foldName=migTaskConfig_SplitFile"
+			$('#win').window("refresh", getContextPath()+"/curd/commonCURDinitModify2.action?foldName=migcommon/migTaskConfig_SplitFile"
 					+"&frontPageName=migTaskConfig_SplitFile_modify1&tableName="+tableName+"&jdata="+encodeURI($.toJSON( read.jdata )));
 		}else if( row.mig_dst.replace(/ /g, "") == "" && row.mig_dst_conn.replace(/ /g, "") != ""  ){//&& row.mig_where.replace(/ /g, "") != ""
-			$('#win').window("refresh", getContextPath()+"/curd/commonCURDinitModify2.action?foldName=migTaskConfig_SplitFile"
+			$('#win').window("refresh", getContextPath()+"/curd/commonCURDinitModify2.action?foldName=migcommon/migTaskConfig_SplitFile"
 					+"&frontPageName=migTaskConfig_SplitFile_modify2&tableName="+tableName+"&jdata="+encodeURI($.toJSON( read.jdata )));
 		}else if( row.mig_dst.replace(/ /g, "") == "" && row.mig_dst_conn.replace(/ /g, "") == "" && row.mig_where.replace(/ /g, "") != "" ){
-			$('#win').window("refresh", getContextPath()+"/curd/commonCURDinitModify2.action?foldName=migTaskConfig_SplitFile"
+			$('#win').window("refresh", getContextPath()+"/curd/commonCURDinitModify2.action?foldName=migcommon/migTaskConfig_SplitFile"
 					+"&frontPageName=migTaskConfig_SplitFile_modify3&tableName="+tableName+"&jdata="+encodeURI($.toJSON( read.jdata )));
 		}else{
 			alert("Error! No this type config parameter!");
@@ -173,7 +173,7 @@ function browseRecord() {
 		$('#win').window('open').window('setTitle', 'View');
 		read.jdata.condition.mig_config_id = row.mig_config_id;
 		var readSQLName = "read_TaskConfig";
-		$('#win').window("refresh", getContextPath()+"/curd/commonCURDbrowse2.action?foldName=migTaskConfig_SplitFile"
+		$('#win').window("refresh", getContextPath()+"/curd/commonCURDbrowse2.action?foldName=migcommon/migTaskConfig_SplitFile"
 				+"&frontPageName=migTaskConfig_SplitFile_browse&tableName="+tableName+"&readSQLName="+readSQLName+"&jdata="+encodeURI($.toJSON( read.jdata )));
 	}
 };

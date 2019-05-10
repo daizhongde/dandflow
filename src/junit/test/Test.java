@@ -37,6 +37,9 @@ public class Test {
 		String hostConn = "@{H$IP}";
 		hostConn = hostConn.replace("@{H$IP}", "cier");
 		System.out.println("hostConn:"+hostConn);
+		String s = "smiles";
+		System.out.println(s.substring(1, 6));
+		
 	}
 
 }

@@ -253,6 +253,13 @@
 			<ref bean="sessionFactory" />
 		</property>
 	</bean>
+	<!-- Copote 员工 -->
+	<bean id="tCopoteEmployeeDAO"
+		class="person.daizhongde.migration.hibernate.dao.impl.TCopoteEmployeeDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
 	
 	<!-- 迁移配置表 -->
 	<bean id="MigSyncConfigDAO"

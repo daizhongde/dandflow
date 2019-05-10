@@ -156,6 +156,8 @@ frmReload = function(){
 						<a href="#nogo" onclick="javascript:return false;">Site map</a>
 						<a href="#nogo" onclick="javascript:return false;">Repository</a>
 						<a href="ckfinder/standalone.html" target="_blank" onclick="javascript:return true;">File View</a>
+						
+						<a href="#" target="_blank" onclick="javascript:alert('Expire date <%=person.daizhongde.virtue.constant.Lic.getYear() %>-10-28  德软集团 QQ：413881461');return false;">About</a>
 					</div>
 					<div class="bottom">
 						<span></span>
@@ -175,6 +177,7 @@ frmReload = function(){
 
 <script type="text/javascript">
 function changePage(url){
+	url = convert2newurl(url);
 	document.getElementById('basefrm').src = url;
 	
 };
@@ -260,7 +263,7 @@ function RoundMSG()
 			<a href="javascript:void(0)" class="icon-reload" onclick="javascript:frmReload()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
 			<a href="javascript:void(0)" class="icon-home" onclick="javascript:basefrm.location.href='welcome.html'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
 		</div>
-	Copyright&copy;2015 Asiainfo.All Rights
+	Copyright&copy;2015 Dand.All Rights
 		Reserved
 		<div style="float:right;visibility: visible;margin:0;padding:0;">
 			<img id="imgid" src="images/vq/bull-1-min.gif" alt="VQ:Migration Group(1)"

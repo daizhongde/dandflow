@@ -18,7 +18,11 @@ import person.daizhongde.virtue.assemble.sql.SQLAssembleQ;
 import person.daizhongde.virtue.constant.AbstractConstant;
 import org.springframework.web.socket.server.standard.SpringConfigurator;
 
-//@ServerEndpoint("/websocket/runningIns/{username}")
+/**
+ * 正式用
+ * @author daizd
+ * @date 2019年4月20日
+ */
 @ServerEndpoint(value ="/websocket/runningTask/{username}", configurator = SpringConfigurator.class)
 public class WebSocket_MigJobProcess {
 
