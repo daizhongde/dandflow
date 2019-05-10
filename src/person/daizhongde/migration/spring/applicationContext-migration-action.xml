@@ -519,6 +519,13 @@
 		</property>
 	</bean>
 	
+	<!-- Copote | IMP -->
+	<bean id="tCopoteEmployeeIMPAction" class="person.daizhongde.migration.struts2.action.imp.TCopoteEmployeeIMPAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="tCopoteEmployeeIMPService" />
+		</property>
+	</bean>
+	
 	<!-- 迁移表清单配置| query -->
 	<bean id="migSyncConfigJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigSyncConfigJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
 		<property name="dataService">

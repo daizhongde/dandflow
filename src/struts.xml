@@ -289,10 +289,15 @@
 			<result name="mig_modify2">/migcommon/{1}/{1}_modify2.jsp</result>
 			<result name="mig_browse">/migcommon/{1}/{1}_browse.jsp</result>
 			<result name="mig_browsepara">/migcommon/{1}/{1}_browsepara_${controlId}.jsp</result>
-			<result name="common_modify">/migcommon/${frontPageName}/${frontPageName}_modify.jsp</result>
-			<result name="common_browse">/migcommon/${frontPageName}/${frontPageName}_browse.jsp</result>
-			<result name="common_modify2">/migcommon/${foldName}/${frontPageName}.jsp</result>
-			<result name="common_browse2">/migcommon/${foldName}/${frontPageName}.jsp</result>
+			<!-- 三条配置统一改造，改造时间 20190421 daizd -->
+<!-- 			<result name="common_modify">/migcommon/${frontPageName}/${frontPageName}_modify.jsp</result> -->
+<!-- 			<result name="common_browse">/migcommon/${frontPageName}/${frontPageName}_browse.jsp</result> -->
+<!-- 			<result name="common_browse2">/migcommon/${foldName}/${frontPageName}.jsp</result> -->
+			<result name="common_modify">/${foldName}/${frontPageName}_modify.jsp</result>
+			<result name="common_browse">/${foldName}/${frontPageName}_browse.jsp</result>
+			<!-- 下面为支持定制：frontPageName  一般适用于从页面传来的情况 -->
+			<result name="common_browse2">/${foldName}/${frontPageName}.jsp</result>
+			
 			</action>
 	</package>
 	
@@ -357,7 +362,7 @@
 		</action>
 	</package>
 	
-	<package name="imp" namespace="/imp" extends="struts-default"  strict-method-invocation="false">
+	<package name="imp" namespace="/imp" extends="json-default"  strict-method-invocation="false">
 		<default-action-ref name="login" />
 		<global-results>
 			<!--下面定义的结果对所有的Action都有效 -->
@@ -408,6 +413,11 @@
             <param name="savePath">/wls/authorityfile/</param>
               -->
             <result name="success">/common/response/sResponse.jsp</result>
+            <result name="json" type="json">
+            	<param name="root">json</param>
+            	<param name="noCache">true</param>  
+		        <param name="ignoreHierarchy">false</param>
+			</result>
 			<result name="login">/login.jsp</result>
 			<!-- for export progress display -->
 			<result name="map">/common/response/map.jsp</result>

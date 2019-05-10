@@ -1403,7 +1403,10 @@ public class MigJobProcessServiceImpl implements MigJobProcessService {
 							if(0 == flag )
 							{//调用WebService并收到返回后执行
 								String msg = oResponse.getString("msg");
-								msg = msg.length() > 1024 ? msg.substring(0, 1023) + "..." : msg;
+								int len = msg.length();
+								msg = len > 102400 
+										? msg.substring(0, 90000) + "...省略..."+ msg.substring(len-2048, len)
+									: msg;
 //								log.info("special: msg:"+msg);
 								if(true == oResponse.getBoolean("success"))
 								{//WebService返回成功

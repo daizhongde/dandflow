@@ -4,10 +4,10 @@
         <wb-resource deploy-path="/" source-path="/WebRoot" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
         <wb-resource deploy-path="/" source-path="/src/main/webapp"/>
-        <dependent-module archiveName="authority-1.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/authority-jdk17/authority-jdk17">
+        <dependent-module archiveName="authority-1.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/authority/authority">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="virtue-common-1.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/virtue-common/virtue-common">
+        <dependent-module archiveName="virtue-common-1.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/virtue/virtue">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="virtue-util-1.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/virtue-util/virtue-util">

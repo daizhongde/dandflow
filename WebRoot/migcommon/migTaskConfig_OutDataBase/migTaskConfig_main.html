@@ -72,7 +72,7 @@ function editRecord() {
 	if (row) {
 		read.jdata.condition.mig_config_id = row.mig_config_id;
 		$('#win').window('open').window('setTitle', 'Edit');
-		$('#win').window("refresh", getContextPath()+"/curd/commonCURDinitModify2.action?foldName=migTaskConfig_OutDataBase"
+		$('#win').window("refresh", getContextPath()+"/curd/commonCURDinitModify2.action?foldName=migcommon/migTaskConfig_OutDataBase"
 				+"&frontPageName=migTaskConfig_OutDataBase_modify&tableName="+tableName+"&jdata="+encodeURI($.toJSON( read.jdata )));
 	}
 };
@@ -83,7 +83,7 @@ function browseRecord() {
 		$('#win').window('open').window('setTitle', 'View');
 		read.jdata.condition.mig_config_id = row.mig_config_id;
 		var readSQLName = "read_TaskConfig";
-		$('#win').window("refresh", getContextPath()+"/curd/commonCURDbrowse2.action?foldName=migTaskConfig_OutDataBase"
+		$('#win').window("refresh", getContextPath()+"/curd/commonCURDbrowse2.action?foldName=migcommon/migTaskConfig_OutDataBase"
 				+"&frontPageName=migTaskConfig_OutDataBase_browse&tableName="+tableName+"&readSQLName="+readSQLName+"&jdata="+encodeURI($.toJSON( read.jdata )));
 	}
 };

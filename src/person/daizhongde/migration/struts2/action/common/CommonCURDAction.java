@@ -38,6 +38,13 @@ public class CommonCURDAction extends BaseAction {
 
 	private String tableName;
 	private String frontPageName;
+	/** foldName is path. eg:
+	 *  migcommon 
+	 * 	migcommon/migConfigConnection
+	 *  migConfigConnection
+	 *  defalut:
+	 *    migcommon/${frontPageName}
+	 *   **/
 	private String foldName;
 	
 	private String authorColumnName;
@@ -85,11 +92,11 @@ public class CommonCURDAction extends BaseAction {
 	 * 修改初始化,跳到JSP页面
 	 * @return
 	 * @throws Exception
-	 */
+	 
 	public String initModify2() {
 		this.map = curdService.browse( super.getJdata(), tableName);
 		return "common_modify2";
-	}
+	}*/
 	/**
 	 * 修改初始化,跳到JSP页面
 	 * @return
@@ -192,7 +199,7 @@ public class CommonCURDAction extends BaseAction {
 	
 	public String getFoldName() {
 		return StringUtils.isEmpty( foldName ) ? 
-				getFrontPageName() : foldName;
+				"migcommon/"+getFrontPageName() : foldName;
 	}
 	public void setFoldName(String foldName) {
 		this.foldName = foldName;

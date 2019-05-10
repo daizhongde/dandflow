@@ -123,6 +123,13 @@
 	<bean id="tChatMsgService" class="person.daizhongde.migration.spring.service.impl.TChatMsgServiceImpl" autowire="byType"></bean>
  	
  	<bean id="tAsiainfoEmployeeService" class="person.daizhongde.migration.spring.service.impl.TAsiainfoEmployeeServiceImpl" autowire="byType"></bean>
+	<bean id="tCopoteEmployeeService" class="person.daizhongde.migration.spring.service.impl.TCopoteEmployeeServiceImpl" autowire="byType"></bean>
+	<bean id="tCopoteEmployeeIMPService" class="person.daizhongde.migration.spring.service.imp.TCopoteEmployeeIMPServiceImpl" autowire="byType"></bean>
+<!-- 	 init-method="initXwpf" -->
+	<bean id="excel2Email" class="person.daizhongde.migration.spring.service.imp.Excel2Email" 
+		autowire="byType" scope="prototype">
+	</bean>
+	
 	
 	<bean id="migSyncConfigService" class="person.daizhongde.migration.spring.service.impl.MigSyncConfigServiceImpl" autowire="byType"></bean>
 	<bean id="migSyncConfigService_IMP" class="person.daizhongde.migration.spring.jdbc.MigSyncConfigServiceImpl_IMP" autowire="byType"></bean>

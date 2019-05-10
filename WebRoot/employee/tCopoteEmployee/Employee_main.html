@@ -1,0 +1,380 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>湘邮通迅录</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/default/easyui.css"/>
+<link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/icon.css"/>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
+<style type="text/css">
+a {text-decoration:none;}
+</style>
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
+
+<script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/plugins/easyuiExtends.js"></script>
+<script type="text/javascript" src="../../scripts/virtue/virtue.js"></script>
+
+<script type="text/javascript" src="../../scripts/const/const.js"></script>
+<script type="text/javascript" src="../../scripts/utils/commonUtil.js"></script>
+<script type="text/javascript" src="../../scripts/ajaxfileupload.js"></script>
+<script type="text/javascript" src="../../scripts/utils/stringUtil.js"></script>
+<script type="text/javascript" src="copote_dept.js"></script>
+<script type="text/javascript">
+var noquery = VIRTUE.noquery;
+var query = VIRTUE.query;
+var imp = VIRTUE.imp;
+var exp = VIRTUE.exp;
+var OPE = VIRTUE.operator;
+
+var tableName = "t_copote_employee";
+
+function enterKeyDown(event)
+{
+    if(event.keyCode==13)
+    {
+    	submitForm();
+	}
+};
+
+/** format level **/
+function fmtEmail(email){
+	return "<a href='mailto:"+email+"'>"+email+"</a>";
+};
+/** format level **/
+function fmtSex(sex){
+	if(sex=='1'){
+		return "男";
+	}else if(sex=='2'){
+		return "女";
+	}else{
+		return sex;
+	}
+};
+
+/** validate and assign value **/
+function PackingParameter(){
+	var formData = $('#s_form').form( 'getData');
+
+	query.init();
+	for (var field in formData) {
+		if( formData[field] !== "" ){
+			query.jdata.condition[field] = formData[field];
+			query.jdata.operator[field] = OPE.CONTAIN;
+		}
+	}
+	return true;
+};
+
+/** search data ,reload data  **/
+function submitForm(){
+   	if(!PackingParameter()){
+   		return;
+   	}
+   	$('#grid').datagrid( 'reload', {
+   		tableName : tableName,
+   		jdata: encodeURI( $.toJSON( query.jdata ) ) 
+   	} );
+};
+/**  清空  **/
+function clearForm(){
+	$('#s_form').form('clear');
+};
+/** export data, don't search   **/
+function exportData(){
+	if(!PackingParameter()){
+   		return;
+   	}
+    var form = document.createElement("form");
+    document.body.appendChild(form);
+    var i = document.createElement("input");
+    i.type = "hidden";
+    i.name = "jdata";
+    i.value = encodeURI($.toJSON( exp.jdata ) );
+    form.appendChild(i);
+    form.action = "../../exp/tCopoteEmployeeEXPmodule.action";
+    form.method = "post";
+    form.submit();
+};
+
+function newRecord(){  //使用一个window
+	$('#win').window('open').window('setTitle', 'New');
+	$('#win').window("refresh", "tCopoteEmployee_add.html");
+}
+
+var read = {};
+read.jdata = { act: "read",condition: {id: ""}, operator : {id:1} };
+function editRecord() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		read.jdata.condition.id = row.id;
+		$('#win').window('open').window('setTitle', 'Edit');
+		$('#win').window("refresh", getContextPath()+"/curd/commonCURDinitModify.action?tableName="+tableName+"&foldName=employee/tCopoteEmployee&jdata="+encodeURI($.toJSON( read.jdata )));
+	}
+};
+
+function browseRecord() {
+	var row = $('#grid').datagrid('getSelected');
+	if (row) {
+		$('#win').window('open').window('setTitle', 'View');
+		read.jdata.condition.id = row.id;
+		$('#win').window("refresh", getContextPath()+"/curd/commonCURDbrowse.action?tableName="+tableName+"&foldName=employee/tCopoteEmployee&jdata="+encodeURI($.toJSON( read.jdata )));
+	}
+};
+
+var del = {};
+del.jdata = {act: "del",condition: { id: "" },operator : {id : 1} };
+function destroyRecord(){
+	var row = $('#grid').datagrid('getSelected');
+	if (row){
+		$.messager.confirm('Confirm','Confirm Remove?',function(r){
+			if (r){
+				del.jdata.condition.id = row.id;
+				$.post( getContextPath()+"/curd/commonCURDdelete.action", {
+					tableName : tableName,
+					jdata: encodeURI($.toJSON( del.jdata )) 
+				}, function(result, status){
+					alert(result.msg);
+					if (result.success){
+						$('#grid').datagrid('reload',{
+							tableName : tableName,
+							jdata: encodeURI( $.toJSON( query.jdata ) )
+						} );	// reload data
+					}
+				});
+			}
+		});
+	}
+};
+
+
+
+/**  上传前检查，并从数据库获取该批次的社保机构号   **/
+function btnExcelI_onClick() {
+	var path = document.getElementById("upload").value;
+	document.getElementById("imp_btn").disabled="disabled";
+	if (path == "") {
+		alert("Please select file！");
+		return;
+	}
+	ajaxFileUpload();
+};
+// var displayFlag = false;
+/**  上传  **/
+function ajaxFileUpload() {
+	$("#loading").ajaxStart(function() {
+		$(this).show();
+// 		displayFlag = true;
+	}).ajaxComplete(function() {
+		$(this).hide();
+// 		displayFlag = false;
+	});
+	$("#loading").show();
+	$.ajaxFileUpload({
+		url : getContextPath() + "/imp/tCopoteEmployeeIMPimportSalaryXLS.action?_="+(new Date).getTime(),
+		secureuri : false,
+		fileElementId : 'upload',
+		//data: "",
+		dataType : 'text',
+		success : function(data, status) {
+			data = eval("(" + data + ")");
+			document.getElementById("imp_btn").disabled="";
+			alert(data.msg);
+			if (data.success) {
+				$('#IMPdlg_4Salary').dialog('close');
+				console.log(data.path)
+// 				downloadFile(data.path);
+// 				submitForm();
+			}
+			$("#loading").hide();
+		},
+		error : function(data, status, e) {
+			alert("Error:" + data + ",exception:" + e);
+			$("#loading").hide();
+		}
+	});
+};
+
+var toolbar = [{
+	text:'New',
+	iconCls:'icon-add',
+	handler:function(){
+		newRecord();
+	}
+},{
+	text:'Edit',
+	iconCls:'icon-edit',
+	handler:function(){
+		editRecord();
+	}
+},{
+	text:'Remove',
+	iconCls:'icon-remove',
+	handler:function(){
+		destroyRecord();
+	}
+},{
+	text:'View',
+	iconCls:'icon-search',
+	handler:function(){ 
+		browseRecord(); 
+	}
+},{
+	text:'导入并发送邮件',
+	iconCls:'icon-import',
+	disabled: false,
+	handler:function(){
+		$('#IMPdlg_4Salary').dialog('open'); 
+		document.getElementById("upload").value="";
+	}
+}];
+
+//program component
+$(function(){
+	$('#grid').datagrid({
+		title : 'Search Result',
+		toolbar : toolbar,
+		width: 938,
+		height: 720,
+		nowrap: true,
+		striped: true,
+		fit: true,
+// 		collapsible: true,
+		url: getContextPath()+"/query/commonJEasyUIQUERYdfind.action",
+		idField: "id",
+		remoteSort: true,
+		sortName:"id",
+		sortOrder:"desc",
+		singleSelect: true,
+		frozenColumns: [[
+            {title:'员工ID',field:"uin", width:60, sortable: true, hidden: true },
+		    {title:'姓名',field:"name", width:70, sortable: true },
+		    {title:'登陆名',field:"logname", width:90, sortable: true },
+		    {title:'员工编号',field:"employee_no", width:60, sortable: true },
+		    {title:'工牌号',field:"employee_cardno", width:40, sortable: true }
+		]],
+		columns:[[
+			{title:'部门ID',field:"pid", width:70, sortable: true, hidden: true  },
+			{title:'部门',field:"department", width:260, sortable: true },
+		    {title:'座机号',field:"tel", width:95, sortable: true },
+		    {title:'手机号',field: "mobile", width: 90 },
+		    {title:'E-Mail',field:"alias", width:140, formatter: fmtEmail  },
+		    {title:'sex',field:"sex", width:30, sortable: true, formatter: fmtSex  },
+		    {title:'pos',field:"pos", width:30, sortable: true, hidden: false },
+		    {title:'birth',field:"birth", width:80, sortable: true, hidden: false },
+		    {title:'副邮箱',field:"slave_alias", width:80, sortable: true, hidden: false },
+		    {title:'身份证号码',field:"employee_idcard", width:140, sortable: true, hidden: false },
+		    {title:'QQ号码',field:"qq", width:80, sortable: true, hidden: false }
+		]],
+		rownumbers:true,
+		pagination:true,
+		queryParams:{
+	   		tableName : tableName,
+			jdata: encodeURI($.toJSON( noquery.jdata )) 
+		}
+	});
+
+});
+</script>
+</head>
+<body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
+    <div data-options="region:'north',border:true,split:true" style="height:118px;background:#B3DFDA;" title="通迅录" >  
+    	<form id="s_form" method="post" style="margin:0;padding:0;">
+			<div style="padding:0px 0 0px 5px">
+				<table width="100%">
+                <tr>
+                    <td>部门（树）:</td>
+                    <td>
+                        <input class="easyui-combotree" 
+		                        id='pid' name="pid" value="" editable="false"
+		                        data-options="valueField:'id', textField:'text',
+		                        	data:goBizTreeData,
+		                         	panelWidth:400,panelHeight: 350,
+                        onChange: function(newValue, oldValue){
+                        	//submitForm();
+                        }" 
+		                        style="width:150px;">
+                    </td>
+                    <td>工牌号码:</td>
+                    <td>
+                        <input id="employee_cardno" name="employee_cardno" value="" style="width:140px;" onkeydown="enterKeyDown(event)">
+                    </td>
+                    <td>身份证号:</td>
+                    <td>
+                        <input id="employee_idcard" name="employee_idcard" value="" style="width:140px;" onkeydown="enterKeyDown(event)">
+                    </td>
+                    <td>员工编号:</td>
+                    <td>
+                        <input id="employee_no" name="employee_no" value="" style="width:140px;" onkeydown="enterKeyDown(event)">
+                    </td>
+                </tr>
+                <tr>
+                    <td>姓名:</td>
+                    <td>
+                        <input id="name" name="name" value="" style="width:140px;" onkeydown="enterKeyDown(event)">
+                    </td>
+                    <td>登陆名:</td>
+                    <td>
+                        <input id="logname" name="logname" value="" style="width:140px;" onkeydown="enterKeyDown(event)">
+                    </td>
+                    <td>座机号:</td>
+                    <td>
+                        <input id="tel" name="tel" value="" style="width:140px;" onkeydown="enterKeyDown(event)">
+                    </td>
+                    <td>手机号:</td>
+                    <td>
+                        <input id="mobile" name="mobile" value="" style="width:140px;" onkeydown="enterKeyDown(event)">
+                    </td>
+                </tr>
+            	</table>
+			</div>
+			
+			<table width="100%" border="0" align="center">
+			<tr bgcolor="#E2EEFE" valign="bottom">
+				<td height="23"><div align="center"><!-- default height='21'  -->
+					<input id='btnSearch' type='button' onclick='submitForm()' value='查 询'/>&nbsp;
+<!-- 					<input id='btnExpSimply' type='button' onclick="$('#EXPdlg').dialog('open')" value='导 出'/>&nbsp; -->
+<!-- 					<input id='btnExpWizard' type='button' onclick="$('#EXPdlg1').dialog('open')" value='导出向导'/>&nbsp; -->
+					<input type='button' onclick="clearForm()" value='清 空'/>
+				</div></td>
+			</tr>
+			</table>
+        </form>
+    </div>
+    <div data-options="region:'center',border:false" title="员工main" style="overflow:hidden;" noheader="true">
+		<table id="grid"></table>
+	</div>
+	
+	<div id="win" class="easyui-window" title="添加" style="width:600px;height:400px"  
+        data-options="modal:true,closed:true">
+	</div>
+	
+	<!-- #########################   dialog  import 4 Salary   ######################################################################## -->	
+	<div id="IMPdlg_4Salary" class="easyui-dialog" title="导入工资数据并发送邮件到公司邮箱" data-options="iconCls:'icon-import',
+		modal: true,
+		buttons: '#IMPdlg-buttons'" closed="true" style="width:596px;height:180px;padding:10px">
+		<form id="IMPdlg4Salary_Form" action="../../imp/tCopoteEmployeeIMPimportSalaryXLS.action" method="post" enctype="multipart/form-data" style="margin:0;padding:0;">
+	    	<table>
+	    		<tr height="50">
+	    			<td>
+		    			<span>选择文件:</span>
+						<input type='file' id="upload" name='upload' size="60" 
+		    				style="margin-left:5px;margin-top:5px;"/>
+    					<img id="loading" src="../../images/loading.gif" style="display:none;">
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>
+						<span id="backmsg"></span>
+	    			</td>
+				</tr>
+			</table>
+	    </form>
+    </div>
+	<div id="IMPdlg-buttons">
+		<input type='button' id='imp_btn' onclick="javascript: btnExcelI_onClick();" value='确 定'/>
+		&nbsp;&nbsp;
+		<input type='button' onclick="javascript:$('#IMPdlg_4Salary').dialog('close');" value='取 消'/>
+	</div>
+</body>
+</html>

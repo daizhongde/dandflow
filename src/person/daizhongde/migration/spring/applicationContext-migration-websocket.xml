@@ -16,7 +16,7 @@
 	</websocket:handlers> 
  -->
  
- <!-- 下面的配置没有用到spring-websocket -->
+ <!-- 下面的配置没有用到spring-websocket  -->
  <bean id="jobInsWebSocket" class="person.daizhongde.migration.websocket.WebSocket_MigJobIns"
   autowire="byType"   scope="prototype"></bean>
  	
