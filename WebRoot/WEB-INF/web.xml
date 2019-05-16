@@ -3,8 +3,8 @@
   <description>AsiaInfo 2.0 data migration</description>
   <display-name>migration2</display-name>
 	<icon>
-	  	<small-icon>/images/ico/asiainfo.ico</small-icon>
-	  	<large-icon>/images/ico/asiainfo.ico</large-icon>
+	  	<small-icon>/images/ico/copote.ico</small-icon>
+	  	<large-icon>/images/ico/copote.ico</large-icon>
 	</icon>
 	<context-param>
 	    <param-name>contextConfigLocation</param-name>

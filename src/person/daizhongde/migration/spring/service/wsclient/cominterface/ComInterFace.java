@@ -6,6 +6,9 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.WebEndpoint;
 import javax.xml.ws.WebServiceClient;
 import javax.xml.ws.WebServiceFeature;
+
+import org.slf4j.LoggerFactory;
+
 import javax.xml.ws.Service;
 
 /**
@@ -30,9 +33,8 @@ public class ComInterFace extends Service {
         try {
             url = new URL("http://10.1.249.109:1111/migration/ComInterFace?wsdl");
         } catch (MalformedURLException e) {
-            java.util.logging.Logger.getLogger(ComInterFace.class.getName())
-                .log(java.util.logging.Level.INFO, 
-                     "Can not initialize the default wsdl from {0}", "http://10.1.249.109:1111/migration/ComInterFace?wsdl");
+            LoggerFactory.getLogger(ComInterFace.class.getName())
+                .error("Can not initialize the default wsdl from {0}", "http://10.1.249.109:1111/migration/ComInterFace?wsdl");
         }
         WSDL_LOCATION = url;
     }

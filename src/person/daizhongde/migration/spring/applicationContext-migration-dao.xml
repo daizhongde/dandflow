@@ -38,14 +38,14 @@
 		</property>
 	</bean>
 	
-	<!-- 作业导入DAO -->
+	<!-- 作业导入DAO   已改用jdbcSConnection
 	<bean id="jdbcDAO"
 		class="person.daizhongde.migration.hibernate.jdbc.JdbcDAOImpl">
 		<property name="sessionFactory">
 			<ref bean="sessionFactory" />
 		</property>
 	</bean>
-	
+	-->
 	<bean id="migJobProcessDAO"
 		class="person.daizhongde.migration.hibernate.dao.impl.MigJobProcessDAOImpl">
 		<property name="sessionFactory">

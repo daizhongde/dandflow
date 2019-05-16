@@ -37,9 +37,9 @@
 <head>
 <base href="<%=basePath%>" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Welcome to AIDM</title>
+<title>Welcome to Copote OA</title>
 <link href="css/frame-css/frame.css" rel="stylesheet" type="text/css" />
-<link rel="shortcut icon" href="images/ico/asiainfo.ico" type="image/x-icon" />
+<link rel="shortcut icon" href="images/ico/copote.ico" type="image/x-icon" />
 <!-- <link rel="stylesheet" type="text/css" href="scripts/jquery-easyui/1.4.1/themes/default/easyui.css"/> -->
 <!-- <link rel="stylesheet" type="text/css" href="scripts/jquery-easyui/1.4.1/themes/icon.css"/> -->
 <style type="text/css">
@@ -138,7 +138,9 @@ frmReload = function(){
 				<span class="name"><%=user.getCUlogname()%>-<%=user.getCUname()%></span>
 				<span class="role">[<%=role%>]</span>
 			</div>
-			<a href="<%=basePath%>/sfdsf" target='basefrm' id="notice" class="notice className">消息(2)</a>
+			<a href="#" id="notice" class="notice className" 
+				onclick="javascript:this.src='images/vq/bull-1-min.gif';window.open('chat/chat.jsp', 'chat windows', {}, {});">消息(2)</a>
+			
 			<a href="<%=basePath%>logoutServlet" class="exit">Logout</a>
 			<div class="more">
 				<a href="javascript:void(0);" class="spot"

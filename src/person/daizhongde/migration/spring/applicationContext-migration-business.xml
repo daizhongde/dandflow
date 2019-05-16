@@ -13,6 +13,11 @@
 		class="person.daizhongde.migration.dwr.reverseajax.MigJobInsComet"
 		autowire="byType" scope="prototype">
 	</bean>
+	<!-- 导入工资excel并发送邮件时前台实时展示处理信息  -->
+	<bean id="salaryImportSendMailMsg"
+		class="person.daizhongde.migration.dwr.reverseajax.SalaryImportSendMailMsg"
+		autowire="byType" scope="prototype">
+	</bean>
 
 	<!-- 全局常量|service  autowire="byType" -->
 	<bean id="commonService" init-method="init" class="person.daizhongde.migration.spring.service.impl.CommonServiceImpl" autowire="byName"></bean>

@@ -30,8 +30,12 @@ var read = VIRTUE.read;
 
 var OPE = VIRTUE.operator;
 
-var currentIId = 1;//1-省中心，2-长沙市-辖区，17-长沙市
-//var currentICode = 1;//430000901-省中心，430100901-长沙市-辖区，430101901-长沙市
+var currentIId = 8025053;//8020083-湘邮；  8025053-软开
+/**
+ * history
+ * 1-省中心，2-长沙市-辖区，17-长沙市
+ * 430000901-省中心，430100901-长沙市-辖区，430101901-长沙市
+ */
 var selectedIId = currentIId; 
 var selectedIPId = ""; 
 
@@ -89,7 +93,7 @@ var toolbar = [{
 //<input class='easyui-combotree' id='instCBT' name='pojo.NIid' style='width:260px;' >
 $(function(){
 	$('#grid').datagrid({
-		title: "Select Institution<input class='easyui-combotree' id='instCBT' name='pojo.NIid' style='width:330px;' >",
+		title: "Select Institution/Dept.<input class='easyui-combotree' id='instCBT' name='pojo.NIid' style='width:330px;' >",
 		toolbar: toolbar,
 		nowrap: true,
 		striped: true,
@@ -204,7 +208,7 @@ jQuery(document).ready(function(){
 		url : "../../tree/tAuthorityInstTREEquery_JEasyUI_CBT_Async.action",
 		method:'post',
 		mode: 'remote',
-// 		queryParams:{ id: 30 },
+// 		queryParams:{ id: 8020083 },
 		value: currentIId,//if combotree has set default value, is would do a select on initial
 		required:true,
 		onShowPanel:function( ){

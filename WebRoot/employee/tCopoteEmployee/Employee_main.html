@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>湘邮通迅录</title>
+<title>湘邮通迅录(发送工资邮件主页面)</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/default/easyui.css"/>
 <link rel="stylesheet" type="text/css" href="../../scripts/jquery-easyui/1.4.1/themes/icon.css"/>
@@ -20,7 +20,13 @@ a {text-decoration:none;}
 <script type="text/javascript" src="../../scripts/ajaxfileupload.js"></script>
 <script type="text/javascript" src="../../scripts/utils/stringUtil.js"></script>
 <script type="text/javascript" src="copote_dept.js"></script>
+<script type='text/javascript' src='../../dwr/engine.js'> </script>
+<script type='text/javascript' src='../../dwr/interface/SalaryImportSendMailMsg.js'> </script>
+<script type='text/javascript' src='../../dwr/util.js'> </script>
+<script type="text/javascript" src="Employee_main_comet.js"> </script>
+
 <script type="text/javascript">
+
 var noquery = VIRTUE.noquery;
 var query = VIRTUE.query;
 var imp = VIRTUE.imp;
@@ -28,6 +34,7 @@ var exp = VIRTUE.exp;
 var OPE = VIRTUE.operator;
 
 var tableName = "t_copote_employee";
+var emailpwd = ajaxReqRespText("/query/tAuthorityUserJEasyUIQUERYdfindCip.action");
 
 function enterKeyDown(event)
 {
@@ -37,6 +44,11 @@ function enterKeyDown(event)
 	}
 };
 
+
+/** format QQ **/
+function fmtQQ(qq){
+	return "<a href='tencent://message/?uin="+qq+"&Site=copote&Menu=yes'>"+qq+"</a>";
+};
 /** format level **/
 function fmtEmail(email){
 	return "<a href='mailto:"+email+"'>"+email+"</a>";
@@ -153,34 +165,50 @@ function destroyRecord(){
 function btnExcelI_onClick() {
 	var path = document.getElementById("upload").value;
 	document.getElementById("imp_btn").disabled="disabled";
+
 	if (path == "") {
 		alert("Please select file！");
 		return;
 	}
 	ajaxFileUpload();
 };
-// var displayFlag = false;
+/** 是否更新导入弹框中的消息  */
+var displayFlag = false;
+
 /**  上传  **/
 function ajaxFileUpload() {
+	displayFlag = true;
+	/** 上传文件前设置初始消息  */
+	SalaryImportSendMailMsg.modifyMsg( "正在上传文件..." );
+	sendMessage();
+	
 	$("#loading").ajaxStart(function() {
 		$(this).show();
-// 		displayFlag = true;
 	}).ajaxComplete(function() {
 		$(this).hide();
-// 		displayFlag = false;
 	});
 	$("#loading").show();
+	
+	var strictlyVerify=document.getElementById("strictlyVerify").checked;
+	var onlySend2me=document.getElementById("onlySend2me").checked;
+	
 	$.ajaxFileUpload({
 		url : getContextPath() + "/imp/tCopoteEmployeeIMPimportSalaryXLS.action?_="+(new Date).getTime(),
+		type: 'post',
+		data: {
+			strictlyVerify: strictlyVerify,
+			onlySend2me: onlySend2me
+		},
 		secureuri : false,
 		fileElementId : 'upload',
-		//data: "",
-		dataType : 'text',
+		dataType : 'json',
 		success : function(data, status) {
-			data = eval("(" + data + ")");
+// 			data = eval("(" + data + ")");
 			document.getElementById("imp_btn").disabled="";
 			alert(data.msg);
 			if (data.success) {
+				displayFlag = false;
+				$("#backmsg").text("");
 				$('#IMPdlg_4Salary').dialog('close');
 				console.log(data.path)
 // 				downloadFile(data.path);
@@ -189,6 +217,8 @@ function ajaxFileUpload() {
 			$("#loading").hide();
 		},
 		error : function(data, status, e) {
+			displayFlag = false;
+			$("#backmsg").text("");
 			alert("Error:" + data + ",exception:" + e);
 			$("#loading").hide();
 		}
@@ -224,15 +254,22 @@ var toolbar = [{
 	iconCls:'icon-import',
 	disabled: false,
 	handler:function(){
+		if(emailpwd==""||emailpwd=="\"\""){
+			alert("请先设置公司邮箱密码！");
+			window.location.href= getContextPath() + "/employee/tCopoteEmployee/tCopoteEmployee_MailPwdModify.jsp";
+			return;
+		}
 		$('#IMPdlg_4Salary').dialog('open'); 
 		document.getElementById("upload").value="";
+		$("#backmsg").text("");
 	}
 }];
 
 //program component
 $(function(){
 	$('#grid').datagrid({
-		title : 'Search Result',
+// 		title : '此表格是行政（或HR）使用的员工数据，数据来自爬虫程序（单击<更新>可以爬到最新公司邮箱->企业地址本中的数据）。不是用户数据，但可以同步到系统登陆用户数据中（单击<同步到用户数据中>）',
+		title : '此表格是行政（或HR）发送工资邮件使用的员工数据，数据来自爬虫程序（单击<更新>可以爬到最新数据）',
 		toolbar : toolbar,
 		width: 938,
 		height: 720,
@@ -263,8 +300,8 @@ $(function(){
 		    {title:'pos',field:"pos", width:30, sortable: true, hidden: false },
 		    {title:'birth',field:"birth", width:80, sortable: true, hidden: false },
 		    {title:'副邮箱',field:"slave_alias", width:80, sortable: true, hidden: false },
-		    {title:'身份证号码',field:"employee_idcard", width:140, sortable: true, hidden: false },
-		    {title:'QQ号码',field:"qq", width:80, sortable: true, hidden: false }
+		    {title:'身份证号码',field:"employee_idcard", width:140, sortable: true, hidden: false},
+		    {title:'QQ号码',field:"qq", width:80, sortable: true, hidden: false, formatter: fmtQQ  }
 		]],
 		rownumbers:true,
 		pagination:true,
@@ -273,12 +310,11 @@ $(function(){
 			jdata: encodeURI($.toJSON( noquery.jdata )) 
 		}
 	});
-
 });
 </script>
 </head>
 <body rightmargin="0" bottommargin="0" leftmargin="0" topmargin="0" class="easyui-layout">
-    <div data-options="region:'north',border:true,split:true" style="height:118px;background:#B3DFDA;" title="通迅录" >  
+    <div data-options="region:'north',border:true,split:true" style="height:118px;background:#B3DFDA;" title="每月工作->发送工资邮件" >  
     	<form id="s_form" method="post" style="margin:0;padding:0;">
 			<div style="padding:0px 0 0px 5px">
 				<table width="100%">
@@ -352,9 +388,15 @@ $(function(){
 	<!-- #########################   dialog  import 4 Salary   ######################################################################## -->	
 	<div id="IMPdlg_4Salary" class="easyui-dialog" title="导入工资数据并发送邮件到公司邮箱" data-options="iconCls:'icon-import',
 		modal: true,
-		buttons: '#IMPdlg-buttons'" closed="true" style="width:596px;height:180px;padding:10px">
+		buttons: '#IMPdlg-buttons'" closed="true" style="width:596px;height:200px;padding:10px">
 		<form id="IMPdlg4Salary_Form" action="../../imp/tCopoteEmployeeIMPimportSalaryXLS.action" method="post" enctype="multipart/form-data" style="margin:0;padding:0;">
 	    	<table>
+	    		<tr>
+	    			<td>
+		    			 <input id="strictlyVerify" type="checkbox" name="setting" value="严格校验数据" checked="checked"/>严格校验数据   
+   						 <input id="onlySend2me" type="checkbox" name="setting" value="只给我发邮件"/>只给我发邮件 
+	    			</td>
+	    		</tr>
 	    		<tr height="50">
 	    			<td>
 		    			<span>选择文件:</span>

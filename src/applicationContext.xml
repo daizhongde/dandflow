@@ -51,7 +51,8 @@
 		<property name="javaMailProperties">
 			<props>
 				<prop key="mail.${email.protocol}.auth">${email.auth}</prop>
-				<prop key="mail.smtp.timeout">25000</prop> 
+<!-- 				<prop key="mail.smtp.timeout">25000</prop>  -->
+				<prop key="mail.smtp.timeout">6000</prop> 
 			</props>
 		</property>
 	</bean>

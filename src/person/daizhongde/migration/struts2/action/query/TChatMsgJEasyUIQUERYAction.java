@@ -106,9 +106,10 @@ public class TChatMsgJEasyUIQUERYAction extends BaseAction {
 				sort.add(map);
 			}
 		}
-		
-		Map param = new HashMap(1);
+		/** 给sql文件中的静态sql参数赋值  */
+		Map param = new HashMap(2);
 		param.put("n_uid", super.getLoginUser().getNUid() );
+//		param.put("did", super.getLoginUser().getNUid() );
 		
 		SQLAssembleQ sqlA = new SQLAssembleQ(
 				absConstant.getSQLDOC(),
@@ -119,8 +120,8 @@ public class TChatMsgJEasyUIQUERYAction extends BaseAction {
 				absConstant.getFront2col(),
 				sort
 			);
-		
 		sqlA.setMap(param);
+		
 		if( jsonObject.getString("act").equalsIgnoreCase("noquery") ){
 			total = 0;
 			rows = new ArrayList();
@@ -203,8 +204,11 @@ public class TChatMsgJEasyUIQUERYAction extends BaseAction {
 		// 在这里读配置文件sql并组装sql的where条件
 		JSONObject jsonObject = JSONObject.fromObject(jdata);
 		AbstractConstant absConstant = new ConstTChatMsg();
-		Map param = new HashMap(1);
+		
+		/** 给sql文件中的静态sql参数赋值  */
+		Map param = new HashMap(2);
 		param.put("n_uid", super.getLoginUser().getNUid() );
+//		param.put("did", super.getLoginUser().getNUid() );
 		
 		SQLAssembleQ sqlA = new SQLAssembleQ(
 				absConstant.getSQLDOC(),
@@ -214,8 +218,8 @@ public class TChatMsgJEasyUIQUERYAction extends BaseAction {
 				absConstant.getColumnTypes(),
 				absConstant.getFront2col()
 			);
-		
 		sqlA.setMap(param);
+		
 		total = dataService.getTotal(sqlA);
 //		rows = new ArrayList(0);
 		return "total";

@@ -21,7 +21,7 @@ import java.sql.ResultSet;
 
 public class DbOperatorBulterDAO extends DbReaderBulterDAO implements DbOperatorBulter
 {
-	private org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+	private org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 	
     public int doUpdate (String strJndiName_DataSource , QueryInfo queryInfo) throws SQLException , NamingException
     {

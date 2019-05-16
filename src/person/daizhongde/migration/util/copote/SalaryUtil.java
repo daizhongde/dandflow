@@ -194,6 +194,9 @@ public class SalaryUtil {
 		StringBuilder sb = new StringBuilder(
 //				"<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Insert title here</title></head><body>"
 				"<style> table {  border-collapse:collapse;  border:1px solid black;  } td {  height:20px;  border:1px solid black; }</style>");
+		
+
+		sb.append("*************注*意*：*试*运*行*期*过*后*正*文*不*再*显*示*工*资*信*息*************<br/>");
 		sb.append("<table cellpadding=\"0\" cellspacing=\"0\" border=\"1\" width=\"1400px\">");
 		sb.append("<tr>");
 		for (int i = 0; i < celltitle.length; i++) {
@@ -252,9 +255,10 @@ public class SalaryUtil {
 		}
 		sb.append("</tr>");
 		sb.append("</table>");
+		sb.append("<br/>*************注*意*：*试*运*行*期*过*后*正*文*不*再*显*示*工*资*信*息*************");
 //		sb.append("</body></html>");
 
-		System.out.println(sb.toString());
+//		System.out.println(sb.toString());
 		return sb.toString();
 
 	}

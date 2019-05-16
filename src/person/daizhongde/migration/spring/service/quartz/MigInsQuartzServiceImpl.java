@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;import org.slf4j.LoggerFactory;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
 import org.quartz.JobBuilder;
@@ -50,7 +50,7 @@ import person.daizhongde.migration.quartz.util.QuartzJobFactory;
 //@Service("migInsQuartzService")
 public class MigInsQuartzServiceImpl implements MigInsQuartzService {
 	private MigInsQuartzDAO dataDAO;
-	private Logger log = Logger.getLogger(MigInsQuartzServiceImpl.class);
+	private Logger log = LoggerFactory.getLogger(MigInsQuartzServiceImpl.class);
 
 //	@Autowired
 	private SchedulerFactoryBean schedulerFactoryBean;

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;import org.slf4j.LoggerFactory;
 
 import person.daizhongde.virtue.configutils.ConfigDocument_JS;
 import person.daizhongde.virtue.configutils.ConfigDocument_SQL;
@@ -31,8 +31,8 @@ import person.daizhongde.virtue.constant.INIT;
  */
 public class ConstMigAuditfMain extends AbstractConstant {
 	
-	private static org.apache.log4j.Logger log = Logger.getLogger(ConstMigAuditfMain.class);
-	
+    private static final Logger log = LoggerFactory.getLogger(ConstMigAuditfMain.class);
+    
 	private static String clazzName = new SecurityManager() {
 		public String getClassName() {
 			return getClassContext()[1].getName();

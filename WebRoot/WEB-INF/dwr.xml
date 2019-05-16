@@ -32,6 +32,13 @@
       <param name="beanName">migJobInsComet</param>
       <include method="sendInsId" />
     </create>
+	<!-- 导入工资excel并发送邮件时前台实时展示处理信息  -->
+    <create javascript="SalaryImportSendMailMsg" creator="spring">
+      <param name="beanName">salaryImportSendMailMsg</param>
+      <include method="sendDisplayflag" />
+      <include method="modifyMsg" />
+      <include method="clearMsg" />
+    </create>
      
     <convert converter="bean" match="person.daizhongde.migration.dwr.reverseajax.Message"/>
     

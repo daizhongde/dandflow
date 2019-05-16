@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;import org.slf4j.LoggerFactory;
 
 import person.daizhongde.virtue.assemble.sql.SQLAssembleQ;
 import person.daizhongde.virtue.assemble.sql.SQLUtil;
@@ -35,7 +35,7 @@ import person.daizhongde.virtue.configutils.ConfigDocument_SQL;
  */
 public class SQLAssembleQ_GroupBy extends SQLAssembleQ{
 	
-	private Logger log = Logger.getLogger(this.getClass());
+	private Logger log = LoggerFactory.getLogger(this.getClass());
 	
 //	/** value in the config file<p>There only used when refer to Nest sql  **/
 //	private AbstractConstant absc;

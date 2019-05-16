@@ -47,14 +47,14 @@ public class SpringTest54excel2email {
 			user.setCUcip("DZd123456");
 			user.setCUname("戴忠德");
 			
-//			toEmail.notxsendEmailByExcel("D:\\usr\\copoteOA\\软件开发部2019年4月工资.xlsx", 
-//					"软件开发部2019年4月工资.xlsx",
-//					"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-//					user);
-			toEmail.notxsendEmailByExcel("D:\\usr\\copoteOA\\软件开发部2018年4月工资.xls", 
-					"软件开发部2018年4月工资.xlsx",
-					"application/vnd.ms-excel",
+			toEmail.notxsendEmailByExcel("D:\\Java项目\\copote_oa\\软件开发部2019年4月工资.xlsx", 
+					"软件开发部2019年4月工资.xlsx",
+					"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 					user);
+//			toEmail.notxsendEmailByExcel("D:\\Java项目\\copote_oa\\软件开发部2018年4月工资.xls", 
+//					"软件开发部2018年4月工资.xls",
+//					"application/vnd.ms-excel",
+//					user);
 		} catch (Exception e) {
 			System.out.println("2");	
 			// TODO Auto-generated catch block

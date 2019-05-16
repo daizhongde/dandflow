@@ -24,7 +24,7 @@
 <base href="<%=basePath%>" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Welcome to AIDM</title>
-<link rel="shortcut icon" href="../images/asiainfo.ico" type="image/x-icon" />
+<link rel="shortcut icon" href="../images/copote.ico" type="image/x-icon" />
 <link rel="stylesheet" type="text/css" href="<%=basePath%>scripts/jquery-easyui/1.4.1/themes/default/easyui.css"/>
 <link rel="stylesheet" type="text/css" href="<%=basePath%>scripts/jquery-easyui/1.4.1/themes/icon.css"/>
 <style type="text/css">

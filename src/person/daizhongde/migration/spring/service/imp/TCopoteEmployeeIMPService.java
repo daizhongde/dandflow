@@ -18,5 +18,9 @@ public interface TCopoteEmployeeIMPService {
  */
 	public abstract void importSalaryXLS(File file,  String uploadFileName, String uploadContentType, String _ ,  TAuthorityUser user) throws Exception;
 	
+	public abstract void importSalaryXLS(File file,  String uploadFileName, String uploadContentType, 
+
+			boolean strictlyVerify, boolean onlySend2me,
+			String _ ,  TAuthorityUser user) throws Exception;
 	
 }

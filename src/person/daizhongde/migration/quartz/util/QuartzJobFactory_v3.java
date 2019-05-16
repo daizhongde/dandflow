@@ -1,6 +1,6 @@
  package person.daizhongde.migration.quartz.util;
  
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -17,7 +17,7 @@ import person.daizhongde.migration.spring.service.MigJobProcessService;
  public class QuartzJobFactory_v3
    implements Job
  {
-   public final Logger log = Logger.getLogger(getClass());
+   public final Logger log = LoggerFactory.getLogger(getClass());
  
    public void execute(JobExecutionContext context) throws JobExecutionException {
      MigInsQuartz scheduleJob = (MigInsQuartz)context.getMergedJobDataMap().get("scheduleJob");

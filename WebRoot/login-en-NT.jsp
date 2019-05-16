@@ -11,9 +11,9 @@
 <head>
     <base href="<%=basePath%>">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>AIDM Login-NT</title>
+<title>Copote OA Login-NT</title>
 <link href="css/frame-css/login.css" rel="stylesheet" type="text/css" />
-<link rel="shortcut icon" href="images/ico/asiainfo.ico" type="image/x-icon" />
+<link rel="shortcut icon" href="images/ico/copote.ico" type="image/x-icon" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 <!--

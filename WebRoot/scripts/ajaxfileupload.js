@@ -26,7 +26,8 @@ jQuery.extend({
 
             return io			
     },
-    createUploadForm: function(id, fileElementId)
+    /** 后面加了一个参数，支持带参数提交 20190512 daizd */
+    createUploadForm: function(id, fileElementId,data)
 	{
 		//create form	
 		var formId = 'jUploadForm' + id;
@@ -41,15 +42,24 @@ jQuery.extend({
 		$(form).css('position', 'absolute');
 		$(form).css('top', '-1200px');
 		$(form).css('left', '-1200px');
-		$(form).appendTo('body');		
+		$(form).appendTo('body');	
+
+        /** 支持带参数提交 20190512 daizd */
+		if (data) { 
+	        for (var i in data) { 
+	            $('<input type="hidden" name="' + i + '" value="' + data[i] + '" />').appendTo(form);
+	        } 
+	    }
+
 		return form;
     },
 
     ajaxFileUpload: function(s) {
         // TODO introduce global settings, allowing the client to modify them for all requests, not only timeout		
         s = jQuery.extend({}, jQuery.ajaxSettings, s);
-        var id = new Date().getTime()        
-		var form = jQuery.createUploadForm(id, s.fileElementId);
+        var id = new Date().getTime()
+        /** 后面加了一个参数，支持带参数提交 20190512 daizd */
+		var form = jQuery.createUploadForm(id, s.fileElementId,s.data);
 		var io = jQuery.createUploadIframe(id, s.secureuri);
 		var frameId = 'jUploadFrame' + id;
 		var formId = 'jUploadForm' + id;		

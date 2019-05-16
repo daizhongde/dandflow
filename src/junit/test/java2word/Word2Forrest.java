@@ -1,6 +1,6 @@
 package junit.test.java2word;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;import org.slf4j.LoggerFactory;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.usermodel.*;
 import org.apache.poi.hwpf.model.*;
@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  * @date 2019年4月26日
  */
 public final class Word2Forrest {
-	private static final Logger log = Logger.getLogger(Word2Forrest.class); 
+	private static final Logger log = LoggerFactory.getLogger(Word2Forrest.class); 
 	private String qType = null, qTypeName = null, content = null,chapterName = null;
 
 	String QueryStr = " select max(id) from question ", hql="update Question set answer = ? where id = ?";

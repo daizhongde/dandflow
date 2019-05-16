@@ -8,13 +8,16 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import person.daizhongde.migration.exception.AccountEmailException;
 
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
+import javax.mail.Part;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
+import javax.mail.util.ByteArrayDataSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -29,7 +32,7 @@ public class MailUtil {
     private String USERNAME;// = "daizhongde@copote.com";
     private String PASSWORD;// = "DZd123456";
     private String emailForm;// = "daizhongde@copote.com";
-    private String timeout = "25000";
+    private String timeout = "12000";//default 25000
     private String personal;// = "戴忠德";
     private JavaMailSenderImpl mailSender;
 
@@ -52,7 +55,7 @@ public class MailUtil {
         sender.setDefaultEncoding("UTF-8");
         Properties p = new Properties();
         p.setProperty("mail.smtp.timeout", timeout);
-        p.setProperty("mail.smtp.auth", "false");
+        p.setProperty("mail.smtp.auth", "true");// false 公司邮箱这里都可以，如果是qq邮箱还只能设置false
         p.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         sender.setJavaMailProperties(p);
         mailSender = sender;
@@ -157,6 +160,7 @@ public class MailUtil {
 
             /*  添加邮件正文（带附件） */
             MimeMultipart multipart = new MimeMultipart();
+            
             BodyPart contentPart = new MimeBodyPart();
             contentPart.setContent( htmlText, "text/html;charset=UTF-8");
             multipart.addBodyPart(contentPart);
@@ -168,7 +172,8 @@ public class MailUtil {
                 MimeBodyPart part = new MimeBodyPart();
                 FileDataSource fds = new FileDataSource(filePath);
 //                String filename = fds.getName();
-                part.setFileName(MimeUtility.encodeWord(attachNameArr[i]));// MimeUtility.encodeWord文件名解决中文乱码
+//                part.setFileName(MimeUtility.encodeWord(attachNameArr[i]));// MimeUtility.encodeWord文件名解决中文乱码
+                part.setFileName( attachNameArr[i] );// MimeUtility.encodeWord文件名解决中文乱码
                 part.setDataHandler(new DataHandler(fds));
                 multipart.addBodyPart(part);
                 i++;
@@ -189,6 +194,10 @@ public class MailUtil {
 
     /**
      * 附件名与本地文件名不一致，此方法只适用于一个附件的情况，入参有文件流
+     * <p>
+     *   适用于要求以不生成临时文件的方式发送附件的情况<br>
+     * 特别注意：<br>
+     *    <b>以流的形式发不需要 MimeUtility.encodeWord  文件名中文无乱码</>
      * @param to
      * @param subject
      * @param htmlText
@@ -217,26 +226,21 @@ public class MailUtil {
             msgHelper.setSubject( subject );
 
             /*  添加邮件正文（带附件） */
-            MimeMultipart multipart = new MimeMultipart();
-            BodyPart contentPart = new MimeBodyPart();
-            contentPart.setContent( htmlText, "text/html;charset=UTF-8");
-            multipart.addBodyPart(contentPart);
-            
-            // 添加附件
-            MimeBodyPart part = new MimeBodyPart();
-//            FileDataSource fds = new FileDataSource(filePath);
-            part.setFileName(MimeUtility.encodeWord(attachName));// MimeUtility.encodeWord文件名解决中文乱码
-//            part.setDataHandler(new DataHandler(fds));
-            part.setDataHandler(
-            		new DataHandler(attachInputStream, mimeType) // "application/octet-stream"
-            	);
-            multipart.addBodyPart(part);
-
-            msg.setContent(multipart);
-            
-
+            MimeMultipart mime =(MimeMultipart) createContent(
+					htmlText,attachInputStream, 
+					mimeType, 
+					attachName );//参数为正文内容和附件流
+//			MimeBodyPart stream = new MimeBodyPart();
+			
+//			MimeBodyPart part=(MimeBodyPart) createAttachment("D:/test/1.jpg");//可增加多个附件
+//			MimeMultipart mime=new MimeMultipart("mixed");
+//			mime.addBodyPart(contentPart);
+//			mime.addBodyPart(part);//可增加多个附件
+			msg.setContent(mime);
+			
             mailSender.send( msg );
-        } catch ( MessagingException e )
+        } 
+        catch ( MessagingException e )
         {
             throw new AccountEmailException( "Faild to send mail.MessagingException：", e );
         } catch (UnsupportedEncodingException e) {
@@ -245,6 +249,75 @@ public class MailUtil {
 			throw new AccountEmailException( "Faild to send mail.UnsupportedEncodingException：", e );
 		}
     }
+//    private Part createContent1(String content,ByteArrayInputStream inputstream, 
+//    		String mimeType,
+//    		String attachName){
+//		MimeBodyPart contentPart=null;
+//		try {
+//			contentPart=new MimeBodyPart();
+//			MimeMultipart contentMultipart=new MimeMultipart("related");
+//			MimeBodyPart htmlPart=new MimeBodyPart();
+//			htmlPart.setContent(content, "text/html;charset=UTF-8");
+////			htmlPart.setContent(content, "text/html;charset=gbk");
+//			contentMultipart.addBodyPart(htmlPart);
+//			//附件部分
+//			MimeBodyPart excelBodyPart=new MimeBodyPart();
+//			DataSource dataSource=new ByteArrayDataSource(inputstream, mimeType );
+//            DataHandler dataHandler=new DataHandler(dataSource);
+//            excelBodyPart.setDataHandler(dataHandler);
+//            excelBodyPart.setFileName(MimeUtility.encodeText( attachName ));
+////			excelBodyPart.setDataHandler(new DataHandler(fileDs));
+////			excelBodyPart.setFileName(fileDs.getName());
+////			excelBodyPart.setContentID("excel");
+//			contentMultipart.addBodyPart(excelBodyPart);
+//			contentPart.setContent(contentMultipart);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		return contentPart;
+//	}
+    /**
+     * 组装MimeMultipart
+     * <p>
+     * 特别注意：
+     *    以流的形式发不需要 MimeUtility.encodeWord  文件名中文无乱码
+     * @param content
+     * @param inputstream
+     * @param mimeType
+     * @param attachName
+     * @return
+     */
+    private MimeMultipart createContent(String content,
+    		ByteArrayInputStream inputstream, 
+    		String mimeType,
+    		String attachName){
+    	MimeMultipart multipart=new MimeMultipart("mixed");
+//    	MimeMultipart multipart=new MimeMultipart("related");
+//    	MimeMultipart multipart=new MimeMultipart("alternative ");
+		try {
+            
+            /*  添加邮件正文（带附件） */
+            BodyPart contentPart = new MimeBodyPart();
+            contentPart.setContent( content, "text/html;charset=UTF-8");
+            multipart.addBodyPart(contentPart);
+            
+            // 添加附件 
+            MimeBodyPart part = new MimeBodyPart();
+			DataSource dataSource=new ByteArrayDataSource(inputstream, mimeType );
+            DataHandler dataHandler=new DataHandler(dataSource);
+//            String fname = MimeUtility.encodeWord(attachName);
+
+            //以流的形式发不需要 MimeUtility.encodeWord  文件名中文无乱码
+            part.setFileName(attachName);
+            part.setDataHandler(dataHandler);
+        
+            multipart.addBodyPart(part); 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return multipart;
+	}
+
 //    /**
 //     * 发送带附件的邮件
 //     *

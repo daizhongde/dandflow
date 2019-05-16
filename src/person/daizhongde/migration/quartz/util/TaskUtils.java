@@ -2,12 +2,12 @@ package person.daizhongde.migration.quartz.util;
 
 import java.lang.reflect.Method;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;import org.slf4j.LoggerFactory;
 
 import person.daizhongde.migration.hibernate.pojo.MigInsQuartz;
 
 public class TaskUtils {
-	public static final Logger log = Logger.getLogger(TaskUtils.class);
+	public static final Logger log = LoggerFactory.getLogger(TaskUtils.class);
 
 	public static void invokMethod(MigInsQuartz scheduleJob) {
 		try {
@@ -16,7 +16,7 @@ public class TaskUtils {
 					new Object[] { scheduleJob.getCaseId()},
 					new Class[] { String.class });//user传实例author
 		} catch (Exception e) {
-			log.error(e);
+			log.error(e.getLocalizedMessage());
 			e.printStackTrace();
 			return;
 		}

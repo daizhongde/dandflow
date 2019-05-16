@@ -2,6 +2,7 @@ package person.daizhongde.migration.struts2.action.imp;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,8 +13,9 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import person.daizhongde.virtue.constant.INIT;
 import person.daizhongde.virtue.util.file.FileUtil;
-
+import person.daizhongde.authority.hibernate.pojo.TAuthorityUser;
 import person.daizhongde.authority.struts2.action.BaseAction;
+import person.daizhongde.migration.spring.service.imp.Excel2Email;
 import person.daizhongde.migration.spring.service.imp.TCopoteEmployeeIMPService;
 
 /**
@@ -34,8 +36,12 @@ public class TCopoteEmployeeIMPAction extends BaseAction  {
     private String uploadContentType;
     private String uploadFileName;
 	
-	//** 接受依赖注入的属性 ,在这里从配置文件中读来*/
+	/** 接受依赖注入的属性 ,在这里从配置文件中读来*/
     private String savePath;
+    /** 如果需要严格的数据验证   每行除第二列之外的所有数据列，必需有值，否则认为Excel此行数据不全 */
+    private boolean strictlyVerify;
+    /** 是否只发当前登陆人的工资邮件   */
+    private boolean onlySend2me;
 	
 	private List customColumns;
 	
@@ -65,14 +71,20 @@ public class TCopoteEmployeeIMPAction extends BaseAction  {
 	 * 
 	 */
 	public String importSalaryXLS() throws Throwable{
+		TAuthorityUser user= super.getLoginUser();
+		Excel2Email.msg.put( user.getCUemail(), "正在上传文件...完成");
+		
 		log.debug("begin upload Gong Zi file-----------------------");
 		log.debug("==========" + getUploadFileName());
 		log.debug("==========" + getUploadContentType());
 		log.debug("==========" + getUpload());
+		log.debug("==========" + strictlyVerify );
+		log.debug("==========" + onlySend2me );
 		
 		//以服务器的文件保存地址和原文件名建立上传文件输出流
 		this.savePath = getSavePath();
-//		System.out.println("savePath:"+savePath);
+		System.out.println("upload:"+upload.getAbsolutePath());
+		System.out.println("java.io.tmpdir:"+System.getProperty("java.io.tmpdir"));
 		
 //		System.out.println("upload.getAbsolutePath():"+upload.getAbsolutePath());
 		
@@ -88,10 +100,12 @@ public class TCopoteEmployeeIMPAction extends BaseAction  {
 //			String targetFAbsDir = INIT.tempFileDirectory+"/export/excel/";
 //			targetFAbsPath = targetFAbsDir + targetFAbsName;
 			dataService.importSalaryXLS(upload,uploadFileName, 
-					uploadContentType, _,  super.getLoginUser() );
+					uploadContentType, 
+					strictlyVerify,onlySend2me, 
+					_,  user );
 			
 			log.info("导入Salary文件并发送邮件完成!");
-/**  屏蔽记临时文件的代友，因为工资为敏感信息   */
+/**  屏蔽记临时文件的代码，因为工资为敏感信息   */
 //			//validate 
 //			String ExtensionName = FileUtil.getExtensionName(uploadFileName);
 //			/** server file absolute directory , end with '/' **/
@@ -128,7 +142,7 @@ public class TCopoteEmployeeIMPAction extends BaseAction  {
 	
 			Map map = new HashMap(2);
 			map.put("success", Boolean.FALSE );
-			map.put("msg", e2.getLocalizedMessage());
+			map.put("msg", URLDecoder.decode( e2.getLocalizedMessage() ) );
 			super.setMap(map);
 			return "map";
 		}
@@ -210,6 +224,19 @@ public class TCopoteEmployeeIMPAction extends BaseAction  {
 	}
 	public String getSResponse() {
 		return sResponse;
+	}
+	
+	public boolean isStrictlyVerify() {
+		return strictlyVerify;
+	}
+	public void setStrictlyVerify(boolean strictlyVerify) {
+		this.strictlyVerify = strictlyVerify;
+	}
+	public boolean isOnlySend2me() {
+		return onlySend2me;
+	}
+	public void setOnlySend2me(boolean onlySend2me) {
+		this.onlySend2me = onlySend2me;
 	}
 	public void setDataService(TCopoteEmployeeIMPService dataService) {
 		this.dataService = dataService;
