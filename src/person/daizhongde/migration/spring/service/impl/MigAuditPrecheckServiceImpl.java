@@ -300,7 +300,7 @@ public class MigAuditPrecheckServiceImpl implements MigAuditPrecheckService {
 		
 		return (MigAuditPrecheck)dataDAO.listAllByMap( "from MigAuditPrecheck t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigAuditPrecheck browsePOJOById(int id) {
+	public MigAuditPrecheck browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

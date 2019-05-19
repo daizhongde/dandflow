@@ -399,7 +399,7 @@ public class MigControlInfoServiceImpl implements MigControlInfoService {
 		
 		return (MigControlInfo)dataDAO.listAllByMap( "from MigControlInfo t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigControlInfo browsePOJOById(int id) {
+	public MigControlInfo browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

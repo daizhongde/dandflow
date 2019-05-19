@@ -623,7 +623,7 @@ public class MigJobContentServiceImpl implements MigJobContentService {
 		
 		return (MigJobContent)dataDAO.listAllByMap( "from MigJobContent t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigJobContent browsePOJOById(int id) {
+	public MigJobContent browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

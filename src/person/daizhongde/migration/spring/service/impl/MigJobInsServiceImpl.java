@@ -498,7 +498,7 @@ public class MigJobInsServiceImpl implements MigJobInsService {
 		
 		return (MigJobIns)dataDAO.listAllByMap( "from MigJobIns t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigJobIns browsePOJOById(int id) {
+	public MigJobIns browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

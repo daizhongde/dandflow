@@ -283,7 +283,7 @@ public class TChatMsgServiceImpl implements TChatMsgService {
 		
 		return (TChatMsg)dataDAO.listAllByMap( "from TChatMsg t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public TChatMsg browsePOJOById(int id) {
+	public TChatMsg browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

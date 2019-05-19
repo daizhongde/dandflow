@@ -4,9 +4,7 @@ import java.io.File;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.scheduling.annotation.Async;
 
-import person.daizhongde.authority.hibernate.dao.TAuthorityUserDAO;
 import person.daizhongde.authority.hibernate.pojo.TAuthorityUser;
 import person.daizhongde.authority.spring.service.TAuthorityUserService;
 import person.daizhongde.migration.exception.BusinessException;

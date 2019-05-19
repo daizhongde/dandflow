@@ -299,7 +299,7 @@ public class MigAuditcConsistencyServiceImpl implements MigAuditcConsistencyServ
 		
 		return (MigAuditcConsistency)dataDAO.listAllByMap( "from MigAuditcConsistency t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigAuditcConsistency browsePOJOById(int id) {
+	public MigAuditcConsistency browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

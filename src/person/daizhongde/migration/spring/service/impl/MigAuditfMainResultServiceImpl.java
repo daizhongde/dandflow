@@ -300,7 +300,7 @@ public class MigAuditfMainResultServiceImpl implements MigAuditfMainResultServic
 		
 		return (MigAuditfMainResult)dataDAO.listAllByMap( "from MigAuditfMainResult t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigAuditfMainResult browsePOJOById(int id) {
+	public MigAuditfMainResult browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

@@ -6,6 +6,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
 import person.daizhongde.migration.exception.AccountEmailException;
+import person.daizhongde.virtue.util.character.CharacterConvert;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -172,8 +173,12 @@ public class MailUtil {
                 MimeBodyPart part = new MimeBodyPart();
                 FileDataSource fds = new FileDataSource(filePath);
 //                String filename = fds.getName();
-//                part.setFileName(MimeUtility.encodeWord(attachNameArr[i]));// MimeUtility.encodeWord文件名解决中文乱码
-                part.setFileName( attachNameArr[i] );// MimeUtility.encodeWord文件名解决中文乱码
+                
+                /* MimeUtility.encodeText文件名解决中文乱码  */
+                String fname1 = MimeUtility.encodeText(attachNameArr[i],"UTF-8",null);
+//                String fname2 = MimeUtility.encodeWord(attachNameArr[i],"UTF-8",null);
+                
+                part.setFileName( fname1 );// MimeUtility.encodeWord文件名解决中文乱码
                 part.setDataHandler(new DataHandler(fds));
                 multipart.addBodyPart(part);
                 i++;
@@ -304,9 +309,16 @@ public class MailUtil {
             // 添加附件 
             MimeBodyPart part = new MimeBodyPart();
 			DataSource dataSource=new ByteArrayDataSource(inputstream, mimeType );
+			
             DataHandler dataHandler=new DataHandler(dataSource);
-//            String fname = MimeUtility.encodeWord(attachName);
 
+//			CharacterConvert.testCharSet(attachName);
+//            String fname1 = MimeUtility.encodeText(attachName,"UTF-8",null);
+//            String fname2 = MimeUtility.encodeWord(attachName,"UTF-8",null);
+
+//			CharacterConvert.testCharSet(fname1);
+			
+			
             //以流的形式发不需要 MimeUtility.encodeWord  文件名中文无乱码
             part.setFileName(attachName);
             part.setDataHandler(dataHandler);

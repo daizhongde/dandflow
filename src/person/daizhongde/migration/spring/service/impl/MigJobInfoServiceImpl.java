@@ -1161,7 +1161,7 @@ public class MigJobInfoServiceImpl implements MigJobInfoService {
 		
 		return (MigJobInfo)dataDAO.listAllByMap( "from MigJobInfo t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigJobInfo browsePOJOById(int id) {
+	public MigJobInfo browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

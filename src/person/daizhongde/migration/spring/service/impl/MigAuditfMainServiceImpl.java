@@ -396,7 +396,7 @@ public class MigAuditfMainServiceImpl implements MigAuditfMainService {
 		
 		return (MigAuditfMain)dataDAO.listAllByMap( "from MigAuditfMain t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigAuditfMain browsePOJOById(int id) {
+	public MigAuditfMain browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

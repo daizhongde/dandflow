@@ -300,7 +300,7 @@ public class MigAuditfFieldResultServiceImpl implements MigAuditfFieldResultServ
 		
 		return (MigAuditfFieldResult)dataDAO.listAllByMap( "from MigAuditfFieldResult t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigAuditfFieldResult browsePOJOById(int id) {
+	public MigAuditfFieldResult browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

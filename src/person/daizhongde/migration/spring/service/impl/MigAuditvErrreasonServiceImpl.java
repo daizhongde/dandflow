@@ -327,7 +327,7 @@ public class MigAuditvErrreasonServiceImpl implements MigAuditvErrreasonService 
 		
 		return (MigAuditvErrreason)dataDAO.listAllByMap( "from MigAuditvErrreason t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigAuditvErrreason browsePOJOById(int id) {
+	public MigAuditvErrreason browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

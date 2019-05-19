@@ -321,7 +321,7 @@ public class MigAuditvResultServiceImpl implements MigAuditvResultService {
 		
 		return (MigAuditvResult)dataDAO.listAllByMap( "from MigAuditvResult t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigAuditvResult browsePOJOById(int id) {
+	public MigAuditvResult browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

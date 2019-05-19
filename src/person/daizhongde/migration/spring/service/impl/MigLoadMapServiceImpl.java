@@ -280,7 +280,7 @@ public class MigLoadMapServiceImpl implements MigLoadMapService {
 		
 		return (MigLoadMap)dataDAO.listAllByMap( "from MigLoadMap t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigLoadMap browsePOJOById(int id) {
+	public MigLoadMap browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

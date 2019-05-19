@@ -589,7 +589,7 @@ public class MigTaskInfoServiceImpl implements MigTaskInfoService {
 		
 		return (MigTaskInfo)dataDAO.listAllByMap( "from MigTaskInfo t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigTaskInfo browsePOJOById(int id) {
+	public MigTaskInfo browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

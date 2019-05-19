@@ -290,7 +290,7 @@ public class MigControlTemplateServiceImpl implements MigControlTemplateService 
 		
 		return (MigControlTemplate)dataDAO.listAllByMap( "from MigControlTemplate t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigControlTemplate browsePOJOById(int id) {
+	public MigControlTemplate browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

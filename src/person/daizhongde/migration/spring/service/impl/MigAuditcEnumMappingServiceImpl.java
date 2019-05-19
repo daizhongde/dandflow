@@ -300,7 +300,7 @@ public class MigAuditcEnumMappingServiceImpl implements MigAuditcEnumMappingServ
 		
 		return (MigAuditcEnumMapping)dataDAO.listAllByMap( "from MigAuditcEnumMapping t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigAuditcEnumMapping browsePOJOById(int id) {
+	public MigAuditcEnumMapping browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

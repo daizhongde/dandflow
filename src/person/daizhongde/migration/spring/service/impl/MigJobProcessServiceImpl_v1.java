@@ -1131,7 +1131,7 @@ public class MigJobProcessServiceImpl_v1 implements MigJobProcessService {
 		
 		return (MigJobProcess)dataDAO.listAllByMap( "from MigJobProcess t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigJobProcess browsePOJOById(int id) {
+	public MigJobProcess browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

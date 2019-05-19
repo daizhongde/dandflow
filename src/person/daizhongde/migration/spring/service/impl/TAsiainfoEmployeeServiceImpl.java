@@ -408,7 +408,7 @@ public class TAsiainfoEmployeeServiceImpl implements TAsiainfoEmployeeService {
 		
 		return (TAsiainfoEmployee)dataDAO.listAllByMap( "from TAsiainfoEmployee t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public TAsiainfoEmployee browsePOJOById(int id) {
+	public TAsiainfoEmployee browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

@@ -304,7 +304,7 @@ public class MigInsParaServiceImpl implements MigInsParaService {
 		
 		return (MigInsPara)dataDAO.listAllByMap( "from MigInsPara t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigInsPara browsePOJOById(int id) {
+	public MigInsPara browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

@@ -11,7 +11,7 @@ public class TChatMsg implements java.io.Serializable {
 	// Fields
 
 	private Integer NMid;
-	private Integer NUid;
+	private Long NUid;
 	private String CMsg;
 	private Timestamp DMstime;
 
@@ -22,11 +22,10 @@ public class TChatMsg implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public TChatMsg(Integer NUid, String CMsg) {
+	public TChatMsg(Long NUid, String CMsg) {
 		this.NUid = NUid;
 		this.CMsg = CMsg;
 	}
-
 	// Property accessors
 
 	public Integer getNMid() {
@@ -37,11 +36,11 @@ public class TChatMsg implements java.io.Serializable {
 		this.NMid = NMid;
 	}
 
-	public Integer getNUid() {
+	public Long getNUid() {
 		return this.NUid;
 	}
 
-	public void setNUid(Integer NUid) {
+	public void setNUid(Long NUid) {
 		this.NUid = NUid;
 	}
 

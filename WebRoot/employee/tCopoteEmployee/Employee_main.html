@@ -205,6 +205,7 @@ function ajaxFileUpload() {
 		success : function(data, status) {
 // 			data = eval("(" + data + ")");
 			document.getElementById("imp_btn").disabled="";
+			$("#loading").hide();
 			alert(data.msg);
 			if (data.success) {
 				displayFlag = false;
@@ -214,13 +215,12 @@ function ajaxFileUpload() {
 // 				downloadFile(data.path);
 // 				submitForm();
 			}
-			$("#loading").hide();
 		},
 		error : function(data, status, e) {
 			displayFlag = false;
 			$("#backmsg").text("");
-			alert("Error:" + data + ",exception:" + e);
 			$("#loading").hide();
+			alert("Error:" + data + ",exception:" + e);
 		}
 	});
 };

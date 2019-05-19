@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import person.daizhongde.migration.hibernate.vo.SalaryVo;
+import person.daizhongde.migration.spring.service.imp.Excel2Email;
 
 public class SalaryUtil {
 	public static void switchCaseColNameAndValue(String colName, String value, MinRYVo vo, SalaryVo o,
@@ -12,11 +13,16 @@ public class SalaryUtil {
 		if(null==value||"".equalsIgnoreCase(value.trim())||"null".equalsIgnoreCase(value.trim())){
 			value="0";
 		}
+		if(value.endsWith(".0")||value.endsWith(".00")){
+			int index = value.indexOf(".");
+			value = value.substring(0, index);
+		}
 		colName = colName.replaceAll("[']","");
 		switch (colName) {
 		case "人员编号":
 			vo.employee_no = value;
-			value = "0".equalsIgnoreCase(value)?"":value;
+//			value = "0".equalsIgnoreCase(value)?"":value;
+			value = String.format("%04d", new Long(value).intValue() );
 			o.setEmployee_no(value);
 			// System.out.print("人员编号|")
 			break;
@@ -208,18 +214,23 @@ public class SalaryUtil {
 			String v = salaryArr[i];
 			v = (null==v||"null".equalsIgnoreCase(v)||"".equalsIgnoreCase(v.trim())?"0":v);
 			
-			if(celltitle[i].equalsIgnoreCase("签名")
+			if(celltitle[i].equalsIgnoreCase("人员类别")
 				|| celltitle[i].equalsIgnoreCase("部门")
-				|| celltitle[i].equalsIgnoreCase("人员类别")
-				|| celltitle[i].startsWith("身份证")){
+				|| celltitle[i].equalsIgnoreCase("签名")
+				|| celltitle[i].startsWith("身份证")
+				|| celltitle[i].contains("邮箱"))
+			{
 					continue;
 			}
 			if(!celltitle[i].equalsIgnoreCase("人员编号")
-					&&!celltitle[i].equalsIgnoreCase("姓名")
-					&&!celltitle[i].startsWith("身份证")
-					&&!celltitle[i].equalsIgnoreCase("签名")
-					&&!celltitle[i].equalsIgnoreCase("部门")
-					&&!celltitle[i].equalsIgnoreCase("人员类别")){
+				&&!celltitle[i].equalsIgnoreCase("姓名")
+//				&&!celltitle[i].equalsIgnoreCase("人员类别")
+//				&&!celltitle[i].equalsIgnoreCase("部门")
+//				&&!celltitle[i].equalsIgnoreCase("签名")
+//				&&!celltitle[i].startsWith("身份证")
+//				&&!celltitle[i].contains("邮箱")
+					)
+			{
 				if(Double.valueOf(v)==0){
 					continue;
 				}
@@ -231,25 +242,33 @@ public class SalaryUtil {
 		for (int i = 0; i < celltitle.length; i++) {
 			String v = salaryArr[i];
 			v = (null==v||"null".equalsIgnoreCase(v)||"".equalsIgnoreCase(v.trim())?"0":v);
+
+			if(v.endsWith(".0")||v.endsWith(".00")){
+				int index = v.indexOf(".");
+				v = v.substring(0, index);
+			}
 			
 			String w = "";
 
-			if(celltitle[i].equalsIgnoreCase("签名")
-				|| celltitle[i].equalsIgnoreCase("部门")
-				|| celltitle[i].equalsIgnoreCase("人员类别")
-				|| celltitle[i].startsWith("身份证")){
+			if(celltitle[i].equalsIgnoreCase("人员类别")
+					|| celltitle[i].equalsIgnoreCase("部门")
+					|| celltitle[i].equalsIgnoreCase("签名")
+					|| celltitle[i].startsWith("身份证")
+					|| celltitle[i].contains("邮箱"))
+			{
 					continue;
 			}
 			if(!celltitle[i].equalsIgnoreCase("人员编号")
-					&&!celltitle[i].equalsIgnoreCase("姓名")
-					&&!celltitle[i].startsWith("身份证")
-					&&!celltitle[i].equalsIgnoreCase("签名")
-					&&!celltitle[i].equalsIgnoreCase("部门")
-					&&!celltitle[i].equalsIgnoreCase("人员类别")){
+				&&!celltitle[i].equalsIgnoreCase("姓名"))
+			{
 				if(Double.valueOf(v)==0){
 					continue;
+				}else{
+					v = Excel2Email.formatDouble( new Double(v).doubleValue() );
 				}
 				w=" align=\"right\"";
+			}else if(celltitle[i].equalsIgnoreCase("人员编号")){
+				v = String.format("%04d", new Long(v).intValue() );
 			}
 			sb.append("<td"+w+">" + v + "</td>");
 		}

@@ -587,7 +587,7 @@ public class MigInsQuartzServiceImpl implements MigInsQuartzService {
 		
 		return (MigInsQuartz)dataDAO.listAllByMap( "from MigInsQuartz t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigInsQuartz browsePOJOById(int id) {
+	public MigInsQuartz browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

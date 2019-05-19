@@ -332,7 +332,7 @@ public class MigComInsServiceImpl implements MigComInsService {
 		
 		return (MigComIns)dataDAO.listAllByMap( "from MigComIns t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigComIns browsePOJOById(int id) {
+	public MigComIns browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

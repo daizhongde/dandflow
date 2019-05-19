@@ -9,8 +9,9 @@ public class SalaryVo {
 	private String employee_no;
 	/** 证件号  eg:  430722198710286115 */
 	private String employee_idcard;
+//	/** 邮箱  eg:  liuqiong@copote.com  */
+//	private String email;
 	
-
 	/** 年月 eg:2018年02月 */
 	private String yyyyMM;
 	/** 计算期  eg:  2018/02/01-2018/02/28 */

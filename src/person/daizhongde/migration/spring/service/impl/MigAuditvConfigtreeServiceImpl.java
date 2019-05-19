@@ -418,8 +418,8 @@ public class MigAuditvConfigtreeServiceImpl implements MigAuditvConfigtreeServic
 		
 		return (MigAuditvConfigtree)dataDAO.listAllByMap( "from MigAuditvConfigtree t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigAuditvConfigtree browsePOJOById(int id) {
-		return dataDAO.findById( id);
+	public MigAuditvConfigtree browsePOJOById(long id) {
+		return dataDAO.findById( new Long(id).intValue() );
 //		return null;
 	}
 	public MigAuditvConfigtree browsePOJOById(String id) {

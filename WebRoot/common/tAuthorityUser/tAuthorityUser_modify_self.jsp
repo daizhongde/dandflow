@@ -11,7 +11,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 TAuthorityUser user=(TAuthorityUser)request.getSession().getAttribute( SessionConstants.LOGIN_USER );
 ApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(session.getServletContext());
-user = TAuthorityUserServiceImpl.getFromApplicationContext(ctx).findById( user.getNUid().intValue() );
+user = TAuthorityUserServiceImpl.getFromApplicationContext(ctx).findById( user.getNUid() );
 
 JSPParameterPrinter jspPR = new JSPParameterPrinter();
 %>

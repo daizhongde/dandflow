@@ -300,7 +300,7 @@ public class MigAuditcReportDetailResultServiceImpl implements MigAuditcReportDe
 		
 		return (MigAuditcReportDetailResult)dataDAO.listAllByMap( "from MigAuditcReportDetailResult t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigAuditcReportDetailResult browsePOJOById(int id) {
+	public MigAuditcReportDetailResult browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

@@ -310,7 +310,7 @@ public class MigCodedetailDefineServiceImpl implements MigCodedetailDefineServic
 		
 		return (MigCodedetailDefine)dataDAO.listAllByMap( "from MigCodedetailDefine t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigCodedetailDefine browsePOJOById(int id) {
+	public MigCodedetailDefine browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

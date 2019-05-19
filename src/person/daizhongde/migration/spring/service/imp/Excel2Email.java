@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -110,8 +112,12 @@ public class Excel2Email {
 	private CustomXWPFDocument xwpf;
 	private String duration;
 	private String ny;
+	private String ny_en;
 	
 	private String alias;
+	private TAuthorityUser user;
+//	private TCopoteEmployee emp;
+	
 	
 	/** key为email(alias) */
 	public static Map<String,String> msg = new HashMap<String,String>();
@@ -120,7 +126,7 @@ public class Excel2Email {
 //		this.xwpf =  new CustomXWPFDocument(POIXMLDocument.openPackage(
 //				Excel2Email.class.getResource("/").getPath()+"\\template\\工资清单-非mercer.docx")
 //			);
-		System.out.println("构造DOC XWP对象....");
+		log.info("构造DOC XWP对象....");
 		Timestamp beginTime = new Timestamp( new Date().getTime());
 		String template = Excel2Email.class.getResource("/").getPath()+"template/工资清单.docx";
 		template = URLDecoder.decode(template);
@@ -150,7 +156,7 @@ public class Excel2Email {
 			String uploadContentType,
 			TAuthorityUser user  
 			) throws Exception{
-
+		this.user=user;
 		if(!new File(inputFile).exists() ){
 			throw new BusinessException("input file is not exist!");
 		}
@@ -172,6 +178,7 @@ public class Excel2Email {
 			TAuthorityUser user 
 			) throws Exception {
 
+		this.user=user;
 		this.notxsendEmailByExcel(inputFile, uploadFileName, uploadContentType, 
 				true, true, user);
 	}
@@ -194,6 +201,7 @@ public class Excel2Email {
 			boolean strictlyVerify, boolean onlySend2me,
 			TAuthorityUser user ) throws Exception {
 
+		this.user=user;
 		alias = user.getCUemail();
 		msg.put(alias, "开始读取文件......");
 		
@@ -230,7 +238,8 @@ public class Excel2Email {
 		/* YyyyMM */
 		ny = uploadFileName.substring(idxN-4, idxY+1);
 		Date date = new SimpleDateFormat("yyyy年MM月").parse(ny);
-
+		ny_en = new SimpleDateFormat("yyyy-MM").format(date);
+		
 		GregorianCalendar gc = new GregorianCalendar();
 		gc.setTime(date);
 		
@@ -270,7 +279,7 @@ public class Excel2Email {
 		Row firstRow = sheet.getRow(0);
 		int COLNUM = firstRow.getLastCellNum();
 		celltitle = new String[COLNUM];
-		System.out.println("sheetName:<"+sheet.getSheetName()+">,LastCellNum (1-based):"+COLNUM);
+		log.info("sheetName:<"+sheet.getSheetName()+">,LastCellNum (1-based):"+COLNUM);
 		
 		// for(Cell cell : firstRow) {
 		for (int i = 0; i < COLNUM; i++) {
@@ -301,18 +310,18 @@ public class Excel2Email {
 					dupCol.add(col);
 				}
 			}
-			log.error("工资源文件正在同名列！dupCol:"+dupCol.toString());
-			System.out.println("工资源文件正在同名列！dupCol:"+dupCol.toString());
-			throw new RuntimeException("工资源文件格式校验不通过：存正在同名列！"+dupCol.toString());
+			log.error("工资源文件存在同名列！dupCol:"+dupCol.toString());
+			System.out.println("工资源文件存在同名列！dupCol:"+dupCol.toString());
+			throw new RuntimeException("工资源文件格式校验不通过：存存在同名列！"+dupCol.toString());
 		}
 
 		int lastRowNum = sheet.getLastRowNum();
-		System.out.println("sheetName:<"+sheet.getSheetName()+">,lastRowNum (0-based):"+lastRowNum);
+		log.info("sheetName:<"+sheet.getSheetName()+">,lastRowNum (0-based):"+lastRowNum);
 		/* 第二行开始为：数据行 */
 		for (int i = 1; i <= lastRowNum; i++) {
 			Row row = sheet.getRow(i);
 			if(null==row|| null==row.getCell(0)){
-				System.out.println("null==row|| null==row.getCell(0) break; 行号 i:"+i);
+				log.info("null==row|| null==row.getCell(0) break; 行号 i:"+i);
 				break;
 			}
 //			System.out.println(sheet.getSheetName() + "  Row " + row.getRowNum());
@@ -338,17 +347,17 @@ public class Excel2Email {
 					value = "";
 				} 
 				value = (null==value||"null".equalsIgnoreCase(value)?"":value);
-				value = value.trim().replaceAll("  ", " ");
+				value = value.trim().replaceAll(" ", "");
 				
-				if(   celltitle[j].contains("工号") || celltitle[j].contains("签名") ){//第二列工号列  
+				if(   celltitle[j].contains("工号") || celltitle[j].contains("签名") ){//第二列工号列,工号、签名列跳过  
 					continue;
 				}else if( null==cell || StringUtils.isBlank(value) ){// j!=1
 					/* 如果需要严格的数据验证 */
-					if(strictlyVerify){
-						/** 每行除第二列之外的所有数据列，必需有值，否则认为Excel此行数据不全 */
-						dataErrorNameVec.add(vo.name);//导入的Excel中的数据不全，不发邮件(程序认为导入的Excel姓名数据是全的，且在不全的数据列之前)
+					if(strictlyVerify && !celltitle[j].contains("身份证号") ){
+						/** 每行除[工号、签名、身份证号]列之外的所有数据列，必需有值，否则认为Excel此行数据不全 */
+						dataErrorNameVec.add(vo.name+"<"+celltitle[j]+">");//导入的Excel中的数据不全，不发邮件(程序认为导入的Excel姓名数据是全的，且在不全的数据列之前)
 						break;
-					}else if(celltitle[j].contains("员工编号") 
+					}else if(celltitle[j].contains("人员编号") 
 							|| celltitle[j].contains("姓名")
 							|| celltitle[j].contains("基本工资")
 							|| celltitle[j].contains("绩效")
@@ -369,7 +378,7 @@ public class Excel2Email {
 						        基本养老金、医疗保险金、失业保险金、住房公积金、企业年金、
 						        工会费、代扣税、实际扣款合计、实发合计
 						        */
-						dataErrorNameVec.add(vo.name);//导入的Excel中的数据不全，不发邮件(程序认为导入的Excel姓名数据是全的，且在不全的数据列之前)
+						dataErrorNameVec.add(vo.name+"<"+celltitle[j]+">");//导入的Excel中的数据不全，不发邮件(程序认为导入的Excel姓名数据是全的，且在不全的数据列之前)
 						break;
 					}
 				}
@@ -399,9 +408,11 @@ public class Excel2Email {
 			rowVo.setnSbgjjgrkk(rowVo.getnEndowment()+rowVo.getnMedical()
 					+rowVo.getnSygrkk()+rowVo.getnGjjgrkk());
 			// 税后扣款=企业年金+工会费+房租费+电费+物业费
-			rowVo.setnShkk(rowVo.nQynj+rowVo.nGhf
+			double nShkk = rowVo.nQynj+rowVo.nGhf
 					+rowVo.nFzf+rowVo.nDf
-					+rowVo.nWyf);
+					+rowVo.nWyf;
+			String sShkk = String.format("%.2f", nShkk);
+			rowVo.setnShkk( Double.valueOf(sShkk) );
 			// 补贴合计=年资津贴+加薪+开门红+防寒暑费+节日费
 			rowVo.setnBthj(rowVo.nNzjt+rowVo.salary_increase
 					+rowVo.nKmh+rowVo.nFhsf
@@ -453,6 +464,7 @@ public class Excel2Email {
 			} else {/**
 					数据库存在此人，且不存在重名(这里是通过姓名查到的)
 					*/
+
 				dataMap.put(list.get(0).getAlias(),salaryArr);//发邮件用
 				mapMap.put(list.get(0).getAlias(), rowMap);
 				salaryMap.put(list.get(0).getAlias(), rowVo);//生成附件用
@@ -478,9 +490,9 @@ public class Excel2Email {
 					dupName.add(col);
 				}
 			}
-			System.out.println("工资源文件正在同名同姓的人，并且没有在系统中录入员工编号！dupName:"+dupName.toString());
-			log.error("工资源文件正在同名同姓的人，并且没有在系统中录入员工编号！dupName:"+dupName.toString());
-			throw new RuntimeException("工资源文件存正在同名同姓的人，并且没有在系统中录入员工编号！所以：请对下面的员工录入员工编号：" +dupName.toString());
+			System.out.println("工资源文件存在同名同姓的人，并且没有在系统中录入员工编号！dupName:"+dupName.toString());
+			log.error("工资源文件存在同名同姓的人，并且没有在系统中录入员工编号！dupName:"+dupName.toString());
+			throw new RuntimeException("工资源文件存存在同名同姓的人，并且没有在系统中录入员工编号！所以：请对下面的员工录入员工编号：" +dupName.toString());
 		}
 		if(dataErrorNameVec.size()>0){
 			System.out.println("导入的Excel数据不全！dataErrorNameVec:"+dataErrorNameVec.toString());
@@ -489,11 +501,11 @@ public class Excel2Email {
 		}
 		
 		/** 更新数据库 */
-		System.out.println("开始更新数据中的人员编号....");
+		log.info("开始更新数据中的人员编号....");
 		notxupdateDB(volist);
-		System.out.println("更新数据中的人员编号完成！");
+		log.info("更新数据中的人员编号完成！");
 
-		System.out.println("开始发送邮件....");
+		log.info("开始发送邮件....");
 		Timestamp beginTime = new Timestamp( new Date().getTime());
 				
 		String pwd = Base64Util.decodeCopoteMailPWD(user.getCUcip());
@@ -530,8 +542,7 @@ public class Excel2Email {
 							+ idcardSql
 					+ "  where name='"+vo.name+"' AND (employee_no IS NULL OR TRIM(employee_no) ='')";
 //			CharacterConvert.testCharSet( vo.name );
-//			System.out.println("vo.name:"+vo.name);
-			System.out.println(sql);
+			log.info(sql);
 			sqllist.add(sql);
 		}
 		
@@ -566,7 +577,6 @@ public class Excel2Email {
 		
 //		File f = new File(Test.class.getResource("/").getPath()+"\\template\\工资清单-非mercer.docx");
 		
-//		System.out.println("FilePathUtils:"+fu.getWebRoot());
 		/* 耗时： use time: 0 day 0 hour 0 minute 1 seconds 421 milliseconds 
 		 * 
 		 * 这个做为湘邮工资邮件的附件生成实现  
@@ -574,10 +584,16 @@ public class Excel2Email {
 		WordUtils util = new WordUtils();
 		// 需要进行文本替换的信息
 		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("${cEmail}", user.getCUemail() );//email
+//		data.put("$cemail$", user.getCUemail() );//email
+		data.put("${cMobileNo}", user.getCUtel() );//办公座机
+		data.put("${cDeptName}", user.getCDname() );//部门名称
+		
 		data.put("${name}", o.getName() );//姓名
 		data.put("${yyyyMM}", o.getYyyyMM() );//年月 eg:2018年02月
 		data.put("${employee_no}", o.getEmployee_no() );//员工编号   eg:  0086
 		String idc = o.getEmployee_idcard();
+
 		data.put("${employee_idcard}", null==idc?"":idc );//证件号  eg:  430722198710286115
 		data.put("${duration}", o.getDuration() );//计算期  eg:  2018/02/01-2018/02/28
 		
@@ -589,29 +605,29 @@ public class Excel2Email {
 		data.put("${nGrsds}", o.getnGrsds() );//个人所得税
 		data.put("${nShkk}", o.getnShkk() );//税后扣款
 		
-		data.put("${nJbgz}", o.getnJbgz() );//基本工资
+		data.put("${nJbgz}", Excel2Email.formatDouble( o.getnJbgz()) );//基本工资
 //		data.put("${nGwgz}", o.getnGwgz() );//岗位工资
 //		data.put("${nJzgxjxsfgz}", o.getnJzgxjxsfgz() );//价值贡献绩效实发工资
 		data.put("${nJiXiao}", o.nJiXiao );//价值贡献绩效实发工资
 //		data.put("${nBthj}", o.getnBthj() );//补贴合计
 
-		data.put("${nNzjt}", o.nNzjt );//年资津贴
-		data.put("${salary_increase}", o.salary_increase );//奖励
-		data.put("${nFhsf}", o.nFhsf );//防寒暑费
-		data.put("${nJrf}", o.nJrf );//节日费
+		data.put("${nNzjt}", Excel2Email.formatDouble( o.nNzjt) );//年资津贴
+		data.put("${salary_increase}", Excel2Email.formatDouble( o.salary_increase) );//奖励
+		data.put("${nFhsf}", Excel2Email.formatDouble( o.nFhsf ));//防寒暑费
+		data.put("${nJrf}", Excel2Email.formatDouble( o.nJrf ));//节日费
 		
 //		data.put("${nQtkk_ns}", o.getnQtkk_ns());// 其他扣款（纳税）
 //		data.put("${nKqkk}", o.getnKqkk() );// 考勤扣款
-		data.put("${nEndowment}", o.getnEndowment() );//养老个人扣款
+		data.put("${nEndowment}", Excel2Email.formatDouble( o.getnEndowment()) );//养老个人扣款
 		data.put("${nSygrkk}", o.getnSygrkk() );//失业个人扣款
 		data.put("${nMedical}", o.getnMedical() );//医疗个人扣款
-		data.put("${nGjjgrkk}", o.getnGjjgrkk() );//公积金个人扣款
-		data.put("${nQynj}", o.nQynj );//企业年金
+		data.put("${nGjjgrkk}", Excel2Email.formatDouble( o.getnGjjgrkk()) );//公积金个人扣款
+		data.put("${nQynj}", Excel2Email.formatDouble( o.nQynj) );//企业年金
 		data.put("${nGhf}", o.nGhf );//工会费
-		data.put("${nFzf}", o.nFzf );//房租费
-		data.put("${nWyf}", o.nWyf );//物业费
-		data.put("${nDf}", o.nDf );//电费
-		data.put("${nQtkk_ms}", o.getnQtkk_ms() );//其他扣款（免税）
+		data.put("${nFzf}", Excel2Email.formatDouble( o.nFzf ));//房租费
+		data.put("${nWyf}", Excel2Email.formatDouble( o.nWyf ));//物业费
+		data.put("${nDf}", Excel2Email.formatDouble( o.nDf ));//电费
+		data.put("${nQtkk_ms}", Excel2Email.formatDouble( o.getnQtkk_ms()) );//其他扣款（免税）
 		
 		//"D:/daizd/Desktop/工资/工资清单-非mercer.docx"
 		this.initXwpf();
@@ -648,7 +664,8 @@ public class Excel2Email {
 		Iterator<String> it = map.keySet().iterator();
 		
 		while(it.hasNext()){
-			String mail =  it.next();
+			String mail = it.next();
+			String name = salaryMap.get(mail).getName();
 //			if(!mail.equalsIgnoreCase("daizhongde@copote.com")
 //					&&!mail.equalsIgnoreCase("413881461@qq.com")
 //					&&!mail.equalsIgnoreCase("dzd2746679@163.com")
@@ -658,9 +675,8 @@ public class Excel2Email {
 //				System.out.println("给<"+mail+">发送邮件跳过......");
 //				continue;
 //			}
-
-			System.out.println("开始给<"+mail+">发送邮件....");
-			msg.put(alias,  "开始给<"+mail+">发送邮件....");
+			log.info("开始给"+name+"<"+mail+">发送邮件....");
+			msg.put(alias,  "开始给"+name+"<"+mail+">发送邮件....");
 			Timestamp beginTime = new Timestamp( new Date().getTime());
 			try {
 
@@ -690,13 +706,12 @@ public class Excel2Email {
 						new ByteArrayInputStream(bos.toByteArray()),
 //						"application/octet-stream",
 						"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-						"工资清单-"+ny+".docx");
+						"Salary-"+ny_en+".docx");
 			} catch (AccountEmailException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				log.error("给<"+mail+">发送邮件失败！"+e.getLocalizedMessage());
+				log.error("给"+name+"<"+mail+">发送邮件失败！"+e.getLocalizedMessage());
 				
-				String name = salaryMap.get(mail).getName();
 				sendErrorNameVec.add(name+"<"+mail+">");
 			}
 			Timestamp endTime = new Timestamp(new Date().getTime());
@@ -704,7 +719,7 @@ public class Excel2Email {
 
 			msg.put(alias,  
 					ElapsedTimePrinter.printElapsedTime2(
-							beginTime, endTime,"给<"+mail+">发送邮件完成！") 
+							beginTime, endTime,"给"+name+"<"+mail+">发送邮件完成！") 
 					);
 		}//end of while 
 		
@@ -723,7 +738,16 @@ public class Excel2Email {
 						beginTime1, endTime1,"邮件发送完成！") 
 				);
 	}
-	 
+	
+	public static String formatDouble(double d) {
+		BigDecimal bg = new BigDecimal(d).setScale(2, RoundingMode.UP);
+		double num = bg.doubleValue();
+		if (Math.round(num) - num == 0) {
+			return String.valueOf((long) num);
+		}
+		return String.valueOf(num);
+	}
+	
 	public static void main(String[] args) {
 //		Connection conn = null;
 		try {
@@ -756,7 +780,7 @@ public class Excel2Email {
 			
 //			con_Default.commit();
 //			con_Default.close();
-			System.out.println("all success,no errors!");
+			log.info("all success,no errors!");
 		} catch (Exception e) {
 //			try {
 //				con_Default.rollback();
@@ -766,7 +790,7 @@ public class Excel2Email {
 //				System.err.println("rollback error!");
 //			}
 			e.printStackTrace();
-			System.out.println("error:" + e.getLocalizedMessage());
+			log.info("error:" + e.getLocalizedMessage());
 		}finally{
 //			try {
 //				con_Default.close();
@@ -777,6 +801,8 @@ public class Excel2Email {
 		}
 	}
 }
+
+
 /**
  * 暂没有用到
  * @author daizd

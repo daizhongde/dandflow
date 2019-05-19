@@ -302,7 +302,7 @@ public class MigSyncConfigServiceImpl implements MigSyncConfigService {
 		
 		return (MigSyncConfig)dataDAO.listAllByMap( "from MigSyncConfig t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigSyncConfig browsePOJOById(int id) {
+	public MigSyncConfig browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

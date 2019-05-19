@@ -426,8 +426,8 @@ public class MigAuditvConfigServiceImpl implements MigAuditvConfigService {
 		
 		return (MigAuditvConfig)dataDAO.listAllByMap( "from MigAuditvConfig t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigAuditvConfig browsePOJOById(int id) {
-		return dataDAO.findById( id );
+	public MigAuditvConfig browsePOJOById(long id) {
+		return dataDAO.findById( new Long(id).intValue() );
 //		return null;
 	}
 	public MigAuditvConfig browsePOJOById(String id) {

@@ -383,7 +383,7 @@ public class MigJobParaServiceImpl implements MigJobParaService {
 		
 		return (MigJobPara)dataDAO.listAllByMap( "from MigJobPara t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigJobPara browsePOJOById(int id) {
+	public MigJobPara browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

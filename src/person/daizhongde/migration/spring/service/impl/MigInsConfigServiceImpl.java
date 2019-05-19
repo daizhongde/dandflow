@@ -282,7 +282,7 @@ public class MigInsConfigServiceImpl implements MigInsConfigService {
 		
 		return (MigInsConfig)dataDAO.listAllByMap( "from MigInsConfig t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigInsConfig browsePOJOById(int id) {
+	public MigInsConfig browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

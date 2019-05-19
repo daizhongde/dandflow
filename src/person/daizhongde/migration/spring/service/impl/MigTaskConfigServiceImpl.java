@@ -404,7 +404,7 @@ public class MigTaskConfigServiceImpl implements MigTaskConfigService {
 		
 		return (MigTaskConfig)dataDAO.listAllByMap( "from MigTaskConfig t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigTaskConfig browsePOJOById(int id) {
+	public MigTaskConfig browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

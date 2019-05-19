@@ -304,7 +304,7 @@ public class MigAuditfSubServiceImpl implements MigAuditfSubService {
 		
 		return (MigAuditfSub)dataDAO.listAllByMap( "from MigAuditfSub t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public MigAuditfSub browsePOJOById(int id) {
+	public MigAuditfSub browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

@@ -299,7 +299,7 @@ public class TCopoteEmployeeServiceImpl implements TCopoteEmployeeService {
 		
 		return (TCopoteEmployee)dataDAO.listAllByMap( "from TCopoteEmployee t1 where "+hqlA.getWhereBackHQL(), hqlA.getMap() ).get(0);
 	}
-	public TCopoteEmployee browsePOJOById(int id) {
+	public TCopoteEmployee browsePOJOById(long id) {
 //		return dataDAO.findById((short)id);
 		return null;
 	}

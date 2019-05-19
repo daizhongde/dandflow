@@ -46,14 +46,14 @@ public class TreeDataUtil_Employee {
 //			if(m.getTAsiainfoEmployee().getNIid().getNIid().compareTo( parentM.getNIid() ) == 0){
 			if ( !m.getClass_().equalsIgnoreCase("0") ) {// not leaf
 				JEasyUI_CBT mJEU = new JEasyUI_CBT();
-				mJEU.setId( m.getPerson_id() );
+				mJEU.setId(new Long( m.getPerson_id()) );
 				mJEU.setText( m.getOrg_name()  + "-" + m.getLast_name()+ "("+m.getClass_()+")" );
 				mJEU.setState("closed");
 				dataList.add( mJEU );
 				
 			} else{ // 下属数量为0
 				JEasyUI_CBT_Leaf mJEU_L = new JEasyUI_CBT_Leaf();
-				mJEU_L.setId( m.getPerson_id() );
+				mJEU_L.setId( new Long(m.getPerson_id()) );
 				mJEU_L.setText( m.getOrg_name()  + "-" + m.getLast_name()  );
 				mJEU_L.setState( "open" );
 				dataList.add( mJEU_L );
