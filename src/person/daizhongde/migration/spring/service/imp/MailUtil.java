@@ -56,7 +56,7 @@ public class MailUtil {
         sender.setDefaultEncoding("UTF-8");
         Properties p = new Properties();
         p.setProperty("mail.smtp.timeout", timeout);
-        p.setProperty("mail.smtp.auth", "true");// false 公司邮箱这里都可以，如果是qq邮箱还只能设置false
+        p.setProperty("mail.smtp.auth", "false");// false 公司邮箱这里都可以，如果是qq邮箱还只能设置false
         p.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         sender.setJavaMailProperties(p);
         mailSender = sender;

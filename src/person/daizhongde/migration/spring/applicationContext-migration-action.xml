@@ -525,11 +525,23 @@
 			<ref bean="tCopoteEmployeeIMPService" />
 		</property>
 	</bean>
+	<!-- Copote | busi -->
+	<bean id="tCopoteEmployeeBUSIAction" class="person.daizhongde.migration.struts2.action.busi.TCopoteEmployeeBUSIAction" autowire="no" autowire-candidate="false" scope="prototype">
+		<property name="dataService">
+			<ref bean="tCopoteEmployeeService" />
+		</property>
+	</bean>
 	
 	<!-- 迁移表清单配置| query -->
 	<bean id="migSyncConfigJEasyUIQUERYAction" class="person.daizhongde.migration.struts2.action.query.MigSyncConfigJEasyUIQUERYAction" autowire="no" autowire-candidate="false" scope="prototype">
 		<property name="dataService">
 			<ref bean="migSyncConfigService" />
+		</property>
+		<property name="tAuthorityInstService">
+			<ref bean="tAuthorityInstService" />
+		</property>
+		<property name="reptiles">
+			<ref bean="reptiles" />
 		</property>
 	</bean>
 	<!-- 迁移表清单配置| import -->

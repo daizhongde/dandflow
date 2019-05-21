@@ -46,7 +46,6 @@ import person.daizhongde.virtue.util.date.ElapsedTimePrinter;
 import person.daizhongde.virtue.util.word.type2.CustomXWPFDocument;
 import person.daizhongde.virtue.util.word.type2.WordUtils;
 import person.daizhongde.authority.hibernate.pojo.TAuthorityUser;
-import person.daizhongde.migration.exception.AccountEmailException;
 import person.daizhongde.migration.exception.BusinessException;
 import person.daizhongde.migration.hibernate.dao.TCopoteEmployeeDAO;
 import person.daizhongde.migration.hibernate.pojo.TCopoteEmployee;
@@ -401,14 +400,14 @@ public class Excel2Email {
 			rowVo.setnBygz(rowVo.getnJbgz()+rowVo.getnGwgz()
 					+rowVo.nJiXiao);
 			// 税前补款=年资津贴+加薪+开门红+防寒暑费+节日费
-			rowVo.setnSqbk(rowVo.nNzjt+rowVo.nJiXiao
+			rowVo.setnSqbk(rowVo.nNzjt+rowVo.salary_increase
 					+rowVo.nKmh+rowVo.nFhsf
 					+rowVo.nJrf);
-			// 社保公积金个人扣款=基本养老+医疗保险+失业保险+住房公积金
+			// 社保公积金个人扣款=基本养老+医疗保险+失业保险+住房公积金+企业年金
 			rowVo.setnSbgjjgrkk(rowVo.getnEndowment()+rowVo.getnMedical()
-					+rowVo.getnSygrkk()+rowVo.getnGjjgrkk());
-			// 税后扣款=企业年金+工会费+房租费+电费+物业费
-			double nShkk = rowVo.nQynj+rowVo.nGhf
+					+rowVo.getnSygrkk()+rowVo.getnGjjgrkk()+rowVo.nQynj);
+			// 税后扣款=工会费+房租费+电费+物业费
+			double nShkk = rowVo.nGhf
 					+rowVo.nFzf+rowVo.nDf
 					+rowVo.nWyf;
 			String sShkk = String.format("%.2f", nShkk);
@@ -598,17 +597,17 @@ public class Excel2Email {
 		data.put("${duration}", o.getDuration() );//计算期  eg:  2018/02/01-2018/02/28
 		
 		
-		data.put("${nSfgz}", o.getnSfgz() );//实发工资
-		data.put("${nBygz}", o.getnBygz() );//本月工资
-		data.put("${nSqbk}", o.getnSqbk() );//税前补款
-		data.put("${nSbgjjgrkk}", o.getnSbgjjgrkk() );//社保公积金个人扣款
-		data.put("${nGrsds}", o.getnGrsds() );//个人所得税
-		data.put("${nShkk}", o.getnShkk() );//税后扣款
+		data.put("${nSfgz}", Excel2Email.formatDouble(o.getnSfgz() ) );//实发工资
+		data.put("${nBygz}", Excel2Email.formatDouble(o.getnBygz() ) );//本月工资
+		data.put("${nSqbk}", Excel2Email.formatDouble(o.getnSqbk() ) );//税前补款
+		data.put("${nSbgjjgrkk}", Excel2Email.formatDouble( o.getnSbgjjgrkk()) );//社保公积金个人扣款
+		data.put("${nGrsds}", Excel2Email.formatDouble(o.getnGrsds() ) );//个人所得税
+		data.put("${nShkk}", Excel2Email.formatDouble(o.getnShkk())  );//税后扣款
 		
 		data.put("${nJbgz}", Excel2Email.formatDouble( o.getnJbgz()) );//基本工资
 //		data.put("${nGwgz}", o.getnGwgz() );//岗位工资
 //		data.put("${nJzgxjxsfgz}", o.getnJzgxjxsfgz() );//价值贡献绩效实发工资
-		data.put("${nJiXiao}", o.nJiXiao );//价值贡献绩效实发工资
+		data.put("${nJiXiao}", Excel2Email.formatDouble(o.nJiXiao ) );//价值贡献绩效实发工资
 //		data.put("${nBthj}", o.getnBthj() );//补贴合计
 
 		data.put("${nNzjt}", Excel2Email.formatDouble( o.nNzjt) );//年资津贴
@@ -619,11 +618,11 @@ public class Excel2Email {
 //		data.put("${nQtkk_ns}", o.getnQtkk_ns());// 其他扣款（纳税）
 //		data.put("${nKqkk}", o.getnKqkk() );// 考勤扣款
 		data.put("${nEndowment}", Excel2Email.formatDouble( o.getnEndowment()) );//养老个人扣款
-		data.put("${nSygrkk}", o.getnSygrkk() );//失业个人扣款
-		data.put("${nMedical}", o.getnMedical() );//医疗个人扣款
+		data.put("${nSygrkk}", Excel2Email.formatDouble(o.getnSygrkk())  );//失业个人扣款
+		data.put("${nMedical}", Excel2Email.formatDouble(o.getnMedical() ) );//医疗个人扣款
 		data.put("${nGjjgrkk}", Excel2Email.formatDouble( o.getnGjjgrkk()) );//公积金个人扣款
 		data.put("${nQynj}", Excel2Email.formatDouble( o.nQynj) );//企业年金
-		data.put("${nGhf}", o.nGhf );//工会费
+		data.put("${nGhf}", Excel2Email.formatDouble( o.nGhf ) );//工会费
 		data.put("${nFzf}", Excel2Email.formatDouble( o.nFzf ));//房租费
 		data.put("${nWyf}", Excel2Email.formatDouble( o.nWyf ));//物业费
 		data.put("${nDf}", Excel2Email.formatDouble( o.nDf ));//电费
@@ -707,7 +706,7 @@ public class Excel2Email {
 //						"application/octet-stream",
 						"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 						"Salary-"+ny_en+".docx");
-			} catch (AccountEmailException e) {
+			} catch ( Exception e) {//AccountEmailException
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				log.error("给"+name+"<"+mail+">发送邮件失败！"+e.getLocalizedMessage());

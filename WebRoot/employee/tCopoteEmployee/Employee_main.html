@@ -159,7 +159,30 @@ function destroyRecord(){
 	}
 };
 
+/**  更新员工数据   **/
+function btnUpdatedata_onClick() {
+	var cookies = document.getElementById("cookies").value;
+	document.getElementById("updatedata_btn").disabled="disabled";
 
+	if (cookies == "") {
+		alert("Please input cookies！");
+		return;
+	}
+	$.post( getContextPath()+"/busi/commonCURDdelete.action", 
+			function(result, status){
+//				result = eval("(" + result + ")");
+				document.getElementById("updatedata_btn").disabled="";
+				alert(result.msg);
+				if (result.success){
+					$('#grid').datagrid('reload',{
+						tableName : tableName,
+						cookies : cookies,
+						jdata: encodeURI( $.toJSON( query.jdata ) )
+					} );	// reload data
+				}
+			}
+		);
+};
 
 /**  上传前检查，并从数据库获取该批次的社保机构号   **/
 function btnExcelI_onClick() {
@@ -236,6 +259,13 @@ var toolbar = [{
 	iconCls:'icon-edit',
 	handler:function(){
 		editRecord();
+	}
+},{
+	text:'更新',
+	iconCls:'icon-download',
+	handler:function(){
+		$('#Updatedatadlg').dialog('open'); 
+		document.getElementById("cookies").value="";
 	}
 },{
 	text:'Remove',
@@ -417,6 +447,34 @@ $(function(){
 		<input type='button' id='imp_btn' onclick="javascript: btnExcelI_onClick();" value='确 定'/>
 		&nbsp;&nbsp;
 		<input type='button' onclick="javascript:$('#IMPdlg_4Salary').dialog('close');" value='取 消'/>
+	</div>
+	
+	<!-- #########################   dialog  update employee data   ######################################################################## -->	
+	<div id="Updatedatadlg" class="easyui-dialog" title="更新员工数据" data-options="iconCls:'icon-download',
+		modal: true,
+		buttons: '#Updatedatadlg-buttons'" closed="true" style="width:596px;height:200px;padding:10px">
+		<form id="Updatedatadlg_Form" action="../../busi/tCopoteEmployeeBUSIimportXLS.action" method="post" style="margin:0;padding:0;">
+	    	<table>
+	    		<tr height="50">
+	    			<td>
+		    			<span>Cookies:</span>
+						<input type='textarea' id="cookies" name='cookies'  
+		    				style="margin-left:5px;margin-top:5px;"/>
+    					<img id="loading2" src="../../images/loading.gif" style="display:none;">
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>
+						<span id="backmsg2"></span>
+	    			</td>
+				</tr>
+			</table>
+	    </form>
+    </div>
+	<div id="Updatedatadlg-buttons">
+		<input type='button' id='updatedata_btn' onclick="javascript: btnUpdatedata_onClick();" value='确 定'/>
+		&nbsp;&nbsp;
+		<input type='button' onclick="javascript:$('#Updatedatadlg').dialog('close');" value='取 消'/>
 	</div>
 </body>
 </html>

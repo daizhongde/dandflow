@@ -130,6 +130,8 @@
  	<bean id="tAsiainfoEmployeeService" class="person.daizhongde.migration.spring.service.impl.TAsiainfoEmployeeServiceImpl" autowire="byType"></bean>
 	<bean id="tCopoteEmployeeService" class="person.daizhongde.migration.spring.service.impl.TCopoteEmployeeServiceImpl" autowire="byType"></bean>
 	<bean id="tCopoteEmployeeIMPService" class="person.daizhongde.migration.spring.service.imp.TCopoteEmployeeIMPServiceImpl" autowire="byType"></bean>
+<!-- 	<bean id="reptiles" class="org.apache.http.examples.client.copote.HttpWriteResponse2DB_copote" autowire="byType"></bean> -->
+	
 <!-- 	 init-method="initXwpf" -->
 	<bean id="excel2Email" class="person.daizhongde.migration.spring.service.imp.Excel2Email" 
 		autowire="byType" scope="prototype">
