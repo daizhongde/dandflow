@@ -108,6 +108,18 @@ public class MigJobProcessDAOImpl extends SpringHibernateDaoSupport implements M
 				+ "    where process_id = :process_id and status = "+TaskState.EXECUTING;
 		return this.sqlQueryExeUByMap(SQL, condition);
 	}
+	public int sqlQueryUpdateProcessState_Running2Finish2( String processId, String remark, String node_remark ){
+		Map condition = new HashMap(2);
+		condition.put("process_id", processId);
+		condition.put("remark", remark);
+		condition.put("node_remark", node_remark);
+
+		String SQL = "update mig_job_process "
+				+ "      set status = "+TaskState.FINISH+", end_time=NOW(), "
+				+ "          remark = :remark,node_remark = :node_remark  "
+				+ "    where process_id = :process_id and status = "+TaskState.EXECUTING;
+		return this.sqlQueryExeUByMap(SQL, condition);
+	}
 	public int sqlQueryUpdateProcessState_2Finish( String processId){
 		Map condition = new HashMap(1);
 		condition.put("process_id", processId);

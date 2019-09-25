@@ -155,7 +155,6 @@ public class SalaryUtil {
 			break;
 		case "扣税合计":
 			o.nKshj = Double.valueOf(value);
-			o.setnGrsds(o.nKshj);
 			// System.out.print("扣税合计|")
 			break;
 		case "补扣退个税":
@@ -164,6 +163,7 @@ public class SalaryUtil {
 			break;
 		case "本月扣税":
 			o.nByks = Double.valueOf(value);
+			o.setnGrsds(o.nByks);
 			// System.out.print("本月扣税|")
 			break;
 		case "扣款合计":
@@ -202,7 +202,7 @@ public class SalaryUtil {
 				"<style> table {  border-collapse:collapse;  border:1px solid black;  } td {  height:20px;  border:1px solid black; }</style>");
 		
 
-		sb.append("*************注*意*：*试*运*行*期*过*后*正*文*不*再*显*示*工*资*信*息*************<br/>");
+		sb.append("*************感*谢*您*对*公*司*做*出*的*贡*献*和*努*力*************<br/>");
 		sb.append("<table cellpadding=\"0\" cellspacing=\"0\" border=\"1\" width=\"1400px\">");
 		sb.append("<tr>");
 		for (int i = 0; i < celltitle.length; i++) {

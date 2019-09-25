@@ -548,7 +548,16 @@ public class MigJobInfoServiceImpl implements MigJobInfoService {
 			
 			//此时没有jobinsid，传递0值
 //	        JSONObject retmsg = wsClientService.invoke( result, jobId, "0", dryrunId, taskId,"1", taskInfo.getControlId());
-			AIDMResp retmsg = wsClientService.invoke( result, jobId, "0", dryrunId, taskId,"1", taskInfo.getControlId());
+			AIDMResp retmsg = new AIDMResp();
+			try{
+			
+				retmsg = wsClientService.invoke( result, jobId, "0", dryrunId, taskId,"1", taskInfo.getControlId());
+			
+			}catch(Exception e){
+				e.printStackTrace();
+				retmsg.setSuccess(false);
+				retmsg.setMsg("调用WebService服务时出错！");
+			}
 			
 //	        if(false == retmsg.getBoolean("success")){
 //	        	String errmsg = retmsg.getString("msg");

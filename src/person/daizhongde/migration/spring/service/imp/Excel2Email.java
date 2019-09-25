@@ -36,8 +36,10 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mail.MailAuthenticationException;
 
 import person.daizhongde.virtue.constant.INIT;
+import person.daizhongde.virtue.interact.BackendInfo;
 import person.daizhongde.virtue.jdbc.JDBCSpringConnection;
 import person.daizhongde.virtue.jdbc.batch.JDBCBatchInsert;
 import person.daizhongde.virtue.util.codec.Base64Util;
@@ -118,8 +120,8 @@ public class Excel2Email {
 //	private TCopoteEmployee emp;
 	
 	
-	/** key为email(alias) */
-	public static Map<String,String> msg = new HashMap<String,String>();
+//	/** key为email(alias) */
+//	public static Map<String,String> msg = new HashMap<String,String>();
 	
 	public void initXwpf( ) throws Exception {
 //		this.xwpf =  new CustomXWPFDocument(POIXMLDocument.openPackage(
@@ -202,7 +204,7 @@ public class Excel2Email {
 
 		this.user=user;
 		alias = user.getCUemail();
-		msg.put(alias, "开始读取文件......");
+		BackendInfo.msg.put(alias, "开始读取文件......");
 		
 		dupName = new HashSet<String>();
 		dupCol = new HashSet<String>();
@@ -507,14 +509,24 @@ public class Excel2Email {
 		log.info("开始发送邮件....");
 		Timestamp beginTime = new Timestamp( new Date().getTime());
 				
-		String pwd = Base64Util.decodeCopoteMailPWD(user.getCUcip());
+		String pwd = null;
+		try{
+			pwd = Base64Util.decodeCopoteMailPWD(user.getCUcip());
+		}catch(Exception e){
+			throw new RuntimeException("您在数据库保存的公司邮箱密码不合法！请重新设置密码然后重新登陆！");
+		}
 		mailUtil.createMailSender(user.getCUemail(), pwd, user.getCUname() );
 		/** 发送邮件 */
 		if(onlySend2me){
 			Map<String,String[]> onlySend2meMap = new HashMap<String,String[]>();
 			String[] arr = dataMap.get( user.getCUemail() );
 			onlySend2meMap.put(user.getCUemail(), arr);
-			sendEmail(onlySend2meMap);
+
+			if(salaryMap.containsKey(user.getCUemail())){
+				sendEmail(onlySend2meMap);
+			}else{
+				log.warn("文件中没有当前员工用户的工资记录！");
+			}
 		}else{
 			sendEmail(dataMap);
 		}
@@ -675,7 +687,7 @@ public class Excel2Email {
 //				continue;
 //			}
 			log.info("开始给"+name+"<"+mail+">发送邮件....");
-			msg.put(alias,  "开始给"+name+"<"+mail+">发送邮件....");
+			BackendInfo.msg.put(alias,  "开始给"+name+"<"+mail+">发送邮件....");
 			Timestamp beginTime = new Timestamp( new Date().getTime());
 			try {
 
@@ -690,22 +702,17 @@ public class Excel2Email {
 //				String text = map.get(mail);
 				String text = SalaryUtil.convert2HTMLTable(
 						celltitle, dataMap.get(mail) );
-//				text="<html><body>"
-//						+ "<table border=\"1\"<tr><th>姓名</th> <th>电话</th><th>电话</th></tr><tr> <td>Bill Gates</td> <td>555 77 854</td><td>555 77 855</td></tr></table>"
-//		+ "</body></html>";
-
-//				mailUtil.sendMail(mail, ny+"工资清单", 
-//						text,
-//						tempFAbsDir+ny+"工资清单-非mercer-"+ mail +".docx",
-//						"工资清单-"+ny+".docx");
-				
-				// new MimetypesFileTypeMap().getContentType(f)
 				mailUtil.sendMail(mail, "工资清单-"+ny, 
 						text,
 						new ByteArrayInputStream(bos.toByteArray()),
 //						"application/octet-stream",
 						"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 						"Salary-"+ny_en+".docx");
+			} catch ( MailAuthenticationException e) {//AccountEmailException
+				// TODO Auto-generated catch block
+//				e.printStackTrace();
+				BackendInfo.msg.put(alias,"邮箱密码不正确！");
+				throw new RuntimeException("邮箱密码不正确！");
 			} catch ( Exception e) {//AccountEmailException
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -716,7 +723,7 @@ public class Excel2Email {
 			Timestamp endTime = new Timestamp(new Date().getTime());
 //			ElapsedTimePrinter.printElapsedTime(beginTime, endTime, "给<"+mail+">发送邮件完成！耗时：");
 
-			msg.put(alias,  
+			BackendInfo.msg.put(alias,  
 					ElapsedTimePrinter.printElapsedTime2(
 							beginTime, endTime,"给"+name+"<"+mail+">发送邮件完成！") 
 					);
@@ -732,7 +739,7 @@ public class Excel2Email {
 		}
 
 		Timestamp endTime1 = new Timestamp(new Date().getTime());
-		msg.put(alias,  
+		BackendInfo.msg.put(alias,  
 				ElapsedTimePrinter.printElapsedTime2(
 						beginTime1, endTime1,"邮件发送完成！") 
 				);

@@ -110,11 +110,12 @@ var copy="";//复制的任务
 @var fmt 格式化函数对象集合
 @var moNode 光标over的节点对象,如果光标没有在任何一个节点上 moNode.overFlag = false
 */
-var connections=[],dragger,move,up,r,start,end,rel="";
+var connections=[],dragger,move,up,r,start,end,rel="",singleTimer;
 var shapes=[], nodes,txts=[];//矩形框,任务json数据,任务文本
 var tempconn={};
 var fmt={};
 var moNode={};//光标over的节点对象
+var operateimg; //显示用于删除箭头的图标   relArrId 属性用来记录相关箭头的raphelid
 moNode.overFlag = false;//光标over标志
 
 /** 当鼠标单击节点时shift状态为true鼠标移动时实时更新箭头
@@ -293,6 +294,26 @@ $(function () {
     r = Raphael("holder", $(window).width(), $(window).height());
 //     var r = Raphael("holder", $('#workspace').width()-5, $('#workspace').height()-5 );
 
+	operateimg = r.image("../scripts/jquery-easyui/1.4.1/themes/icons/cancel.png", 
+				100, 100, 16, 16);
+	$( operateimg.node ).hide(); // 表示为display:none;
+	
+    	    //显示箭头中点的元素
+//     		$("#operatediv").show(); //表示为display：block;
+//     		$("#operatediv").hide(); // 表示为display:none;
+
+	// node属性是raphel图形元素，不是elementId, raphaelid是元素的属性
+	$( operateimg.node ).click(function(){
+		console.log("operateimg clicked!");
+		app.selectArrId = operateimg.relArrId;
+		unlink();
+		$( operateimg.node ).hide(); // 表示为display:none;
+	});
+	
+// 	operateimg.attr({
+// 		border:2
+// 	});
+
  /**
   * 绘制节点,将数据库中已经存在的任务绘制出来
   参数x数字左上角的x坐标
@@ -422,20 +443,31 @@ fmt.fmtShape = function (obj, color, nodeId ){
 
 /** 通用  **/
 Raphael.fn.drawArr3 = function (obj, point) {
+
     var path1 = getArr(point.start.x, point.start.y, point.end.x, point.end.y, 8);
 //     var path1 = ["M", point.start.x, point.start.y, "L", point.end.x, point.end.y ];
+
     if (obj.arrPath) {
-    	obj.arrPath.attr({ path: path1 });
+    	obj.arrPath.attr({ path: path1,
+//             'arrow-end': 'oval-wide-long',
+//             stroke: "#000", 
+            "stroke-width": 2 });
     	
     } else {
     	obj.arrPath = r.path( path1 );
+    	
     	obj.arrPath.data("fromTask", obj.obj1==undefined ? "": obj.obj1.nodeId );
-    	obj.arrPath.data("toTask", obj.obj2==undefined ? "": obj.obj2.nodeId );
+    	obj.arrPath.data("toTask", obj.obj2==undefined ? "": obj.obj2.nodeId )
 //     	.attr({
 //     		'arrow-end':'classic-wide-long'
 //     		  stroke: "#f00",
 //     		  "stroke-width": 3
 //     		});
+    	.attr({
+//             'arrow-end': 'oval-wide-long',
+//             stroke: "#000", 
+            "stroke-width": 2
+    		});
     	
     	$( obj.arrPath.node ).bind('contextmenu',function(e ){
     		e.preventDefault();
@@ -447,10 +479,45 @@ Raphael.fn.drawArr3 = function (obj, point) {
     			top: e.pageY
     		});
     	});
+    	/** 鼠标进入箭头事件  */
+    	$( obj.arrPath.node ).mouseenter(function(e){
+//     		console.log("show");
+    		app.selectArrId = this.raphaelid;
+			/** 用于单击删除图标时用, obj.arrPath.node.raphaelid 与this.raphaelid是价的 */
+// 			console.log("raphaelid_1:"+obj.arrPath.node.raphaelid);
+// 			console.log("raphaelid_2:"+this.raphaelid);
+
+        	operateimg.relArrId = this.raphaelid;
+
+    	    //显示箭头中点的元素
+//     		$("#operatediv").show(); //表示为display：block;
+//     		$("#operatediv").hide(); // 表示为display:none;
+
+    		var x1 = point.start.x;
+    		var y1 = point.start.y;
+    		var x2 = point.end.x;
+    		var y2 = point.end.y;
+    	    var centerx = x1+(x2-x1)/2;
+    	    var centery = y1+(y2-y1)/2;
+    	            	
+        	$( operateimg.node ).attr({x: e.pageX-251,y: e.pageY-42});
+        	$( operateimg.node ).show(); // 表示为display:none;
+        	
+    	});
+    	/** 鼠标进入箭头事件  */
+    	$( obj.arrPath.node ).mouseout(function(e){
+    		clearTimeout(singleTimer);
+//     		console.log("if('"+operateimg.relArrId+"'=='"+this.raphaelid+"')$( operateimg.node ).hide();");
+//     		console.log("$( operateimg.node ).hide();");
+    		singleTimer = setTimeout("$( operateimg.node ).hide();", 2000);
+//         	$( operateimg.node ).hide(); // 表示为display:none;
+    	});
+    	
+    	
+    	
     }
     return obj;
 };
-
 /** 获取组成箭头的三条线段的路径
 @param size 箭头大小
 **/
@@ -462,9 +529,21 @@ Raphael.fn.drawArr3 = function (obj, point) {
       var y2a = y2 + Math.sin(a45) * size;
       var x2b = x2 + Math.cos(a45m) * size;
       var y2b = y2 + Math.sin(a45m) * size;
+      
+      var centerx = x1+(x2-x1)/2;
+      var centery = y1+(y2-y1)/2;
+      
 //       var result = ["M", x1, y1, "L", x2, y2, "L", x2a, y2a, "M", x2, y2, "L", x2b, y2b]
-var result = "M"+ x1 +","+ y1 + "L"+ x2 +","+ y2 + "L"+ x2a +","+ y2a + "M"+ x2+","+ y2 +"L"+ x2b +","+ y2b;
+var result = "M"+ x1 +","+ y1 + "L"+ x2 +","+ y2 
+	+ "L"+ x2a +","+ y2a 
+	+ "M"+ x2+","+ y2 +"L"+ x2b +","+ y2b;
+//  	+ "M"+centerx+","+centery+"L"+(centerx+1)+","+(centery+1);
 //       var result = "M"+ x1 +","+ y1 + "L"+ x2 +","+ y2 + "L"+ x2a +","+ y2a + "M"+ x2+","+ y2 +"L"+ x2b +","+ y2b +"m47.446122,148.46699l47.463496,149.0968l47.430196,149.09969c47.363594,148.8854247.278172,148.7259147.173az931,148.62119c47.069686,148.5164646.943725,148.464146.796048,148.4641c46.681186,148.464146.582493,148.4875146.499968,148.53432c46.417441,148.5811346.340465,148.6571446.269039,148.76235c46.124256,148.9775946.051865,149.2237246.051865,149.50074c46.051865,149.6329846.069239,149.7577346.103987,149.875c46.138734,149.9922846.189408,150.095846.256009,150.18556c46.385347,150.359346.54316,150.4461746.729448,150.44617c46.802803,150.4461746.871816,150.4307346.936487,150.39984c47.001155,150.3689547.054242,150.3264847.095748,150.27243c47.152694,150.1971547.181168,150.1078647.18117,150.00458c47.181168,149.9090347.155349,149.8400247.103711,149.79755c47.05207,149.7550846.96689,149.7338446.84817,149.73384l46.84817,149.70054l47.771883,149.70054l47.771883,149.73384c47.686942,149.7415647.62734,149.7533947.593076,149.76931c47.558809,149.7852447.533472,149.8125147.517065,149.85111c47.498724,149.8935947.489555,149.9780447.489557,150.10448c47.489555,150.1392347.491485,150.1932847.495348,150.26664l47.498244,150.29994c47.461564,150.2864347.434538,150.2796747.417165,150.27967c47.395929,150.2796747.368903,150.2907747.336087,150.31297c47.252112,150.3708847.154625,150.4152847.043626,150.44617c46.932625,150.4770646.815351,150.492546.691804,150.4925c46.521925,150.492546.368697,150.4635546.23212,150.40563c46.095541,150.3477245.984782,150.2647145.899844,150.15661c45.836139,150.0755345.787154,149.9790145.752889,149.86704c45.718624,149.7550845.701491,149.6363545.701491,149.51088c45.701491,149.338145.732378,149.1773945.794152,149.02875c45.855926,148.8801145.942795,148.7575346.054761,148.661c46.146456,148.5828246.252147,148.5224946.371835,148.48002c46.491521,148.4375646.617964,148.4163246.751165,148.41632c46.828382,148.4163246.900049,148.4235646.966168,148.43804c47.032284,148.4525247.102503,148.4761647.176826,148.50898l47.262248,148.54807c47.283481,148.5567647.302785,148.561147.320161,148.5611c47.358768,148.561147.388207,148.5297347.408479,148.46699l47.446122,148.46699z";
+
+// 	var circle = r.circle(centerx, centery, 2);
+// 	// 给绘制的圆圈填充红色 (#f00)
+// 	circle.attr("fill", "#f00");
+	
       return result;
   }
 /** 动态确定起点和终点  **/
@@ -1105,6 +1184,11 @@ app.instanceJobParam = function(  ){
 		<div data-options="disabled:false" onclick="javascript: app.f_modifyJob_open_window( nodes[app.zindex].job.jobId, nodes[app.zindex].job )">setting</div>
 	</div>
 	
+<!-- 	<div id="operatediv" style="display:none"> -->
+<!--   		<img id="operateimg" src="../scripts/jquery-easyui/1.4.1/themes/icons/pencil.png" -->
+<!-- 		 onclick="javascript:window.open('cookie_get.png', 'cookies获取', {}, {});"> -->
+<!-- 	</div> -->
+				 
 	<div id="blankContextMenu" class="easyui-menu" style="width:140px;">
 		<div data-options="disabled:true,iconCls:'icon-add'" onclick="javascript: app.f_modifyTask_open_window( app.zindex )">New</div>
 		<div id = "blankpaste" data-options="disabled:true" onclick="javascript: app.f_pasteTask()">paste</div>
@@ -1145,6 +1229,9 @@ $(function(){
 
 function unlink(){
 	var arrow = r.getById( app.selectArrId );
+	unlinkCommon(arrow);
+};
+function unlinkCommon(arrow){
 	var fromTask = arrow.data("fromTask");
 	var toTask = arrow.data("toTask");
 	

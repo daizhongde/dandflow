@@ -38,7 +38,7 @@
  	<http-conf:conduit name="{http://10.1.249.109:1111/migration/ComInterFace}executeSql.http-conduit">
          <http-conf:client ConnectionTimeout="10000" ReceiveTimeout="20000"/>
 	</http-conf:conduit> -->
-	<!-- 连接超时为1分钟，调用返回超时为 1天  24*60*60 000=86400000 -->
+	<!-- 连接超时为1分钟，调用返回超时为 1天  24*60*60000=86400000 -->
 	<http-conf:conduit name="*.http-conduit">   
         <http-conf:client ConnectionTimeout="60000" ReceiveTimeout="86400000"/>  
     </http-conf:conduit>

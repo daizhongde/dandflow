@@ -2,6 +2,7 @@ package person.daizhongde.migration.spring.service.imp;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
@@ -194,6 +195,10 @@ public class MailUtil {
 			// TODO Auto-generated catch block
 //			e.printStackTrace();
 			throw new AccountEmailException( "Faild to send mail.UnsupportedEncodingException：", e );
+		} catch (MailAuthenticationException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new AccountEmailException( "Faild to send mail.Exception：", e );
 		}
     }
 
@@ -252,6 +257,10 @@ public class MailUtil {
 			// TODO Auto-generated catch block
 //			e.printStackTrace();
 			throw new AccountEmailException( "Faild to send mail.UnsupportedEncodingException：", e );
+		} catch (MailAuthenticationException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new AccountEmailException( "Faild to send mail.Exception：", e );
 		}
     }
 //    private Part createContent1(String content,ByteArrayInputStream inputstream, 

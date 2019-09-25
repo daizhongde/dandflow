@@ -26,9 +26,13 @@ if( StringUtils.isNotBlank( emailpwd ) ){
 	sb = sb.reverse();
 	String reve=sb.toString();
 //     System.out.println("反转:"+reve);
-    //解密
-	byte[] byteArr = Base64.getDecoder().decode(reve);
-	emailpwd = new String(byteArr);
+	try{
+	    //解密
+		byte[] byteArr = Base64.getDecoder().decode(reve);
+		emailpwd = new String(byteArr);
+	}catch(Exception e){
+		emailpwd = "";
+	}
 // 	System.out.println("解密:" + emailpwd);
 }
 %>

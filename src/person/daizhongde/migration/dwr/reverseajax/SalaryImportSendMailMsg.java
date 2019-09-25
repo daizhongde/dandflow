@@ -22,7 +22,7 @@ import org.directwebremoting.WebContextFactory;
 
 import person.daizhongde.authority.constant.SessionConstants;
 import person.daizhongde.authority.hibernate.pojo.TAuthorityUser;
-import person.daizhongde.migration.spring.service.imp.Excel2Email;
+import person.daizhongde.virtue.interact.BackendInfo;
 
 /**
  * 导入工资excel并发送邮件时前台实时展示处理信息
@@ -47,7 +47,7 @@ public class SalaryImportSendMailMsg
             @SuppressWarnings("unchecked")
 			public void run()
             {
-            	String s = Excel2Email.msg.get( user.getCUemail() );
+            	String s = BackendInfo.msg.get( user.getCUemail() );
                 ScriptSessions.addFunctionCall("receiveMessages", s );
             }
         });
@@ -60,7 +60,7 @@ public class SalaryImportSendMailMsg
     	WebContext ctx = WebContextFactory.get();
     	TAuthorityUser user = (TAuthorityUser) ctx.getSession()
     			.getAttribute(SessionConstants.LOGIN_USER);
-		Excel2Email.msg.put( user.getCUemail(), msg );
+    	BackendInfo.msg.put( user.getCUemail(), msg );
     }
 	/**
      * @param text The new message text to add
@@ -70,6 +70,6 @@ public class SalaryImportSendMailMsg
     	WebContext ctx = WebContextFactory.get();
     	TAuthorityUser user = (TAuthorityUser) ctx.getSession()
     			.getAttribute(SessionConstants.LOGIN_USER);
-		Excel2Email.msg.put( user.getCUemail(), "");
+    	BackendInfo.msg.put( user.getCUemail(), "");
     }
 }

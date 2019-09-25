@@ -10,7 +10,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 </head>
   <body>
    	<script type="text/javascript">
-   	var action = "view";//edit,add,view   , isoftstone zddaia employeeNo98974,author 戴忠戴 ,author daizhongde QQ:413881461
+   	var action = "view";//edit,add,view   , mysoftstone zddaia employeeNo98974,author 戴忠戴 ,author daizhongde QQ:413881461
 	/*
 	 * 
 	 * 1、一次性，并且指定了时间 ("13 12 11 1 11 ? 2017")； 2、周期性；3、自定义,并指定了定时表达式

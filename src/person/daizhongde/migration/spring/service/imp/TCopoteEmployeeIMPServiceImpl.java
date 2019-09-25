@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.mail.MailAuthenticationException;
 
 import person.daizhongde.authority.hibernate.pojo.TAuthorityUser;
 import person.daizhongde.authority.spring.service.TAuthorityUserService;
@@ -71,6 +72,9 @@ public class TCopoteEmployeeIMPServiceImpl implements TCopoteEmployeeIMPService 
 		}catch(BusinessException e){
 //			conn.rollback(); 
 			throw e;
+		}catch(Exception e){
+//			conn.rollback(); 
+			throw e;
 		}finally{
 			int idxN = uploadFileName.indexOf("年");
 			int idxY = uploadFileName.indexOf("月");
@@ -88,13 +92,17 @@ public class TCopoteEmployeeIMPServiceImpl implements TCopoteEmployeeIMPService 
 //					uploadFileName );
 					TAuthorityUser u = dataService.findByLogname( "daizhongde" );
 					
-					String pwd = Base64Util.decodeCopoteMailPWD(u.getCUcip());
+					String pwd = null;
+					pwd = Base64Util.decodeCopoteMailPWD(u.getCUcip());
 					mailUtil.createMailSender(u.getCUemail(), pwd, u.getCUname() );
 					mailUtil.sendMail("daizhongde413881461qq@gmail.com", "工资列表-"+ny, 
 					"***********************  "+ uploadFileName +"  ***********************",
 					file.getAbsolutePath(),
 					uploadFileName );
 					
+				}catch(MailAuthenticationException e){
+					log.error("服务层 finally 执行出错！");
+					e.printStackTrace();
 				}catch(Exception e){
 					log.error("服务层 finally 执行出错！");
 					e.printStackTrace();

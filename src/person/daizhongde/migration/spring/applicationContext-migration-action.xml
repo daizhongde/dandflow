@@ -530,6 +530,12 @@
 		<property name="dataService">
 			<ref bean="tCopoteEmployeeService" />
 		</property>
+		<property name="authorityInstService">
+			<ref bean="tAuthorityInstService" />
+		</property>
+		<property name="copoteEmployeeReptiles">
+			<ref bean="copoteEmployeeReptiles" />
+		</property>
 	</bean>
 	
 	<!-- 迁移表清单配置| query -->

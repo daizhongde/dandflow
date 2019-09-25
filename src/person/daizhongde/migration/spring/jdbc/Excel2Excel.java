@@ -11,6 +11,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import person.daizhongde.virtue.constant.INIT;
+import person.daizhongde.virtue.util.date.ElapsedTimePrinter;
 import person.daizhongde.virtue.util.ie.POICellUtil;
 
 import person.daizhongde.migration.exception.BusinessException;
@@ -95,10 +97,12 @@ public class Excel2Excel {
 //	private Map<String,Connection> conn_map = new HashMap<String,Connection>();
 //	private static Connection con_Default;
 
+	/** key为数据库连接  db_urlName  */
 	private Map<String,ArrayList<MyCellValue>> cellList_Map = new HashMap<String,ArrayList<MyCellValue>>();
 	/** 单个库同时支持的最大连接数  INIT.maxThreadNum , suggest 20, good db can be bigger **/
-	private int taskNum = INIT.maxThreadNum/2;
+//	private int taskNum = INIT.maxThreadNum/2;
 //	private int taskNum = 2;
+	private int taskNum = 30;
 	
 //	/** 每个库同时支持的最大连接数 **/
 //	private Map<String, Semaphore> taskNum_Map = new HashMap<String, Semaphore>();
@@ -367,6 +371,7 @@ public class Excel2Excel {
 		
 		System.out.println("begin execute sql...");
 		
+		/** key为数据库连接 db_urlName */
 		Set<String> keys = cellList_Map.keySet();
 		Iterator<String> it = keys.iterator();
 		
@@ -438,9 +443,17 @@ public class Excel2Excel {
 			return false;
 		}else if(value.toLowerCase().startsWith("select ")){
 			return true;
-		}else if(value.toLowerCase().startsWith(MySQL_targetDB_of_SQLprefix.toLowerCase())){
+		}else if(value.toLowerCase().startsWith(MySQL_targetDB_of_SQLprefix.toLowerCase())
+				&& !value.toLowerCase().contains("delete")
+				&& !value.toLowerCase().contains("update")
+				&& !value.toLowerCase().contains("drop")
+				&& !value.toLowerCase().contains("truncate")){
 			return true;
-		}else if(value.toLowerCase().startsWith(Oracle_targetDB_of_SQLprefix.toLowerCase())){
+		}else if(value.toLowerCase().startsWith(Oracle_targetDB_of_SQLprefix.toLowerCase())
+				&& !value.toLowerCase().contains("delete")
+				&& !value.toLowerCase().contains("update")
+				&& !value.toLowerCase().contains("drop")
+				&& !value.toLowerCase().contains("truncate")){
 			return true;
 		}
 		return false;
@@ -586,9 +599,16 @@ class SQLRunnable implements Runnable {
 					ResultSet.CONCUR_READ_ONLY);
 			
 	//		System.out.println(Thread.currentThread().getId());
-					
-			stmt.execute();
 
+			Date begin = new Date();
+			stmt.execute();
+			Date end = new Date();
+			
+			long min = ElapsedTimePrinter.printElapsedTime3(begin, end, "("+cv.sheet+")["+cv.row+","+cv.col+"]:"+this.cv.sql);
+			if(min>=1){
+				log.warn("超过1分钟：("+cv.sheet+")["+cv.row+","+cv.col+"]:"+this.cv.sql);
+			}
+			
 			while (true) {
 				
 				int rowCount = stmt.getUpdateCount();

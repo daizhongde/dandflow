@@ -9,9 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import person.daizhongde.virtue.constant.INIT;
+import person.daizhongde.virtue.interact.BackendInfo;
 import person.daizhongde.virtue.util.file.FileUtil;
 import person.daizhongde.authority.hibernate.pojo.TAuthorityUser;
 import person.daizhongde.authority.struts2.action.BaseAction;
@@ -60,7 +63,8 @@ public class TCopoteEmployeeIMPAction extends BaseAction  {
 	
     /** for response */
 	private String sResponse;
-	
+
+	private Object json;
 
 	/**
 	 * 处理用户导入文件的方法
@@ -70,9 +74,10 @@ public class TCopoteEmployeeIMPAction extends BaseAction  {
 	 * 
 	 * 
 	 */
+	@SuppressWarnings("deprecation")
 	public String importSalaryXLS() throws Throwable{
 		TAuthorityUser user= super.getLoginUser();
-		Excel2Email.msg.put( user.getCUemail(), "正在上传文件...完成");
+		BackendInfo.msg.put( user.getCUemail(), "正在上传文件...完成");
 		
 		log.debug("begin upload Gong Zi file-----------------------");
 		log.debug("==========" + getUploadFileName());
@@ -134,23 +139,30 @@ public class TCopoteEmployeeIMPAction extends BaseAction  {
 			while(e2.getCause() != null ){
 				e2 = e2.getCause();
 			}
-//			super.setJson( "{success: false, msg: \""+e2.getLocalizedMessage()+"\"}" );
-//			return "json";
-//		}
-//		super.setJson( "{success: true, msg: \"Import Salary Excel and Send Email Success！\"}" );
-//		return "json";
-	
 			Map map = new HashMap(2);
 			map.put("success", Boolean.FALSE );
-			map.put("msg", URLDecoder.decode( e2.getLocalizedMessage() ) );
+//			map.put("msg",  "error!");
+//			map.put("msg",   e2.getLocalizedMessage()  ); // URLDecoder.decode( e2.getLocalizedMessage() )
+			String ret = e2.getLocalizedMessage();
+			ret = ret.replaceAll("[<>]", "*");
+//			ret = ret.replace("[", "*");
+//			ret = ret.replace("]", "*");
+//			ret = ret.replace(":", "*");
+//			ret = ret.replace("<", "*");
+//			ret = ret.replace(">", "*");
+			map.put("msg",   ret );
+//			this.setJson( JSON.toJSONString(map) );
+//			return "json";
 			super.setMap(map);
+			
 			return "map";
 		}
 		
 		Map map = new HashMap(2);
 		map.put("success", Boolean.TRUE );
 		map.put("msg", "Import Salary Excel and Send Email Success！");
-	//	map.put("path", targetFAbsPath );
+//		this.setJson( JSON.toJSONString(map) );
+//		return "json";
 		super.setMap(map);
 		return "map";
 			
@@ -237,6 +249,14 @@ public class TCopoteEmployeeIMPAction extends BaseAction  {
 	}
 	public void setOnlySend2me(boolean onlySend2me) {
 		this.onlySend2me = onlySend2me;
+	}
+
+	
+	public Object getJson() {
+		return json;
+	}
+	public void setJson(Object json) {
+		this.json = json;
 	}
 	public void setDataService(TCopoteEmployeeIMPService dataService) {
 		this.dataService = dataService;

@@ -74,6 +74,8 @@ public interface MigJobProcessDAO extends SpringHibernateDao{
 	public abstract int sqlQueryUpdateProcessState_2Running2(String processId);
 	/** 将运行态更新为完成态 **/
 	public abstract int sqlQueryUpdateProcessState_Running2Finish(String processId, String remark );
+	/** 将运行态更新为完成态 , 仅适用于shell控件中datax 执行返回值处理 **/
+	public abstract int sqlQueryUpdateProcessState_Running2Finish2(String processId, String remark, String node_remark );
 	/** 将运行态更新为完成态（目前针对作业包使用） **/
 	public abstract int sqlQueryUpdateProcessState_2Finish(String processId );
 	

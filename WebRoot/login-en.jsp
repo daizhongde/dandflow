@@ -213,7 +213,7 @@ name=checkrand>
 		</div>
 	</div>
 	<div class="copyright">
-		<span class="logo"></span>Copyright &copy; 2014-2016 Asiainfo
+		<span class="logo"></span>Copyright &copy; 2018-2019 Virtue Software
 	</div>
 
 	</form>

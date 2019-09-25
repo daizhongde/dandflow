@@ -38,10 +38,10 @@ public class AccountEmailServiceTest
 //        accountEmailService.sendMail( "test2@juvenxu.com", subject, htmlText );
 //    	String subject = j_username+"'s nt account";
 //        String htmlText = "account:<br>username:"+j_username+"<br>password:"+j_password;
-        accountEmailService.sendMail("86548780@qq.com", subject,  htmlText );
+        accountEmailService.sendMail("413881461@qq.com", subject,  htmlText );
 	
 		
-//        greenMail.waitForIncomingEmail( 2000, 1 );
+//        greenMail.waitForIncomingEmail( 2000, 1 );// 86548780
 //
 //        Message[] msgs = greenMail.getReceivedMessages();
 //        assertEquals( 1, msgs.length );

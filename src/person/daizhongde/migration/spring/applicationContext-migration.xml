@@ -8,9 +8,10 @@
 	
 	<!--  -->
   	<import resource="classpath:person/daizhongde/migration/spring/applicationContext-migration-action.xml" />
+	<import resource="classpath:person/daizhongde/migration/spring/applicationContext-copote-business.xml" />
 	<import resource="classpath:person/daizhongde/migration/spring/applicationContext-migration-business.xml" />
 	<import resource="classpath:person/daizhongde/migration/spring/applicationContext-migration-dao.xml" />
-<!-- 	<import resource="classpath:person/daizhongde/migration/spring/applicationContext-migration-rest.xml" /> -->
+<!-- -->	<import resource="classpath:person/daizhongde/migration/spring/applicationContext-migration-rest.xml" /> 
 <!-- 	<import resource="classpath:person/daizhongde/migration/spring/applicationContext-migration-quartz.xml" /> -->
 	<!-- 
 	<import resource="classpath:person/daizhongde/migration/spring/applicationContext-migration-websocket.xml" />

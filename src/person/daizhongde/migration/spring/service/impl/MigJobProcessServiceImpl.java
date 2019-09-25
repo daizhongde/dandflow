@@ -2,6 +2,7 @@ package person.daizhongde.migration.spring.service.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -521,8 +522,15 @@ public class MigJobProcessServiceImpl implements MigJobProcessService {
 
 		//invoke webservice
 		log.debug("Thread " + pThread + ", ###### 2 ######### invoke webservice task beginning ... "+nodeId);
+		log.info("invoke proc:{},start:{}", 
+				com.alibaba.fastjson.JSONObject.toJSONString( proc),
+						new Date());
+		
 		AIDMResp oResponse = wsClientService2.invoke( result, proc.getJobId(), jobInsId, dryrunId, nodeId, "0", proc.getControlId());
-
+		log.info("invoke proc:{},end:{}", 
+				com.alibaba.fastjson.JSONObject.toJSONString( proc),
+						new Date());
+		
 		log.debug("Thread " + pThread + ", ###### 2 ######### invoke webservice task finished ! " +nodeId);
 		
 		if(false == oResponse.isSuccess() && taskErrorEmail )
@@ -1383,12 +1391,18 @@ public class MigJobProcessServiceImpl implements MigJobProcessService {
 							try{
 //								JobSemaphore.maxThreadNum.acquire();// (这里需加在更新叶子任务状态前)获取许可,在每个线程执行完的时候都一定要释放，且线程不能等待他的子线程
 								/* 目前没有对webservice调用返回值为false的情况进行处理，以后需要再改造 */
+								log.info("MigTaskThread proc:{},begin:{}", 
+										com.alibaba.fastjson.JSONObject.toJSONString( this.proc),
+												new Date());
 								oResponse = executeLeafTask( this.proc, dryrunId,this.i, this.nodelink, jparaMap );
+								log.info("MigTaskThread proc:{},end:{}", 
+										com.alibaba.fastjson.JSONObject.toJSONString( this.proc),
+												new Date());
 								JobSemaphore.maxThreadNum.release();//执行完一个叶子任务释放一个资源
 								
 							} catch (Exception e) {
 						    	//下面的代码一般只有网络异常的情况下才会执行		
-					            e.printStackTrace();  
+					            e.printStackTrace();
 					            //更新当前任务的状态为执行出错，即process表中的subtask的状态
 					            dataDAO.sqlQueryUpdateProcessStateandRemark( processId,
 					            		e.getMessage(),TaskState.ERROR,TaskState.EXECUTING );
@@ -1408,9 +1422,23 @@ public class MigJobProcessServiceImpl implements MigJobProcessService {
 										? msg.substring(0, 90000) + "...省略..."+ msg.substring(len-2048, len)
 									: msg;
 //								log.info("special: msg:"+msg);
-								if(true == oResponse.getBoolean("success"))
+								if(oResponse.getBoolean("success"))
 								{//WebService返回成功
-									dataDAO.sqlQueryUpdateProcessState_Running2Finish( processId, msg  );
+									System.out.println("judge datax NodeName:"+proc.getNodeName());
+									try{
+										if(proc.getNodeName().toLowerCase().contains("datax")){
+	
+											System.out.println("yes datax node!");
+											dataDAO.sqlQueryUpdateProcessState_Running2Finish2( processId, msg,fetchInfo(msg)  );
+										}else{
+	
+											System.out.println("Not datax node!");
+											dataDAO.sqlQueryUpdateProcessState_Running2Finish( processId, msg  );
+										}
+						            }catch (Exception e) {
+						            	log.error("严重错误：线程<"+i+">中出现问题没有更新数据库任务状态");
+										dataDAO.sqlQueryUpdateProcessState_Running2Finish( processId, "严重错误：线程<"+i+">没有更新数据库任务状态，程序走B方案！"  );
+									}
 									//叶子任务执行完成之后的工作:查找后置并检查后置启动的条件是否满足，如果满足就启动
 									recursiveEXEPostpos( proc, i, nodelink, dryrunId, jparaMap );
 								}
@@ -1528,6 +1556,58 @@ public class MigJobProcessServiceImpl implements MigJobProcessService {
 //		}
 	}
 
+	/*
+	任务启动时刻                    : 2019-07-24 00:11:06
+	任务结束时刻                    : 2019-07-24 00:11:48
+	任务总计耗时                    :                 42s
+	任务平均流量                    :            1.42MB/s
+	记录写入速度                    :           5263rec/s
+	读出记录总数                    :              210548
+	读写失败总数                    :                   0
+	return "2019-07-24 00:11:06|2019-07-24 00:11:48|42s|1.42MB/s|5263rec/s|210548|0"
+	 */
+	private String fetchInfo(String s){
+		
+		String starttime="";
+		String endtime="";
+		String usetime="";
+		String average="";
+		String speed="";
+		String readcount="";
+		String writecount="";
+		
+		String[] arr = s.split("\n");
+		System.out.println("arr.length:"+arr.length);
+
+		if(arr.length>7 &&  arr[arr.length-7].startsWith("任务启动时刻") ){
+			System.out.println("arr["+(arr.length-7)+"]:"+  arr[arr.length-7]);
+			System.out.println("arr["+(arr.length-6)+"]:"+  arr[arr.length-6]);
+			System.out.println("arr["+(arr.length-5)+"]:"+  arr[arr.length-5]);
+			System.out.println("arr["+(arr.length-4)+"]:"+  arr[arr.length-4]);
+			System.out.println("arr["+(arr.length-3)+"]:"+  arr[arr.length-3]);
+			System.out.println("arr["+(arr.length-2)+"]:"+  arr[arr.length-2]);
+			System.out.println("arr["+(arr.length-1)+"]:"+  arr[arr.length-1]);
+
+			starttime=arr[arr.length-7].split(" :")[1].trim();
+			endtime=arr[arr.length-6].split(" :")[1].trim();
+			usetime=arr[arr.length-5].split(" :")[1].trim();
+			average=arr[arr.length-4].split(" :")[1].trim();
+			speed=arr[arr.length-3].split(" :")[1].trim();
+			readcount=arr[arr.length-2].split(" :")[1].trim();
+			writecount=arr[arr.length-1].split(" :")[1].trim();
+			
+			System.out.println("starttime:"+  starttime);
+			System.out.println("endtime:"+  endtime);
+			System.out.println("usetime:"+  usetime);
+			System.out.println("average:"+  average);
+			System.out.println("speed:"+  speed);
+			System.out.println("readcount:"+  readcount);
+			System.out.println("writecount:"+  writecount);
+		}
+//		String node_remark = "";
+		return starttime+"|"+endtime+"|"+usetime+"|"+average+"|"+speed+"|"+readcount+"|"+writecount;
+	}
+	
 	@Override
 	public void modifyTaskStatus2Init(String insId, String taskId,
 			TAuthorityUser user) {

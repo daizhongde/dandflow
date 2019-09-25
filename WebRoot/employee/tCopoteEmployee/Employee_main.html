@@ -8,6 +8,40 @@
 <script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.min.js"></script>
 <style type="text/css">
 a {text-decoration:none;}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    top: -5px;
+    right: 110%;
+}
+
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent black;
+}
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
 </style>
 <script type="text/javascript" src="../../scripts/jquery-easyui/1.4.1/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="../../scripts/json/jquery.json-2.2.min.js"></script>
@@ -162,23 +196,40 @@ function destroyRecord(){
 /**  更新员工数据   **/
 function btnUpdatedata_onClick() {
 	var cookies = document.getElementById("cookies").value;
+	console.log("cookies:"+cookies);
 	document.getElementById("updatedata_btn").disabled="disabled";
 
 	if (cookies == "") {
 		alert("Please input cookies！");
 		return;
 	}
-	$.post( getContextPath()+"/busi/commonCURDdelete.action", 
+	displayFla1 = true;
+	/** 上传文件前设置初始消息  */
+	SalaryImportSendMailMsg.modifyMsg( "开始更新员工数据..." );
+	sendMessage();
+
+	$("#loading2").show();
+	
+	$.post( getContextPath()+"/busi/tCopoteEmployeeBUSIupdateData.action", {
+			cookies : cookies
+			},
 			function(result, status){
-//				result = eval("(" + result + ")");
+				result = eval("(" + result + ")");
 				document.getElementById("updatedata_btn").disabled="";
+				$("#loading2").hide();
 				alert(result.msg);
+				displayFla1 = false;
 				if (result.success){
+					$("#backmsg2").text("");
+					
+					$('#Updatedatadlg').dialog('close');
 					$('#grid').datagrid('reload',{
 						tableName : tableName,
 						cookies : cookies,
 						jdata: encodeURI( $.toJSON( query.jdata ) )
 					} );	// reload data
+				}else{
+					$("#backmsg2").text("更新出错！请联系管理员<QQ：413881461>");
 				}
 			}
 		);
@@ -197,6 +248,7 @@ function btnExcelI_onClick() {
 };
 /** 是否更新导入弹框中的消息  */
 var displayFlag = false;
+var displayFla1 = false;
 
 /**  上传  **/
 function ajaxFileUpload() {
@@ -230,8 +282,8 @@ function ajaxFileUpload() {
 			document.getElementById("imp_btn").disabled="";
 			$("#loading").hide();
 			alert(data.msg);
+			displayFlag = false;
 			if (data.success) {
-				displayFlag = false;
 				$("#backmsg").text("");
 				$('#IMPdlg_4Salary').dialog('close');
 				console.log(data.path)
@@ -240,8 +292,9 @@ function ajaxFileUpload() {
 			}
 		},
 		error : function(data, status, e) {
+// 			data = eval("(" + data + ")");
 			displayFlag = false;
-			$("#backmsg").text("");
+			$("#backmsg").text("出错！请联系管理员<QQ：413881461>");
 			$("#loading").hide();
 			alert("Error:" + data + ",exception:" + e);
 		}
@@ -432,7 +485,7 @@ $(function(){
 		    			<span>选择文件:</span>
 						<input type='file' id="upload" name='upload' size="60" 
 		    				style="margin-left:5px;margin-top:5px;"/>
-    					<img id="loading" src="../../images/loading.gif" style="display:none;">
+    					<img id="loading" src="../../images/loading.gif" style="display:none;"/>
 	    			</td>
 	    		</tr>
 	    		<tr>
@@ -452,29 +505,34 @@ $(function(){
 	<!-- #########################   dialog  update employee data   ######################################################################## -->	
 	<div id="Updatedatadlg" class="easyui-dialog" title="更新员工数据" data-options="iconCls:'icon-download',
 		modal: true,
-		buttons: '#Updatedatadlg-buttons'" closed="true" style="width:596px;height:200px;padding:10px">
-		<form id="Updatedatadlg_Form" action="../../busi/tCopoteEmployeeBUSIimportXLS.action" method="post" style="margin:0;padding:0;">
+		buttons: '#Updatedatadlg-buttons'"  closed="true" style="width:596px;height:220px;padding:10px">
+		<form id="Updatedatadlg_Form" action="../../busi/tCopoteEmployeeBUSIupdateData.action" method="post" style="margin:0;padding:0;">
 	    	<table>
 	    		<tr height="50">
 	    			<td>
-		    			<span>Cookies:</span>
-						<input type='textarea' id="cookies" name='cookies'  
-		    				style="margin-left:5px;margin-top:5px;"/>
-    					<img id="loading2" src="../../images/loading.gif" style="display:none;">
+		    			<label>Cookies:</label>
+						<textarea  id="cookies" name='cookies'  
+		    				style="margin-left:5px;margin-top:5px;" rows="4" cols="60"></textarea>
+							<img id="imghelpupdate" src="../../scripts/jquery-easyui/1.4.1/themes/icons/help.png"
+							 onclick="javascript:window.open('cookie_get.png', 'cookies获取', {}, {});">
+							
+    					<img id="loading2" src="../../images/loading.gif" style="display:none;"/>
+    				
 	    			</td>
 	    		</tr>
 	    		<tr>
 	    			<td>
-						<span id="backmsg2"></span>
+	                   <span id="backmsg2"></span>
 	    			</td>
 				</tr>
 			</table>
 	    </form>
     </div>
+
 	<div id="Updatedatadlg-buttons">
 		<input type='button' id='updatedata_btn' onclick="javascript: btnUpdatedata_onClick();" value='确 定'/>
 		&nbsp;&nbsp;
-		<input type='button' onclick="javascript:$('#Updatedatadlg').dialog('close');" value='取 消'/>
-	</div>
+		<input type='button' id='cancel_btn2' onclick="javascript:$('#Updatedatadlg').dialog('close');" value='取 消'/>
+	</div> 
 </body>
 </html>
