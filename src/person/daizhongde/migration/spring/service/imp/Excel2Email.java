@@ -831,7 +831,7 @@ class SendEmailRunnable implements Runnable {
 
 		} catch (Exception e) { 
 			
-		} finally { 
+		} finally {
 			
 		}
 	}

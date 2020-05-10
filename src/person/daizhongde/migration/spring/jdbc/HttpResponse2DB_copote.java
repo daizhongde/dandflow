@@ -131,8 +131,10 @@ public class HttpResponse2DB_copote {
 	 * 更新员工数据步骤
 	 * 1、爬虫数据覆盖 tool.t_copote_employee_1
 	 * 2、删除 tool.t_copote_employee_1中这两条错误数据 uin IN (2611879785,2618234849)
-	 * 3、把新入职的员工写入员工表
-	 * 4、把员工表中增量更新的写入用户表
+	 * 3、从员工表中删除源（新数据）与目标（员工）同邮箱不同id的数据 。在员工表中存在的邮箱但 uin 不一致的数据（一般为离职后入职的员工，或新入职的与已离职的员工同姓名的场景）
+	 * 4、把新入职的员工写入员工表
+	 * 5、从用户表中删除源（员工）与目标（用户）同邮箱不同id的数据。在用户表中存在的邮箱但员工表中 uin 与用户表中的 n_uid 不一致的数据（一般为离职后入职的员工，或新入职的与已离职的员工同姓名的场景）
+	 * 6、把员工表中增量更新的写入用户表
 	 * @param jdbcurl 
 	 *           jdbc:mysql://localhost/tool?charset=utf-8&user=root&password=123
 	 *           jdbc:mysql://rm-wz92qg5g95kqq74xto.mysql.rds.aliyuncs.com:3306/tool?charset=utf-8&useSSL=true&user=root&password=nStamp_2017
@@ -187,9 +189,13 @@ public class HttpResponse2DB_copote {
 			BackendInfo.msg.put( user.getCUemail(), "清洗数据......");
 //			2、删除 tool.t_copote_employee_1中这两条错误数据 uin IN (2611879785,2618234849)
 			longHaul("DELETE FROM tool.t_copote_employee_1 WHERE uin IN (2611879785,2618234849) and pid=8020083");
+//			3、从员工表中删除源（新数据）与目标（员工）同邮箱不同id的数据 。
+			longHaul("DELETE a.* FROM tool.t_copote_employee a,t_copote_employee_1 b "
+					+ " WHERE a.alias=b.alias AND a.uin<>b.uin ");
+			
 			
 			BackendInfo.msg.put( user.getCUemail(), "更新员工表......");
-//			3、把新入职的员工写入员工表
+//			4、把新入职的员工写入员工表
 			longHaul("INSERT INTO tool.t_copote_employee ("
 					+ "`uin`, `pid`, `name`, `alias`, "
 					+ "`sex`, `pos`, `tel`, `birth`, `slave_alias`, "
@@ -208,7 +214,12 @@ public class HttpResponse2DB_copote {
 					+ " ");
 
 			BackendInfo.msg.put( user.getCUemail(), "更新用户表......");
-//			4、把员工表中增量更新的写入用户表
+
+//			5、从用户表中删除源（员工）与目标（用户）同邮箱不同id的数据
+			longHaul("DELETE a.* FROM tool.t_authority_user a,t_copote_employee b "
+					+ " WHERE a.C_UEMAIL=b.alias AND a.n_uid<>b.uin  ");
+			
+//			6、把员工表中增量更新的写入用户表
 			ret = longHaul2("INSERT INTO `t_authority_user`(`N_UID`, `C_ULOGNAME`, `C_UNAME`, `C_UPASSWORD`, `C_USEX`,"
 					+ " `EMPLOYEE_NUMBER`, `SUPERVISOR_ID`, `C_UPHONE`, `C_UTEL`, `C_UFAX`, "
 					+ " `C_UEMAIL`, `C_UQQ`, `C_UADDR`, `C_UNOTE`, `N_IID`, "
@@ -278,7 +289,7 @@ public class HttpResponse2DB_copote {
 				8025053L,8025063L,1102011041L,9580384L,8030576L};
 		List<Long> l = Arrays.asList(arr);
 		
-		String cookies ="CCSHOW=0000; qm_authimgs_id=1; qm_verifyimagesession=h01737d1aa54a74c8ccc286ad8abacf286eb701ac753b4e4ff7144e780e8428d30097e6c0594712a73c; qqmail_alias=daizhongde@copote.com; tinfo=1565444248.0000*; qm_flag=0; qqmail_alias=daizhongde@copote.com; sid=683050631&ea565d30d7490670c474a122134feed6,c2WYKok7jUN0.; qm_sid=ea565d30d7490670c474a122134feed6,c2WYKok7jUN0.; qm_username=683050631; biz_username=683050631; ssl_edition=sail.qq.com; username=683050631&683050631; pcache=5814fa06ef1bb81MTU2ODAzNjI0OA@683050631@2; qylevel=3; qm_sk=683050631&yKamb4b5; qm_ssum=683050631&075beaeb8cefc1bd97ae67e36f9116cc";
+		String cookies ="CCSHOW=0000; qqmail_alias=daizhongde@copote.com; pcache=7b220c62d32f0d6MTU3MTk4MDY5OA@683050631@2; tinfo=1569506131.0000*; qm_flag=0; qqmail_alias=daizhongde@copote.com; sid=683050631&b64bfe18701d521caa9d4abe7d6ef468,c2WYKousdPkQ.; qm_sid=b64bfe18701d521caa9d4abe7d6ef468,c2WYKousdPkQ.; qm_username=683050631; biz_username=683050631; ssl_edition=sail.qq.com; qylevel=3; qm_sk=683050631&yKamb4b5; qm_ssum=683050631&46c9813c22650ec6e22026a73aa8b273";
 		
 		int affectrow=-1;
 		try{

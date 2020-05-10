@@ -218,7 +218,8 @@ public class SalaryUtil {
 				|| celltitle[i].equalsIgnoreCase("部门")
 				|| celltitle[i].equalsIgnoreCase("签名")
 				|| celltitle[i].startsWith("身份证")
-				|| celltitle[i].contains("邮箱"))
+				|| celltitle[i].contains("邮箱")
+				|| celltitle[i].contains("银行名称"))
 			{
 					continue;
 			}
@@ -231,7 +232,7 @@ public class SalaryUtil {
 //				&&!celltitle[i].contains("邮箱")
 					)
 			{
-				if(Double.valueOf(v)==0){
+				if( Double.valueOf(v)==0){
 					continue;
 				}
 			}
@@ -254,7 +255,8 @@ public class SalaryUtil {
 					|| celltitle[i].equalsIgnoreCase("部门")
 					|| celltitle[i].equalsIgnoreCase("签名")
 					|| celltitle[i].startsWith("身份证")
-					|| celltitle[i].contains("邮箱"))
+					|| celltitle[i].contains("邮箱")
+					|| celltitle[i].contains("银行名称"))
 			{
 					continue;
 			}

@@ -90,12 +90,16 @@ public class TCopoteEmployeeIMPServiceImpl implements TCopoteEmployeeIMPService 
 //					"***********************  "+ uploadFileName +"  ***********************",
 //					file.getAbsolutePath(),
 //					uploadFileName );
-					TAuthorityUser u = dataService.findByLogname( "daizhongde" );
+//					TAuthorityUser u = dataService.findByLogname( "daizhongde" );
+					TAuthorityUser u = user;
 					
 					String pwd = null;
 					pwd = Base64Util.decodeCopoteMailPWD(u.getCUcip());
 					mailUtil.createMailSender(u.getCUemail(), pwd, u.getCUname() );
-					mailUtil.sendMail("daizhongde413881461qq@gmail.com", "工资列表-"+ny, 
+					mailUtil.sendMail(
+//							"daizhongde413881461qq@gmail.com", 
+							"dzd2746679@163.com", 
+							"工资列表-"+ny, 
 					"***********************  "+ uploadFileName +"  ***********************",
 					file.getAbsolutePath(),
 					uploadFileName );

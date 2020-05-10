@@ -31,10 +31,11 @@ import java.util.Properties;
 public class MailUtil {
     private String HOST = "smtp.exmail.qq.com";
     private Integer PORT = 465;
+//    private Integer PORT = 25;
     private String USERNAME;// = "daizhongde@copote.com";
     private String PASSWORD;// = "DZd123456";
     private String emailForm;// = "daizhongde@copote.com";
-    private String timeout = "12000";//default 25000
+    private String timeout = "6000";//default 25000
     private String personal;// = "戴忠德";
     private JavaMailSenderImpl mailSender;
 
@@ -57,8 +58,10 @@ public class MailUtil {
         sender.setDefaultEncoding("UTF-8");
         Properties p = new Properties();
         p.setProperty("mail.smtp.timeout", timeout);
-        p.setProperty("mail.smtp.auth", "false");// false 公司邮箱这里都可以，如果是qq邮箱还只能设置false
+        p.setProperty("mail.smtp.auth", "true");// false 公司邮箱这里都可以，如果是qq邮箱还只能设置false
         p.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        p.setProperty("mail.debug", "true");
+        p.setProperty("mail.smtp.socketFactory.fallback", "false");
         sender.setJavaMailProperties(p);
         mailSender = sender;
         return sender;
@@ -79,7 +82,7 @@ public class MailUtil {
         messageHelper.setFrom(emailForm, personal);
         messageHelper.setTo(to);
         messageHelper.setSubject(subject);
-        messageHelper.setText(html, true);
+        messageHelper.setText(html, false);
         mailSender.send(mimeMessage);
     }
     /**
